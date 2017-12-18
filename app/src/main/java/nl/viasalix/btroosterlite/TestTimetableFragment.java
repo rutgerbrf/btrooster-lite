@@ -146,7 +146,7 @@ public class TestTimetableFragment extends Fragment {
                 .appendQueryParameter("code", code)
                 .appendQueryParameter("locatie", locatie)
                 .appendQueryParameter("type", "leerlingen")
-                .appendQueryParameter("toetsweek", "TW1");
+                .appendQueryParameter("toetsweek", "TW2");
         String url = builder.build().toString();
 
         webView.loadUrl(url);
