@@ -31,6 +31,7 @@
         android:minHeight="?android:attr/actionBarSize"
         android:theme="@style/Theme.AppCompat.Light"
         app:popupTheme="@style/Base.Theme.AppCompat.Light"
+        app:titleMarginStart="16dp"
         app:contentInsetEnd="0dp"
         app:contentInsetLeft="0dp"
         app:contentInsetRight="0dp"

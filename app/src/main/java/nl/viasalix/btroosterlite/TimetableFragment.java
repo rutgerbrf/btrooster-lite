@@ -66,7 +66,7 @@ public class TimetableFragment extends Fragment {
 
     // Locaties
     String[] locaties = {
-            "Goes",
+            "Goes Klein Frankrijk",
             "Goes Noordhoeklaan",
             "Goes Stationspark",
             "Krabbendijke Appelstraat",

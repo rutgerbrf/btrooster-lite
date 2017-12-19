@@ -62,6 +62,7 @@ public class CUPFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_cup, container, false);
         webView = (WebView) view.findViewById(R.id.web_view);
 
+        webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
              @Override
              public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
