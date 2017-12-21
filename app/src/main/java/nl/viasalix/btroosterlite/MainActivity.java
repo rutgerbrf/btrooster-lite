@@ -29,6 +29,7 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 
 public class MainActivity extends AppCompatActivity {
+    Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +51,17 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setForceTint(true);
         bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
         bottomNavigation.setCurrentItem(0);
+        bottomNavigation.setTranslucentNavigationEnabled(false);
 
         tabSelected(bottomNavigation.getCurrentItem(), false);
+
+        if (currentFragment instanceof TimetableFragment) {
+            bottomNavigation.setCurrentItem(0);
+        } else if (currentFragment instanceof CUPFragment) {
+            bottomNavigation.setCurrentItem(1);
+        } else if (currentFragment instanceof TestTimetableFragment) {
+            bottomNavigation.setCurrentItem(2);
+        }
 
         bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
@@ -82,28 +92,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void launchTimetableFragment() {
-        Fragment timetableFragment = new TimetableFragment();
+        currentFragment = new TimetableFragment();
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, timetableFragment);
+        fragmentTransaction.replace(R.id.fragment_container, currentFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
     private void launchCUPFragment() {
-        Fragment cupFragment = new CUPFragment();
+        currentFragment = new CUPFragment();
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, cupFragment);
+        fragmentTransaction.replace(R.id.fragment_container, currentFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
     private void launchTestTimetableFragment() {
-        Fragment testTimetableFragment = new TestTimetableFragment();
+        currentFragment = new TestTimetableFragment();
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, testTimetableFragment);
+        fragmentTransaction.replace(R.id.fragment_container, currentFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
