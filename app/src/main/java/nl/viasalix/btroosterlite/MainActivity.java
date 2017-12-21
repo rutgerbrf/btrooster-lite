@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setForceTint(true);
         bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
         bottomNavigation.setCurrentItem(0);
-        bottomNavigation.setTranslucentNavigationEnabled(false);
 
         tabSelected(bottomNavigation.getCurrentItem(), false);
 
