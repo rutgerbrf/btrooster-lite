@@ -32,7 +32,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -292,7 +291,7 @@ public class TimetableFragment extends Fragment {
         }
 
         if (!sharedPreferences.contains("location")) {
-            showLocatieDialog();
+            showLocationDialog();
             return 1;
         }
 
@@ -349,7 +348,7 @@ public class TimetableFragment extends Fragment {
         builder.show();
     }
 
-    private void showLocatieDialog() {
+    private void showLocationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Locatie");
 

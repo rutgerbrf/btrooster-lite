@@ -207,9 +207,12 @@ public class TestTimetableFragment extends Fragment {
     }
 
     private void handleResponse(String response) {
-        String[] responses = response.split("\n");
-
+        availableTestweeks.clear();
+        availableTestweeksNames.clear();
+        
         int i = 0;
+
+        String[] responses = response.split("\n");
 
         for (String responseString : responses) {
             if (responseString.trim().length() > 0) {
