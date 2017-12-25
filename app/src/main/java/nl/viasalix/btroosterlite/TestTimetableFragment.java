@@ -171,8 +171,6 @@ public class TestTimetableFragment extends Fragment {
     }
 
     private void getIndexes() {
-        Log.d("online", Boolean.toString(online()));
-
         if (online()) {
             RequestQueue queue = Volley.newRequestQueue(getActivity());
             Uri.Builder builder = new Uri.Builder();

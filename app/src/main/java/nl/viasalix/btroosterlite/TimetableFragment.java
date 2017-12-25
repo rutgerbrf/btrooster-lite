@@ -96,7 +96,7 @@ public class TimetableFragment extends Fragment {
 
     // Opslag 'roostercode', location en type
     String code = "";
-    String locatie = "";
+    String location = "";
     String type = "";
 
     // Vorige week, deze week, etc.
@@ -266,19 +266,23 @@ public class TimetableFragment extends Fragment {
         }
 
         // Ervoor zorgen dat week niet boven 52 uit komt
-        if (week > 52) {
-            week -= 52;
-        }
+        if (week > 52) week -= 52;
 
         String typeString;
         typeString = getType(code);
 
-        String requestString = "https://btrfrontend.appspot.com/RoosterEmbedServlet" +
-                "?type=" + typeString + "&location=" + locatie + "&code=" + code + "&week=" + week;
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("https")
+                .authority("btrfrontend.appspot.com")
+                .appendPath("RoosterEmbedServlet")
+                .appendQueryParameter("type", typeString)
+                .appendQueryParameter("locatie", location)
+                .appendQueryParameter("code", code)
+                .appendQueryParameter("week", Integer.toString(week));
 
-        Log.d("url", requestString);
+        String url = builder.build().toString();
 
-        webView.loadUrl(requestString);
+        webView.loadUrl(url);
     }
 
     private int loadSharedPreferences() {
@@ -294,11 +298,10 @@ public class TimetableFragment extends Fragment {
 
         code = sharedPreferences.getString("code", "12345");
 
-        locatie = sharedPreferences.getString("location", locaties[0]);
+        location = sharedPreferences.getString("location", locaties[0]);
         type = getType(code);
 
-        String sharedPreferencesInfo = "Code: " + code + ", location: " + locatie + ", type: " + type;
-        Log.v("SharedPreferencesInfo", sharedPreferencesInfo);
+        String sharedPreferencesInfo = "Code: " + code + ", location: " + location + ", type: " + type;
 
         return 0;
     }
