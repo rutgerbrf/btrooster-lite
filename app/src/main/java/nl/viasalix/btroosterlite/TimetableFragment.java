@@ -94,7 +94,7 @@ public class TimetableFragment extends Fragment {
             "Over twee weken"
     };
 
-    // Opslag 'roostercode', locatie en type
+    // Opslag 'roostercode', location en type
     String code = "";
     String locatie = "";
     String type = "";
@@ -265,11 +265,16 @@ public class TimetableFragment extends Fragment {
                 week = week + 2;
         }
 
+        // Ervoor zorgen dat week niet boven 52 uit komt
+        if (week > 52) {
+            week -= 52;
+        }
+
         String typeString;
         typeString = getType(code);
 
         String requestString = "https://btrfrontend.appspot.com/RoosterEmbedServlet" +
-                "?type=" + typeString + "&locatie=" + locatie + "&code=" + code + "&week=" + week;
+                "?type=" + typeString + "&location=" + locatie + "&code=" + code + "&week=" + week;
 
         Log.d("url", requestString);
 
@@ -282,17 +287,17 @@ public class TimetableFragment extends Fragment {
             return 1;
         }
 
-        if (!sharedPreferences.contains("locatie")) {
+        if (!sharedPreferences.contains("location")) {
             showLocatieDialog();
             return 1;
         }
 
         code = sharedPreferences.getString("code", "12345");
 
-        locatie = sharedPreferences.getString("locatie", locaties[0]);
+        locatie = sharedPreferences.getString("location", locaties[0]);
         type = getType(code);
 
-        String sharedPreferencesInfo = "Code: " + code + ", locatie: " + locatie + ", type: " + type;
+        String sharedPreferencesInfo = "Code: " + code + ", location: " + locatie + ", type: " + type;
         Log.v("SharedPreferencesInfo", sharedPreferencesInfo);
 
         return 0;
@@ -348,7 +353,7 @@ public class TimetableFragment extends Fragment {
         builder.setItems(locaties, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                sharedPreferences.edit().putString("locatie", locatiesURL[which]).apply();
+                sharedPreferences.edit().putString("location", locatiesURL[which]).apply();
                 onStart();
             }
         });

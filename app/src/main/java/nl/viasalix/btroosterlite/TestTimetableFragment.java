@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,8 +37,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
@@ -47,7 +60,10 @@ public class TestTimetableFragment extends Fragment {
     SharedPreferences sharedPreferences;
 
     String code;
-    String locatie;
+    String location;
+
+    List<String> availableTestweeks = new ArrayList<>();
+    List<String> availableTestweeksNames = new ArrayList<>();
 
     public TestTimetableFragment() {
         // Required empty public constructor
@@ -70,7 +86,7 @@ public class TestTimetableFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_test_timetable, container, false);
-        webView = (WebView) view.findViewById(R.id.web_view);
+        webView = view.findViewById(R.id.web_view);
         return view;
     }
 
@@ -84,7 +100,7 @@ public class TestTimetableFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_reload:
-                loadTestTimetable();
+                loadTestTimetable(true);
                 return true;
             case R.id.action_settings:
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
@@ -104,19 +120,18 @@ public class TestTimetableFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Toetsrooster");
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         code = sharedPreferences.getString("code", "12345");
-        locatie = sharedPreferences.getString("locatie", "Goes");
+        location = sharedPreferences.getString("location", "Goes");
 
-        loadTestTimetable();
+        loadTestTimetable(true);
     }
 
     private boolean online() {
@@ -126,7 +141,7 @@ public class TestTimetableFragment extends Fragment {
         return (networkInfo != null && networkInfo.isConnected());
     }
 
-    private void loadTestTimetable() {
+    private void loadTestTimetable(boolean getIndexes) {
         webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
 
         if (online()) {
@@ -135,20 +150,92 @@ public class TestTimetableFragment extends Fragment {
             webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         }
 
-        getTestTimetable();
+        if (getIndexes) getIndexes();
+        else            getTestTimetable();
     }
 
     private void getTestTimetable() {
+        int weekChange = sharedPreferences.getInt("tt_weekChange", 0);
+
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("https")
                 .authority("btrfrontend.appspot.com")
                 .appendPath("ToetsroosterEmbedServlet")
                 .appendQueryParameter("code", code)
-                .appendQueryParameter("locatie", locatie)
+                .appendQueryParameter("location", location)
                 .appendQueryParameter("type", "leerlingen")
-                .appendQueryParameter("toetsweek", "TW2");
+                .appendQueryParameter("toetsweek", availableTestweeks.get(weekChange));
         String url = builder.build().toString();
 
         webView.loadUrl(url);
+    }
+
+    private void getIndexes() {
+        Log.d("online", Boolean.toString(online()));
+
+        if (online()) {
+            RequestQueue queue = Volley.newRequestQueue(getActivity());
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme("https")
+                    .authority("btrfrontend.appspot.com")
+                    .appendPath("ToetsroosterEmbedServlet")
+                    .appendQueryParameter("indexOphalen", "1")
+                    .appendQueryParameter("location", location);
+            String url = builder.build().toString();
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            sharedPreferences.edit().putString("tt_indexes", response).apply();
+                            handleResponse(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("error", error.getMessage());
+                }
+            });
+
+            queue.add(stringRequest);
+        } else {
+            String response = sharedPreferences.getString("tt_indexes", null);
+            handleResponse(response);
+            getTestTimetable();
+        }
+    }
+
+    private void handleResponse(String response) {
+        String[] responses = response.split("\n");
+
+        int i = 0;
+
+        for (String responseString : responses) {
+            if (responseString.trim().length() > 0) {
+                String[] responseStringSplit = responseString.split("\\|", 2);
+
+                availableTestweeks.add(i, responseStringSplit[0]);
+                availableTestweeksNames.add(i, responseStringSplit[1]);
+                ++i;
+            }
+        }
+
+        Spinner weekSpinner = getActivity().findViewById(R.id.tt_week_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, availableTestweeksNames);
+        weekSpinner.setAdapter(adapter);
+
+        weekSpinner.setSelection(sharedPreferences.getInt("tt_weekChange", 1));
+
+        weekSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                sharedPreferences.edit().putInt("tt_weekChange", position).apply();
+
+                loadTestTimetable(false);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
     }
 }

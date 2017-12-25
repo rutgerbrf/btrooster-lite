@@ -35,7 +35,15 @@
         app:contentInsetEnd="0dp"
         app:contentInsetLeft="0dp"
         app:contentInsetRight="0dp"
-        app:contentInsetStart="0dp" />
+        app:contentInsetStart="0dp">
+
+        <Spinner
+            android:id="@+id/tt_week_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp" />
+
+    </android.support.v7.widget.Toolbar>
 
     <WebView
         android:id="@+id/web_view"
