@@ -162,7 +162,7 @@ public class TestTimetableFragment extends Fragment {
                 .authority("btrfrontend.appspot.com")
                 .appendPath("ToetsroosterEmbedServlet")
                 .appendQueryParameter("code", code)
-                .appendQueryParameter("location", location)
+                .appendQueryParameter("locatie", location)
                 .appendQueryParameter("type", "leerlingen")
                 .appendQueryParameter("toetsweek", availableTestweeks.get(weekChange));
         String url = builder.build().toString();
@@ -178,14 +178,17 @@ public class TestTimetableFragment extends Fragment {
                     .authority("btrfrontend.appspot.com")
                     .appendPath("ToetsroosterEmbedServlet")
                     .appendQueryParameter("indexOphalen", "1")
-                    .appendQueryParameter("location", location);
+                    .appendQueryParameter("locatie", location);
             String url = builder.build().toString();
+
+            Log.d("url built", url);
 
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             sharedPreferences.edit().putString("tt_indexes", response).apply();
+                            Log.d("or", response);
                             handleResponse(response);
                         }
                     }, new Response.ErrorListener() {
