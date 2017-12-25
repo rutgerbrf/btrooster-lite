@@ -32,6 +32,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,23 +46,22 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class TimetableFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
-
-    private enum e_WEEKCHANGE {
-        YWEEK,  // Yestwerweek
-        TWEEK,  // This week
-        NWEEK,  // Next week
-        ANWEEK  // After next week
-    }
 
     // Locaties
     String[] locaties = {
@@ -85,21 +85,14 @@ public class TimetableFragment extends Fragment {
             "Tholen",
     };
 
-    // Mogelijkheden om uit te selecteren
-    String[] weekMogelijkheden = {
-            "Vorige week",
-            "Deze week",
-            "Volgende week",
-            "Over twee weken"
-    };
-
     // Opslag 'roostercode', location en type
     String code = "";
     String location = "";
     String type = "";
 
-    // Vorige week, deze week, etc.
-    e_WEEKCHANGE weekChange = e_WEEKCHANGE.TWEEK;
+    // Variabelen om beschikbare weken weer te geven
+    List<String> availableWeeks = new ArrayList<>();
+    List<String> availableWeeksNames = new ArrayList<>();
 
     // Initialiseer benodigde variabelen
     SharedPreferences sharedPreferences;
@@ -127,11 +120,21 @@ public class TimetableFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    private boolean online() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = null;
+        if (connectivityManager != null) {
+            networkInfo = connectivityManager.getActiveNetworkInfo();
+        }
+
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_reload:
-                loadTimetable();
+                loadTimetable(true);
                 return true;
             case R.id.action_settings:
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
@@ -152,7 +155,7 @@ public class TimetableFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_timetable, container, false);
-        webView = (WebView) view.findViewById(R.id.web_view);
+        webView = view.findViewById(R.id.web_view);
         return view;
     }
 
@@ -160,7 +163,7 @@ public class TimetableFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
@@ -172,116 +175,8 @@ public class TimetableFragment extends Fragment {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        if (loadSharedPreferences() == 0) {
-            setWeekChangePosition(
-                    sharedPreferences.getInt("weekChange", 1)
-            );
-
-            loadTimetable();
-        }
-
-        /**
-         * ?getIndex=1&type=afdelingen
-         *
-         * id | weergavetekst
-         * TW1|TW1\n\r
-         * TW2|TW2
-         * string.split("|", 2);
-         */
-
-        Spinner weekSpinner = (Spinner) getActivity().findViewById(R.id.week_spinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, weekMogelijkheden);
-        weekSpinner.setAdapter(adapter);
-
-        weekSpinner.setSelection(sharedPreferences.getInt("weekChange", 1));
-
-        weekSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                setWeekChangePosition(position);
-                sharedPreferences.edit().putInt("weekChange", position).apply();
-
-                loadTimetable();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {}
-        });
-    }
-
-    private void setWeekChangePosition(int position) {
-        switch(position) {
-            case 0:
-                weekChange = e_WEEKCHANGE.YWEEK;
-                break;
-            case 1:
-                weekChange = e_WEEKCHANGE.TWEEK;
-                break;
-            case 2:
-                weekChange = e_WEEKCHANGE.NWEEK;
-                break;
-            case 3:
-                weekChange = e_WEEKCHANGE.ANWEEK;
-        }
-    }
-
-    private void loadTimetable() {
-        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-
-        if (online()) {
-            webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-        } else {
-            webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        }
-
-        getTimetable();
-    }
-
-    private boolean online() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-
-        return (networkInfo != null && networkInfo.isConnected());
-    }
-
-    private void getTimetable() {
-        Calendar calendar = Calendar.getInstance();
-        Date time = new Date();
-        calendar.setTime(time);
-
-        int week = calendar.get(Calendar.WEEK_OF_YEAR);
-
-        switch (weekChange) {
-            case YWEEK:
-                week --;
-                break;
-            case TWEEK:
-                break;
-            case NWEEK:
-                week ++;
-                break;
-            case ANWEEK:
-                week = week + 2;
-        }
-
-        // Ervoor zorgen dat week niet boven 52 uit komt
-        if (week > 52) week -= 52;
-
-        String typeString;
-        typeString = getType(code);
-
-        Uri.Builder builder = new Uri.Builder();
-        builder.scheme("https")
-                .authority("btrfrontend.appspot.com")
-                .appendPath("RoosterEmbedServlet")
-                .appendQueryParameter("type", typeString)
-                .appendQueryParameter("locatie", location)
-                .appendQueryParameter("code", code)
-                .appendQueryParameter("week", Integer.toString(week));
-
-        String url = builder.build().toString();
-
-        webView.loadUrl(url);
+        if (loadSharedPreferences() != 1)
+            loadTimetable(true);
     }
 
     private int loadSharedPreferences() {
@@ -299,8 +194,6 @@ public class TimetableFragment extends Fragment {
 
         location = sharedPreferences.getString("location", locaties[0]);
         type = getType(code);
-
-        String sharedPreferencesInfo = "Code: " + code + ", location: " + location + ", type: " + type;
 
         return 0;
     }
@@ -383,18 +276,109 @@ public class TimetableFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void loadTimetable(boolean getIndexes) {
+        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+
+        if (online()) {
+            webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        } else {
+            webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        }
+
+        if (getIndexes) getIndexes();
+        else            getTimetable();
+    }
+
+    private void getTimetable() {
+        int weekChange = sharedPreferences.getInt("t_weekChange", 0);
+
+        String typeString = getType(code);
+
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("https")
+                .authority(MainActivity.AUTHORITY)
+                .appendPath("RoosterEmbedServlet")
+                .appendQueryParameter("code", code)
+                .appendQueryParameter("locatie", location)
+                .appendQueryParameter("type", typeString)
+                .appendQueryParameter("week", availableWeeks.get(weekChange));
+        String url = builder.build().toString();
+
+        webView.loadUrl(url);
+    }
+
+    private void getIndexes() {
+        if (online()) {
+            RequestQueue queue = Volley.newRequestQueue(getActivity());
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme("https")
+                    .authority(MainActivity.AUTHORITY)
+                    .appendPath("RoosterEmbedServlet")
+                    .appendQueryParameter("indexOphalen", "1")
+                    .appendQueryParameter("locatie", location);
+            String url = builder.build().toString();
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            sharedPreferences.edit().putString("t_indexes", response).apply();
+                            Log.d("or", response);
+                            handleResponse(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("error", error.getMessage());
+                }
+            });
+
+            queue.add(stringRequest);
+        } else {
+            String response = sharedPreferences.getString("t_indexes", null);
+            handleResponse(response);
+            getTimetable();
+        }
+    }
+
+    private void handleResponse(String response) {
+        availableWeeks.clear();
+        availableWeeksNames.clear();
+
+        int i = 0;
+
+        String[] responses = response.split("\n");
+
+        for (String responseString : responses) {
+            if (responseString.trim().length() > 0) {
+                String[] responseStringSplit = responseString.split("\\|", 2);
+
+                availableWeeks.add(i, responseStringSplit[0]);
+                availableWeeksNames.add(i, responseStringSplit[1]);
+                ++i;
+            }
+        }
+
+        Spinner weekSpinner = getActivity().findViewById(R.id.week_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, availableWeeksNames);
+        weekSpinner.setAdapter(adapter);
+
+        weekSpinner.setSelection(sharedPreferences.getInt("t_weekChange", 1));
+
+        weekSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                sharedPreferences.edit().putInt("t_weekChange", position).apply();
+
+                loadTimetable(false);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
     }
 }

@@ -69,7 +69,6 @@ public class TestTimetableFragment extends Fragment {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static TestTimetableFragment newInstance() {
         TestTimetableFragment fragment = new TestTimetableFragment();
         return fragment;
@@ -136,7 +135,10 @@ public class TestTimetableFragment extends Fragment {
 
     private boolean online() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo networkInfo = null;
+        if (connectivityManager != null) {
+            networkInfo = connectivityManager.getActiveNetworkInfo();
+        }
 
         return (networkInfo != null && networkInfo.isConnected());
     }
@@ -159,7 +161,7 @@ public class TestTimetableFragment extends Fragment {
 
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("https")
-                .authority("btrfrontend.appspot.com")
+                .authority(MainActivity.AUTHORITY)
                 .appendPath("ToetsroosterEmbedServlet")
                 .appendQueryParameter("code", code)
                 .appendQueryParameter("locatie", location)
@@ -175,7 +177,7 @@ public class TestTimetableFragment extends Fragment {
             RequestQueue queue = Volley.newRequestQueue(getActivity());
             Uri.Builder builder = new Uri.Builder();
             builder.scheme("https")
-                    .authority("btrfrontend.appspot.com")
+                    .authority(MainActivity.AUTHORITY)
                     .appendPath("ToetsroosterEmbedServlet")
                     .appendQueryParameter("indexOphalen", "1")
                     .appendQueryParameter("locatie", location);

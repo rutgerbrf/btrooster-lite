@@ -31,6 +31,8 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 public class MainActivity extends AppCompatActivity {
     Fragment currentFragment;
 
+    public static final String AUTHORITY = "1-dot-0-dot-btrfrontend.appspot.com";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
