@@ -34,7 +34,7 @@
             android:key="t_preload"
             android:defaultValue="false"
             android:title="Roosters van te voren laden"
-            android:summary="Roosters van beschibare weken van te voren laden (bij WiFi)" />
+            android:summary="Roosters van beschikbare weken van tevoren laden (bij WiFi)" />
         <SwitchPreference
             android:key="t_preload_only_wifi"
             android:defaultValue="true"
