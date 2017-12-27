@@ -155,7 +155,7 @@ public class TestTimetableFragment extends Fragment {
         }
 
         if (getIndexes) getIndexes();
-        else            getTestTimetable();
+        else getTestTimetable();
     }
 
     private void getTestTimetable() {
@@ -234,7 +234,8 @@ public class TestTimetableFragment extends Fragment {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {}
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
         });
     }
 }

@@ -64,10 +64,10 @@ public class CUPFragment extends Fragment {
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
-             @Override
-             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                 return false;
-             }
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return false;
+            }
         });
 
         return view;

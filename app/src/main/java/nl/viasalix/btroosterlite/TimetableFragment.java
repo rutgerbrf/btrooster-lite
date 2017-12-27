@@ -72,10 +72,7 @@ import java.util.regex.Pattern;
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class TimetableFragment extends Fragment {
-    private OnFragmentInteractionListener mListener;
-
     Spinner weekSpinner;
-
     // Locaties
     String[] locaties = {
             "Goes Klein Frankrijk",
@@ -86,7 +83,6 @@ public class TimetableFragment extends Fragment {
             "Middelburg",
             "Tholen"
     };
-
     // Locaties die in de request URL moeten te komen staan
     String[] locatiesURL = {
             "Goes",
@@ -97,26 +93,31 @@ public class TimetableFragment extends Fragment {
             "Middelburg",
             "Tholen",
     };
-
     // Opslag 'roostercode', location en type
     String code = "";
     String location = "";
     String type = "";
-
     // Variabelen om beschikbare weken weer te geven
     List<String> availableWeeks = new ArrayList<>();
     List<String> availableWeeksNames = new ArrayList<>();
-
     // Initialiseer benodigde variabelen
     SharedPreferences sharedPreferences;
     View view;
     WebView webView;
     WebView webViewPL;
-
     Stack<String> pagesToLoad = new Stack<>();
+    private OnFragmentInteractionListener mListener;
 
     public TimetableFragment() {
         // Lege constructor is nodig om een fragment te kunnen gebruiken
+    }
+
+    private static int getPixelValue(Context context, int dimenId) {
+        Resources resources = context.getResources();
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dimenId,
+                resources.getDisplayMetrics());
     }
 
     @Override
@@ -240,14 +241,6 @@ public class TimetableFragment extends Fragment {
         return "none";
     }
 
-    private static int getPixelValue(Context context, int dimenId) {
-        Resources resources = context.getResources();
-        return (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                dimenId,
-                resources.getDisplayMetrics());
-    }
-
     private void showCodeDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Code");
@@ -289,7 +282,8 @@ public class TimetableFragment extends Fragment {
         builder.setTitle("Locatie");
         CharSequence items[] = locaties;
 
-        builder.setSingleChoiceItems(items, -1, (dialog, which) -> {});
+        builder.setSingleChoiceItems(items, -1, (dialog, which) -> {
+        });
 
         builder.setPositiveButton("OK", (dialog, which) -> {
             int selectedPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
@@ -318,9 +312,6 @@ public class TimetableFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    interface OnFragmentInteractionListener {
     }
 
     private void loadTimetable(boolean getIndexes) {
@@ -484,5 +475,8 @@ public class TimetableFragment extends Fragment {
                 }
             });
         }
+    }
+
+    interface OnFragmentInteractionListener {
     }
 }
