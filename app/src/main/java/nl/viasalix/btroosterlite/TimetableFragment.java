@@ -41,6 +41,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.webkit.WebViewDatabase;
+import android.webkit.WebViewFragment;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -52,10 +55,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.annimon.stream.Stream;
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Pattern;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
@@ -98,6 +105,9 @@ public class TimetableFragment extends Fragment {
     SharedPreferences sharedPreferences;
     View view;
     WebView webView;
+    WebView webViewPL;
+
+    Stack<String> pagesToLoad = new Stack<>();
 
     public TimetableFragment() {
         // Lege constructor is nodig om een fragment te kunnen gebruiken
@@ -130,6 +140,17 @@ public class TimetableFragment extends Fragment {
         return (networkInfo != null && networkInfo.isConnected());
     }
 
+    private boolean mobileIsConnected() {
+        final ConnectivityManager connMgr = (ConnectivityManager)
+                getActivity().getSystemService(CONNECTIVITY_SERVICE);
+        final android.net.NetworkInfo mobile = connMgr.getNetworkInfo(
+                ConnectivityManager.TYPE_MOBILE);
+
+        if (mobile.isConnected()) return true;
+
+        return false;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -156,6 +177,7 @@ public class TimetableFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_timetable, container, false);
         webView = view.findViewById(R.id.web_view);
+        webViewPL = view.findViewById(R.id.web_view_preload);
         return view;
     }
 
@@ -289,13 +311,53 @@ public class TimetableFragment extends Fragment {
             webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         }
 
-        if (getIndexes) getIndexes();
-        else            getTimetable();
+        if (getIndexes) {
+            getIndexes();
+        } else {
+            getTimetable(sharedPreferences.getString("t_week", Integer.toString(getCurrentWeekOfYear())));
+            if (sharedPreferences.getBoolean("t_preload", false)) {
+                boolean onlyWifiPref = sharedPreferences.getBoolean("t_preload_only_wifi", true);
+
+                if (online()) {
+                    if (mobileIsConnected() != onlyWifiPref) {
+                        preloadTimetables();
+                    }
+                }
+            } else {
+                webViewPL.destroy();
+            }
+        }
+
+
     }
 
-    private void getTimetable() {
-        int weekChange = sharedPreferences.getInt("t_weekChange", 0);
+    private void preloadTimetables() {
+        pagesToLoad.empty();
 
+        Stream.of(availableWeeks).forEach(it -> {
+                pagesToLoad.push(
+                        buildTimetableURL(it)
+                );
+            }
+        );
+
+        class PreloadClient extends WebViewClient {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (!pagesToLoad.isEmpty()) {
+                    view.loadUrl(pagesToLoad.pop());
+                }
+            }
+        }
+
+        PreloadClient client = new PreloadClient();
+        webViewPL.setWebViewClient(client);
+
+        webViewPL.loadUrl(pagesToLoad.pop());
+    }
+
+    private String buildTimetableURL(String week) {
         String typeString = getType(code);
 
         Uri.Builder builder = new Uri.Builder();
@@ -305,10 +367,14 @@ public class TimetableFragment extends Fragment {
                 .appendQueryParameter("code", code)
                 .appendQueryParameter("locatie", location)
                 .appendQueryParameter("type", typeString)
-                .appendQueryParameter("week", availableWeeks.get(weekChange));
+                .appendQueryParameter("week", week);
         String url = builder.build().toString();
 
-        webView.loadUrl(url);
+        return url;
+    }
+
+    private void getTimetable(String week) {
+        webView.loadUrl(buildTimetableURL(week));
     }
 
     private void getIndexes() {
@@ -341,44 +407,70 @@ public class TimetableFragment extends Fragment {
         } else {
             String response = sharedPreferences.getString("t_indexes", null);
             handleResponse(response);
-            getTimetable();
+            getTimetable(
+                sharedPreferences.getString(
+                    "t_week",
+                    Integer.toString(
+                        getCurrentWeekOfYear()
+                    )
+                )
+            );
         }
     }
 
+    private int getCurrentWeekOfYear() {
+        Calendar cl = Calendar.getInstance();
+        Log.d("date", Integer.toString(cl.get(cl.WEEK_OF_YEAR)));
+        return cl.get(cl.WEEK_OF_YEAR);
+    }
+
     private void handleResponse(String response) {
-        availableWeeks.clear();
-        availableWeeksNames.clear();
+        if (response != null) {
+            availableWeeks.clear();
+            availableWeeksNames.clear();
 
-        int i = 0;
+            int i = 0;
 
-        String[] responses = response.split("\n");
+            Log.d("response", response);
+            String[] responses = response.split("\n");
 
-        for (String responseString : responses) {
-            if (responseString.trim().length() > 0) {
-                String[] responseStringSplit = responseString.split("\\|", 2);
+            for (String responseString : responses) {
+                if (responseString.trim().length() > 0) {
+                    String[] responseStringSplit = responseString.split("\\|", 2);
 
-                availableWeeks.add(i, responseStringSplit[0]);
-                availableWeeksNames.add(i, responseStringSplit[1]);
-                ++i;
+                    availableWeeks.add(i, responseStringSplit[0]);
+                    availableWeeksNames.add(i, responseStringSplit[1]);
+                    ++i;
+                }
             }
+
+            final Spinner weekSpinner = getActivity().findViewById(R.id.week_spinner);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, availableWeeksNames);
+            weekSpinner.setAdapter(adapter);
+
+            weekSpinner.setSelection(
+                    availableWeeks.indexOf(
+                            sharedPreferences.getString(
+                                    "t_selectedWeek",
+                                    Integer.toString(
+                                            getCurrentWeekOfYear()
+                                    )
+                            )
+                    )
+            );
+
+            weekSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                    sharedPreferences.edit().putString("t_week", availableWeeks.get(position)).apply();
+
+                    loadTimetable(false);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                }
+            });
         }
-
-        Spinner weekSpinner = getActivity().findViewById(R.id.week_spinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, availableWeeksNames);
-        weekSpinner.setAdapter(adapter);
-
-        weekSpinner.setSelection(sharedPreferences.getInt("t_weekChange", 1));
-
-        weekSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                sharedPreferences.edit().putInt("t_weekChange", position).apply();
-
-                loadTimetable(false);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {}
-        });
     }
 }

@@ -183,8 +183,6 @@ public class TestTimetableFragment extends Fragment {
                     .appendQueryParameter("locatie", location);
             String url = builder.build().toString();
 
-            Log.d("url built", url);
-
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                     new Response.Listener<String>() {
                         @Override

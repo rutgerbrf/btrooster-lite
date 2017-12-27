@@ -30,5 +30,17 @@
             android:summary="Locatie van Calvijn College waar je/u les krijgt/geeft"
             android:entries="@array/locatieArray"
             android:entryValues="@array/locatieValues" />
+        <SwitchPreference
+            android:key="t_preload"
+            android:defaultValue="false"
+            android:title="Roosters van te voren laden"
+            android:summary="Roosters van beschibare weken van te voren laden (bij WiFi)" />
+        <SwitchPreference
+            android:key="t_preload_only_wifi"
+            android:defaultValue="true"
+            android:title="Roosters alleen met WiFi van te voren laden"
+            android:summaryOff="Roosters met WiFi en mobiele netwerken van te voren laden"
+            android:summaryOn="Roosters alleen met WiFi van te voren laden"
+            android:dependency="t_preload" />
     </PreferenceCategory>
 </PreferenceScreen>
