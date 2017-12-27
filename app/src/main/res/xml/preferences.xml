@@ -38,8 +38,8 @@
         <SwitchPreference
             android:key="t_preload_only_wifi"
             android:defaultValue="true"
-            android:title="Roosters alleen met WiFi van te voren laden"
-            android:summaryOff="Roosters met WiFi en mobiele netwerken van te voren laden"
+            android:title="Roosters alleen met WiFi van tevoren laden"
+            android:summaryOff="Roosters met WiFi en mobiele netwerken van tevoren laden"
             android:summaryOn="Roosters alleen met WiFi van te voren laden"
             android:dependency="t_preload" />
     </PreferenceCategory>
