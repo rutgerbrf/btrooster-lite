@@ -25,10 +25,10 @@ android {
     buildToolsVersion "27.0.2"
     defaultConfig {
         applicationId "nl.viasalix.btroosterlite"
-        minSdkVersion 17
+        minSdkVersion 15
         targetSdkVersion 25
-        versionCode 12
-        versionName "1.6.0-ALPHA"
+        versionCode 13
+        versionName "1.7.0-ALPHA"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
