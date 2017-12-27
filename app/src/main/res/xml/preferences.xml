@@ -40,7 +40,7 @@
             android:defaultValue="true"
             android:title="Roosters alleen met WiFi van tevoren laden"
             android:summaryOff="Roosters met WiFi en mobiele netwerken van tevoren laden"
-            android:summaryOn="Roosters alleen met WiFi van te voren laden"
+            android:summaryOn="Roosters alleen met WiFi van tevoren laden"
             android:dependency="t_preload" />
     </PreferenceCategory>
 </PreferenceScreen>
