@@ -24,6 +24,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
@@ -89,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void launchTimetableFragment() {
+        currentFragment = null;
         currentFragment = new TimetableFragment();
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -99,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void launchCUPFragment() {
+        currentFragment = null;
         currentFragment = new CUPFragment();
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -108,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void launchTestTimetableFragment() {
+        currentFragment = null;
         currentFragment = new TestTimetableFragment();
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

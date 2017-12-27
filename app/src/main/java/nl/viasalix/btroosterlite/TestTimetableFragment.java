@@ -57,6 +57,7 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
 public class TestTimetableFragment extends Fragment {
     View view;
     WebView webView;
+    Spinner weekSpinner;
     SharedPreferences sharedPreferences;
 
     String code;
@@ -64,6 +65,8 @@ public class TestTimetableFragment extends Fragment {
 
     List<String> availableTestweeks = new ArrayList<>();
     List<String> availableTestweeksNames = new ArrayList<>();
+
+    boolean menuHasLoaded = false;
 
     public TestTimetableFragment() {
         // Required empty public constructor
@@ -81,6 +84,8 @@ public class TestTimetableFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_test_timetable, container, false);
         webView = view.findViewById(R.id.web_view);
+        weekSpinner = view.findViewById(R.id.tt_week_spinner);
+
         return view;
     }
 
@@ -213,9 +218,10 @@ public class TestTimetableFragment extends Fragment {
             }
         }
 
-        Spinner weekSpinner = getActivity().findViewById(R.id.tt_week_spinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, availableTestweeksNames);
         weekSpinner.setAdapter(adapter);
+
+        menuHasLoaded = true;
 
         weekSpinner.setSelection(sharedPreferences.getInt("tt_weekChange", 1));
 

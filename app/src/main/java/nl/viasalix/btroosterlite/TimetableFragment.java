@@ -74,6 +74,8 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
 public class TimetableFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
+    Spinner weekSpinner;
+
     // Locaties
     String[] locaties = {
             "Goes Klein Frankrijk",
@@ -175,6 +177,8 @@ public class TimetableFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_timetable, container, false);
         webView = view.findViewById(R.id.web_view);
         webViewPL = view.findViewById(R.id.web_view_preload);
+        weekSpinner = view.findViewById(R.id.week_spinner);
+
         return view;
     }
 
@@ -288,7 +292,9 @@ public class TimetableFragment extends Fragment {
         builder.setSingleChoiceItems(items, -1, (dialog, which) -> {});
 
         builder.setPositiveButton("OK", (dialog, which) -> {
-            sharedPreferences.edit().putString("location", locatiesURL[which]).apply();
+            int selectedPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+            sharedPreferences.edit().putString("location", locatiesURL[selectedPosition]).apply();
+            Log.d("selected", Integer.toString(selectedPosition));
             onStart();
         });
 
@@ -314,8 +320,7 @@ public class TimetableFragment extends Fragment {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
+    interface OnFragmentInteractionListener {
     }
 
     private void loadTimetable(boolean getIndexes) {
@@ -330,7 +335,9 @@ public class TimetableFragment extends Fragment {
         if (getIndexes) {
             getIndexes();
         } else {
-            getTimetable(sharedPreferences.getString("t_week", Integer.toString(getCurrentWeekOfYear())));
+            getTimetable(
+                    sharedPreferences.getString("t_week",
+                            Integer.toString(getCurrentWeekOfYear())));
             if (sharedPreferences.getBoolean("t_preload", false)) {
                 boolean onlyWifiPref = sharedPreferences.getBoolean("t_preload_only_wifi", true);
 
@@ -450,7 +457,6 @@ public class TimetableFragment extends Fragment {
                 }
             }
 
-            final Spinner weekSpinner = getActivity().findViewById(R.id.week_spinner);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, availableWeeksNames);
             weekSpinner.setAdapter(adapter);
 
