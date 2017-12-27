@@ -1,5 +1,6 @@
 # BTRooster Lite
 [![Licentie: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![GitHub (pre-)release](https://img.shields.io/github/release/RutgerBroekhoff/btrooster-lite/all.svg)](https://github.com/RutgerBroekhoff/btrooster-lite/releases/latest)
 
 <a href='https://play.google.com/store/apps/details?id=nl.viasalix.btroosterlite&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
   <img alt='Ontdek het op Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/nl_badge_web_generic.png' height='100'/>
