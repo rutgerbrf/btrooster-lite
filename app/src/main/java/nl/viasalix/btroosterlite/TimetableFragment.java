@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -32,7 +33,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.text.Layout;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,6 +50,7 @@ import android.webkit.WebViewFragment;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.android.volley.Request;
@@ -113,11 +117,6 @@ public class TimetableFragment extends Fragment {
         // Lege constructor is nodig om een fragment te kunnen gebruiken
     }
 
-    public static TimetableFragment newInstance() {
-        TimetableFragment fragment = new TimetableFragment();
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,9 +145,7 @@ public class TimetableFragment extends Fragment {
         final android.net.NetworkInfo mobile = connMgr.getNetworkInfo(
                 ConnectivityManager.TYPE_MOBILE);
 
-        if (mobile.isConnected()) return true;
-
-        return false;
+        return mobile.isConnected();
     }
 
     @Override
@@ -188,9 +185,10 @@ public class TimetableFragment extends Fragment {
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-        if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
+        if (((AppCompatActivity) getActivity()).getSupportActionBar() != null)
+            ((AppCompatActivity) getActivity())
+                    .getSupportActionBar()
+                    .setDisplayShowTitleEnabled(false);
 
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setDisplayZoomControls(false);
@@ -238,26 +236,45 @@ public class TimetableFragment extends Fragment {
         return "none";
     }
 
+    private static int getPixelValue(Context context, int dimenId) {
+        Resources resources = context.getResources();
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dimenId,
+                resources.getDisplayMetrics());
+    }
+
     private void showCodeDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Code");
 
+        LinearLayout layout = new LinearLayout(getActivity());
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+
+        layout.setLayoutParams(layoutParams);
         final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
+        input.setLayoutParams(layoutParams);
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                sharedPreferences.edit().putString("code", input.getText().toString()).apply();
-                onStart();
-            }
-        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                getActivity().finish();
-                dialog.cancel();
-            }
+        int margin_left_right_bottom = getPixelValue(getActivity(), 24);
+        int margin_top = getPixelValue(getActivity(), 20);
+        layoutParams.setMargins(margin_left_right_bottom,
+                margin_top,
+                margin_left_right_bottom,
+                margin_left_right_bottom);
+
+        layout.addView(input);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            sharedPreferences.edit().putString("code", input.getText().toString()).apply();
+            onStart();
+        }).setNegativeButton("Annuleren", (dialog, which) -> {
+            getActivity().finish();
+            dialog.cancel();
         });
 
         builder.show();
@@ -266,22 +283,21 @@ public class TimetableFragment extends Fragment {
     private void showLocationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Locatie");
+        CharSequence items[] = locaties;
 
-        builder.setItems(locaties, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                sharedPreferences.edit().putString("location", locatiesURL[which]).apply();
-                onStart();
-            }
+        builder.setSingleChoiceItems(items, -1, (dialog, which) -> {});
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            sharedPreferences.edit().putString("location", locatiesURL[which]).apply();
+            onStart();
         });
 
-        builder.show();
-    }
+        builder.setNegativeButton("Annuleren", ((dialog, which) -> {
+            getActivity().finish();
+            dialog.cancel();
+        }));
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+        builder.show();
     }
 
     @Override
@@ -327,18 +343,16 @@ public class TimetableFragment extends Fragment {
                 webViewPL.destroy();
             }
         }
-
-
     }
 
     private void preloadTimetables() {
         pagesToLoad.empty();
 
         Stream.of(availableWeeks).forEach(it -> {
-                pagesToLoad.push(
-                        buildTimetableURL(it)
-                );
-            }
+                    pagesToLoad.push(
+                            buildTimetableURL(it)
+                    );
+                }
         );
 
         class PreloadClient extends WebViewClient {
@@ -389,31 +403,23 @@ public class TimetableFragment extends Fragment {
             String url = builder.build().toString();
 
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            sharedPreferences.edit().putString("t_indexes", response).apply();
-                            Log.d("or", response);
-                            handleResponse(response);
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("error", error.getMessage());
-                }
-            });
+                    response -> {
+                        sharedPreferences.edit().putString("t_indexes", response).apply();
+                        Log.d("or", response);
+                        handleResponse(response);
+                    }, error -> Log.d("error", error.getMessage()));
 
             queue.add(stringRequest);
         } else {
             String response = sharedPreferences.getString("t_indexes", null);
             handleResponse(response);
             getTimetable(
-                sharedPreferences.getString(
-                    "t_week",
-                    Integer.toString(
-                        getCurrentWeekOfYear()
+                    sharedPreferences.getString(
+                            "t_week",
+                            Integer.toString(
+                                    getCurrentWeekOfYear()
+                            )
                     )
-                )
             );
         }
     }

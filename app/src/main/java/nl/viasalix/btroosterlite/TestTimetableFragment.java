@@ -69,11 +69,6 @@ public class TestTimetableFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TestTimetableFragment newInstance() {
-        TestTimetableFragment fragment = new TestTimetableFragment();
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,7 +118,9 @@ public class TestTimetableFragment extends Fragment {
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            ((AppCompatActivity) getActivity())
+                    .getSupportActionBar()
+                    .setDisplayShowTitleEnabled(false);
         }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -184,19 +181,11 @@ public class TestTimetableFragment extends Fragment {
             String url = builder.build().toString();
 
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            sharedPreferences.edit().putString("tt_indexes", response).apply();
-                            Log.d("or", response);
-                            handleResponse(response);
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("error", error.getMessage());
-                }
-            });
+                    response -> {
+                        sharedPreferences.edit().putString("tt_indexes", response).apply();
+                        Log.d("or", response);
+                        handleResponse(response);
+                    }, error -> Log.d("error", error.getMessage()));
 
             queue.add(stringRequest);
         } else {
@@ -225,7 +214,7 @@ public class TestTimetableFragment extends Fragment {
         }
 
         Spinner weekSpinner = getActivity().findViewById(R.id.tt_week_spinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, availableTestweeksNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, availableTestweeksNames);
         weekSpinner.setAdapter(adapter);
 
         weekSpinner.setSelection(sharedPreferences.getInt("tt_weekChange", 1));

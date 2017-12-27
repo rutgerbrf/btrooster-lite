@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
+        AHBottomNavigation bottomNavigation = findViewById(R.id.bottom_navigation);
 
         AHBottomNavigationItem item_timetable = new AHBottomNavigationItem("Rooster", R.drawable.ic_border_all_black_24dp, R.color.colorBottomNavigationPrimary);
         AHBottomNavigationItem item_cup = new AHBottomNavigationItem("CUP", R.drawable.ic_event_black_24dp, R.color.colorBottomNavigationPrimary);
@@ -64,13 +64,10 @@ public class MainActivity extends AppCompatActivity {
             bottomNavigation.setCurrentItem(2);
         }
 
-        bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
-            @Override
-            public boolean onTabSelected(int position, boolean wasSelected) {
-                tabSelected(position, wasSelected);
+        bottomNavigation.setOnTabSelectedListener((position, wasSelected) -> {
+            tabSelected(position, wasSelected);
 
-                return true;
-            }
+            return true;
         });
     }
 
