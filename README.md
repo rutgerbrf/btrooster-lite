@@ -40,4 +40,4 @@ Open het project in Android Studio / IntelliJ en bouw het.
 <br />
 <br />
 <br />
-Google Play en het logo van Google Play zijn handelsmerken van Google LLC.
+__Google Play en het logo van Google Play zijn handelsmerken van Google LLC.__
