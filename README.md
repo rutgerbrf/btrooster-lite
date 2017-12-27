@@ -1,7 +1,9 @@
 # BTRooster Lite
 [![Licentie: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-![Google Play](https://cdn.rawgit.com/steverichey/google-play-badge-svg/266d2b2d/img/nl_get.svg)
+<a href='https://play.google.com/store/apps/details?id=nl.viasalix.btroosterlite&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
+  <img alt='Ontdek het op Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/nl_badge_web_generic.png' height='100'/>
+</a>
 
 BTRooster Lite is een roosterapp gemaakt voor het Calvijn College
 
@@ -35,3 +37,7 @@ Mac:
 
 #### Optie 2
 Open het project in Android Studio / IntelliJ en bouw het.
+<br />
+<br />
+<br />
+Google Play en het logo van Google Play zijn handelsmerken van Google LLC.
