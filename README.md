@@ -10,7 +10,7 @@
 
 BTRooster Lite is een roosterapp gemaakt voor het Calvijn College
 
-### Bouwen (debug APK)
+### Bouwen :hammer: (debug APK)
 Wil je BTRooster Lite zelf bouwen?
 
 Zorg ervoor dat je de Android SDK op je computer hebt staan en je ook weet waar!
