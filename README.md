@@ -1,4 +1,6 @@
-# BTRooster Lite
+# BTRooster Lite :alarm_clock:
+## De open roosterapp met :zap: 
+
 [![Licentie: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![GitHub (pre-)release](https://img.shields.io/github/release/RutgerBroekhoff/btrooster-lite/all.svg)](https://github.com/RutgerBroekhoff/btrooster-lite/releases/latest)
 
