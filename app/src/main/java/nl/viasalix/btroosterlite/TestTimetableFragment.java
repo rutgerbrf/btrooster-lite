@@ -43,8 +43,6 @@ import android.widget.Spinner;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
@@ -122,11 +120,10 @@ public class TestTimetableFragment extends Fragment {
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-        if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+        if (((AppCompatActivity) getActivity()).getSupportActionBar() != null)
             ((AppCompatActivity) getActivity())
                     .getSupportActionBar()
                     .setDisplayShowTitleEnabled(false);
-        }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         code = sharedPreferences.getString("code", "12345");
@@ -138,9 +135,8 @@ public class TestTimetableFragment extends Fragment {
     private boolean online() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = null;
-        if (connectivityManager != null) {
+        if (connectivityManager != null)
             networkInfo = connectivityManager.getActiveNetworkInfo();
-        }
 
         return (networkInfo != null && networkInfo.isConnected());
     }
@@ -148,11 +144,8 @@ public class TestTimetableFragment extends Fragment {
     private void loadTestTimetable(boolean getIndexes) {
         webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
 
-        if (online()) {
-            webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-        } else {
-            webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        }
+        if (online()) webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        else webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
 
         if (getIndexes) getIndexes();
         else getTestTimetable();
@@ -218,7 +211,11 @@ public class TestTimetableFragment extends Fragment {
             }
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, availableTestweeksNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                getActivity(),
+                android.R.layout.simple_spinner_dropdown_item,
+                availableTestweeksNames);
+
         weekSpinner.setAdapter(adapter);
 
         menuHasLoaded = true;

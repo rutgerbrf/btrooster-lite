@@ -18,8 +18,8 @@
 
 package nl.viasalix.btroosterlite;
 
+import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -28,12 +28,10 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.text.Layout;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -45,8 +43,6 @@ import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.webkit.WebViewDatabase;
-import android.webkit.WebViewFragment;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -55,8 +51,6 @@ import android.widget.Spinner;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.annimon.stream.Stream;
@@ -64,7 +58,6 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
@@ -330,7 +323,9 @@ public class TimetableFragment extends Fragment {
                     sharedPreferences.getString("t_week",
                             Integer.toString(getCurrentWeekOfYear())));
             if (sharedPreferences.getBoolean("t_preload", false)) {
-                boolean onlyWifiPref = sharedPreferences.getBoolean("t_preload_only_wifi", true);
+                boolean onlyWifiPref = sharedPreferences.getBoolean(
+                        "t_preload_only_wifi",
+                        true);
 
                 if (online()) {
                     if (mobileIsConnected() != onlyWifiPref) {
@@ -357,9 +352,8 @@ public class TimetableFragment extends Fragment {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                if (!pagesToLoad.isEmpty()) {
+                if (!pagesToLoad.isEmpty())
                     view.loadUrl(pagesToLoad.pop());
-                }
             }
         }
 
@@ -381,6 +375,8 @@ public class TimetableFragment extends Fragment {
                 .appendQueryParameter("type", typeString)
                 .appendQueryParameter("week", week);
         String url = builder.build().toString();
+
+        Log.v("URL built", url);
 
         return url;
     }
@@ -406,7 +402,6 @@ public class TimetableFragment extends Fragment {
                         Log.d("or", response);
                         handleResponse(response);
                     }, error -> Log.d("error", error.getMessage()));
-
             queue.add(stringRequest);
         } else {
             String response = sharedPreferences.getString("t_indexes", null);
@@ -414,10 +409,7 @@ public class TimetableFragment extends Fragment {
             getTimetable(
                     sharedPreferences.getString(
                             "t_week",
-                            Integer.toString(
-                                    getCurrentWeekOfYear()
-                            )
-                    )
+                            Integer.toString(getCurrentWeekOfYear()))
             );
         }
     }
@@ -448,19 +440,18 @@ public class TimetableFragment extends Fragment {
                 }
             }
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, availableWeeksNames);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    getActivity(),
+                    android.R.layout.simple_spinner_dropdown_item,
+                    availableWeeksNames);
+
             weekSpinner.setAdapter(adapter);
 
             weekSpinner.setSelection(
                     availableWeeks.indexOf(
                             sharedPreferences.getString(
                                     "t_week",
-                                    Integer.toString(
-                                            getCurrentWeekOfYear()
-                                    )
-                            )
-                    )
-            );
+                                    Integer.toString(getCurrentWeekOfYear()))));
 
             weekSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
