@@ -25,7 +25,7 @@
             android:title="Code"
             android:summary="Code waarmee leerlingen en docenten en klassen worden ingeroosterd - niet hoofdlettergevoelig" />
         <ListPreference
-            android:key="locatie"
+            android:key="location"
             android:title="Locatie"
             android:summary="Locatie van Calvijn College waar je/u les krijgt/geeft"
             android:entries="@array/locatieArray"
