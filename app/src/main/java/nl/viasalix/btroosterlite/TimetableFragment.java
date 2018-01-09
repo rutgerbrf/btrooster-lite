@@ -454,7 +454,7 @@ public class TimetableFragment extends Fragment {
             weekSpinner.setSelection(
                     availableWeeks.indexOf(
                             sharedPreferences.getString(
-                                    "t_selectedWeek",
+                                    "t_week",
                                     Integer.toString(
                                             getCurrentWeekOfYear()
                                     )
