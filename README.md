@@ -23,12 +23,12 @@ git clone https://github.com/RutgerBroekhoff/btrooster-lite
 ```
 
 #### Optie 1
-! SDK zit al in Android Studio, deze hoef je dus niet apart te downloaden
+__De Android SDK zit al in Android Studio, deze hoef je dus niet apart te downloaden__
 
 Open het project in Android Studio / IntelliJ en bouw het.
 
 #### Optie 2
-! Waarschijnlijk moet je het pad naar je Android SDK als environment variable instellen of in local.properties (sdk.dir=<pad naar SDK>)
+__Waarschijnlijk moet je het pad naar je Android SDK als environment variable instellen of in local.properties (sdk.dir=\<pad naar SDK>)__
 
 Voer een van de volgende commando's uit:
 
@@ -47,4 +47,4 @@ Mac:
 ./gradlew assembleDebug
 ```
 
-Google Play en het logo van Google Play zijn handelsmerken van Google LLC.
+__Google Play en het logo van Google Play zijn handelsmerken van Google LLC.__
