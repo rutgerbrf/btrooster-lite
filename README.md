@@ -16,7 +16,7 @@ Wil je BTRooster Lite zelf bouwen?
 Zorg ervoor dat je de Android SDK op je computer hebt staan en je ook weet waar!
 De app zal anders niet gebouwd kunnen worden.
 
-Clone eerst de repository via IntelliJ of via Git:
+Clone eerst de repository via Android Studio (IntelliJ) of via Git:
 
 ```bash
 git clone https://github.com/RutgerBroekhoff/btrooster-lite
