@@ -18,6 +18,7 @@
  */
 
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.oss.licenses.plugin'
 
 android {
@@ -69,6 +70,14 @@ dependencies {
     compile 'com.google.android.gms:play-services-oss-licenses:11.8.0'
     compile 'com.android.volley:volley:1.1.0'
     compile 'com.annimon:stream:1.1.9'
+    compile 'com.stepstone.stepper:material-stepper:4.3.1'
 
     testCompile 'junit:junit:4.12'
+    compile "org.jetbrains.anko:anko:$anko_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'kotlin-android-extensions'
