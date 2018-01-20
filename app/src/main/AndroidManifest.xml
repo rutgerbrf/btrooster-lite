@@ -46,6 +46,7 @@
             android:theme="@style/Theme.AppCompat.Light" />
         <activity android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
             android:theme="@style/Theme.AppCompat.Light" />
+        <activity android:name=".cupconfig.CUPConfigActivity"></activity>
         <activity android:name=".introduction.IntroductionActivity"></activity>
     </application>
 

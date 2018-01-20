@@ -16,6 +16,8 @@ class CUPConfigAdapter(fm: FragmentManager, context: Context) : AbstractFragment
     override fun createStep(position: Int): Step {
         val step = when (position) {
             0 -> CUPConfigFragment1()
+            1 -> CUPConfigFragment2()
+            2 -> CUPConfigFragment3()
             else -> CUPConfigFragment1()
         } as Fragment
 
@@ -33,5 +35,5 @@ class CUPConfigAdapter(fm: FragmentManager, context: Context) : AbstractFragment
                 .create()
     }
 
-    override fun getCount() = 1
+    override fun getCount() = 3
 }

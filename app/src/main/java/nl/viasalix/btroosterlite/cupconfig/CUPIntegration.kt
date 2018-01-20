@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nl.viasalix.btroosterlite
+package nl.viasalix.btroosterlite.cupconfig
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -24,11 +24,13 @@ import android.preference.PreferenceManager
 import android.util.Base64
 import android.util.Log
 import android.view.View
+import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import nl.viasalix.btroosterlite.MainActivity
 import java.security.InvalidParameterException
 import java.security.SecureRandom
 import java.util.*
@@ -46,6 +48,7 @@ class CUPIntegration(context: Context) {
     private var sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private var availableNames: MutableMap<String, String> = HashMap()
     private val url = "https://" + MainActivity.AUTHORITY + "/CupServlet"
+    private var callbackListener: (Map<String, String>) -> Unit = {}
 
     init {
         if (sharedPreferences.getString("ci_clientKey", "").isBlank()) {
@@ -54,7 +57,9 @@ class CUPIntegration(context: Context) {
             getToken(false)
         }
 
-        createSession()
+        Log.d("CREATESSION", "YO BOI")
+
+//        createSession()
     }
 
     enum class ErrorCode(val code: String) {
@@ -97,10 +102,13 @@ class CUPIntegration(context: Context) {
         if (genClientKey)
             sharedPreferences.edit().putString("ci_clientKey", generateClientKey()).apply()
 
+        Log.d("GETTOKEN", "YE BOI")
+        System.setProperty("http.keepAlive", "false")
+
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
                     handleResponse(response)
-                    Log.d("RESPONSE", response)
+                    Log.d("RESPONSE: GETTOKEN", response)
                 },
                 Response.ErrorListener {
 
@@ -123,6 +131,9 @@ class CUPIntegration(context: Context) {
                                             ""))
         }
 
+        stringRequest.retryPolicy = DefaultRetryPolicy(20 * 1000, 0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+
         queue.add(stringRequest)
     }
 
@@ -135,48 +146,14 @@ class CUPIntegration(context: Context) {
                 Base64.DEFAULT
         ).take(32)
     }
+    
+    fun searchNames(letters: String, callbackListener: (Map<String, String>) -> Unit) {
+        this.callbackListener = callbackListener
 
-    private fun createSession() {
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
                     handleResponse(response)
-                    Log.v("RESP", response)
-                },
-                Response.ErrorListener {
-
-                }) {
-            override fun getBodyContentType() =
-                    "application/x-www-form-urlencoded; charset=UTF-8"
-
-            /**
-             *
-             * Maakt een Map<String, String> van headers in het volgende formaat:
-             * Client-Key=<sp/ci_clientkey>,
-             * Bewaartoken=<sp/ci_preservationToken>
-             *
-             */
-
-            override fun getHeaders(): Map<String, String> =
-                    hashMapOf(
-                            Params.ClientKey.param to
-                                    sharedPreferences.getString(
-                                            "ci_clientKey",
-                                            ""),
-                            Params.PreservationToken.param to
-                                    sharedPreferences.getString(
-                                            "ci_preservationToken",
-                                            "")
-                    )
-        }
-
-        queue.add(stringRequest)
-    }
-
-    fun searchNames(letters: String) {
-        val stringRequest = object : StringRequest(Request.Method.POST, url,
-                Response.Listener<String> { response ->
-                    handleResponse(response)
-                    Log.v("RESP", response)
+                    Log.v("RESP: SEARCHNAMES", response)
                 },
                 Response.ErrorListener {
 
@@ -211,14 +188,16 @@ class CUPIntegration(context: Context) {
                     )
         }
 
+        Log.d("PRESTOK (SN)", sharedPreferences.getString("ci_preservationToken", "NOTHING"))
+
         queue.add(stringRequest)
     }
 
-    private fun logIn(userName: String, pinCode: String) {
+    fun logIn(userName: String, pinCode: String) {
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
                     handleResponse(response)
-                    Log.v("RESP", response)
+                    Log.v("RESP: LOGIN", response)
                 },
                 Response.ErrorListener {
 
@@ -254,6 +233,8 @@ class CUPIntegration(context: Context) {
                     )
         }
 
+        Log.d("PTOK", sharedPreferences.getString("ci_preservationToken", ""))
+
         queue.add(stringRequest)
     }
 
@@ -281,20 +262,28 @@ class CUPIntegration(context: Context) {
             }
         }
 
+        var isNames: Boolean = false
+
         keys.forEach {
             when (it) {
-                ResponseHeaders.PreservationToken.header ->
+                ResponseHeaders.PreservationToken.header -> {
                     sharedPreferences.edit()
                             .putString("ci_preservationToken", values[keys.indexOf(it)].trim())
                             .apply()
+                    Log.d("BEWAARTOKEN", values[keys.indexOf(it)].trim())
+                }
                 ResponseHeaders.Ok.header -> {
                 }
             // Neemt aan dat de response een lijst van namen is
-                else -> availableNames.put(it, values[keys.indexOf(it)])
+                else -> {
+                    isNames = true
+                    availableNames.put(it, values[keys.indexOf(it)])
+                }
             }
         }
 
-        Log.d("availableNames", availableNames.toString())
+        if (isNames)
+            callbackListener(availableNames)
     }
 
     private fun handleError(error: String) {
@@ -352,9 +341,5 @@ class CUPIntegration(context: Context) {
                 Log.e("ERROR", e.message)
             }
         }
-    }
-
-    interface CUPIntegrationListener {
-        fun ciCallback(view: View, result: String)
     }
 }

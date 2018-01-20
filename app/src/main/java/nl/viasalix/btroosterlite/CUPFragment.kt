@@ -34,8 +34,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import nl.viasalix.btroosterlite.cupconfig.CUPIntegration
 
-class CUPFragment : Fragment(), CUPIntegration.CUPIntegrationListener {
+class CUPFragment : Fragment() {
     private var currentView: View? = null
     private var webView: WebView? = null
 
@@ -96,18 +97,7 @@ class CUPFragment : Fragment(), CUPIntegration.CUPIntegrationListener {
             (activity as AppCompatActivity).supportActionBar!!.title = "CUP"
         }
 
-        val integration = CUPIntegration(activity)
-        object : Thread() {
-            override fun run() {
-                integration.searchNames("bro")
-            }
-        }.run()
-
         webView!!.loadUrl("https://ccgobb.cupweb6.nl/")
-    }
-
-    override fun ciCallback(view: View, result: String) {
-
     }
 
     private fun loadCUP() {

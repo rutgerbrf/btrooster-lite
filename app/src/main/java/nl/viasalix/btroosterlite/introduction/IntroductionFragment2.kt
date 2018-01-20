@@ -4,7 +4,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.support.v4.app.Fragment
 import android.os.Bundle
-import android.preference.PreferenceManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,8 +14,10 @@ import com.stepstone.stepper.VerificationError
 import nl.viasalix.btroosterlite.MainActivity
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.TimetableFragment
+import nl.viasalix.btroosterlite.cupconfig.CUPConfigActivity
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.support.v4.alert
+import org.jetbrains.anko.support.v4.defaultSharedPreferences
 import org.jetbrains.anko.yesButton
 
 class IntroductionFragment2 : Fragment(), Step {
@@ -35,8 +37,8 @@ class IntroductionFragment2 : Fragment(), Step {
         etCode = activity!!.findViewById(R.id.et_code)
         spLocation = activity!!.findViewById(R.id.sp_location)
         ivError = activity!!.findViewById(R.id.iv_error)
-        tvErrorCode = activity!!.findViewById(R.id.tv_error_code)
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        tvErrorCode = activity!!.findViewById(R.id.tv_error_code_s2)
+        sharedPreferences = defaultSharedPreferences
         rbG13 = activity!!.findViewById(R.id.rbG13)
         rbG46 = activity!!.findViewById(R.id.rbG46)
 
@@ -60,14 +62,6 @@ class IntroductionFragment2 : Fragment(), Step {
             ivError!!.visibility = View.INVISIBLE
             tvErrorCode!!.visibility = View.INVISIBLE
 
-            if (rbG46!!.isChecked && location == "Goes") {
-                sharedPreferences!!.edit()
-                        .putBoolean("cupPossible", false)
-                        .putBoolean("cupConfigured", false)
-                        .putBoolean("cupCancelled", false)
-                        .apply()
-            }
-
             sharedPreferences!!.edit()
                     .putString("code", etCode!!.text.toString())
                     .putString("location", location)
@@ -77,17 +71,43 @@ class IntroductionFragment2 : Fragment(), Step {
                     .putBoolean("firstLaunch", false)
                     .apply()
 
-            alert("Door in te loggen op CUP kun je je geselecteerde lessen zien in je rooster. Wil je dit doen?",
-                    "CUP integratie") {
-                yesButton {
-                    startActivity(Intent(activity, MainActivity::class.java))
-                    activity!!.finish()
-                }
-                noButton {
-                    startActivity(Intent(activity, MainActivity::class.java))
-                    activity!!.finish()
-                }
-            }.show()
+            if (rbG46!!.isChecked && location == "Goes") {
+                Log.d("isChecked", rbG46!!.isChecked.toString())
+                Log.d("location", location)
+
+                alert("Door in te loggen op CUP kun je je geselecteerde lessen zien in je rooster. Wil je dit doen?",
+                        "CUP integratie") {
+                    yesButton {
+                        sharedPreferences!!.edit()
+                                .putBoolean("cupPossible", true)
+                                .putBoolean("cupConfigured", false)
+                                .putBoolean("cupCancelled", false)
+                                .apply()
+
+                        startActivity(Intent(activity, CUPConfigActivity::class.java))
+                        activity!!.finish()
+                    }
+                    noButton {
+                        sharedPreferences!!.edit()
+                                .putBoolean("cupPossible", true)
+                                .putBoolean("cupConfigured", false)
+                                .putBoolean("cupCancelled", true)
+                                .apply()
+
+                        startActivity(Intent(activity, MainActivity::class.java))
+                        activity!!.finish()
+                    }
+                }.show()
+            } else {
+                sharedPreferences!!.edit()
+                        .putBoolean("cupPossible", false)
+                        .putBoolean("cupConfigured", false)
+                        .putBoolean("cupCancelled", false)
+                        .apply()
+
+                startActivity(Intent(activity, MainActivity::class.java))
+                activity!!.finish()
+            }
         }
 
         return null

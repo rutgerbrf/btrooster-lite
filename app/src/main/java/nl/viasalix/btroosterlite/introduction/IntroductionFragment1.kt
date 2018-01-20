@@ -11,7 +11,7 @@ import nl.viasalix.btroosterlite.R
 
 class IntroductionFragment1 : Fragment(), Step {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-            inflater.inflate(R.layout.step1, container, false)
+            inflater.inflate(R.layout.int_step1, container, false)
 
     override fun verifyStep(): VerificationError? = null
 

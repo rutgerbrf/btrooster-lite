@@ -12,6 +12,6 @@ class CUPConfigActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_introduction)
         stepperLayout = findViewById(R.id.stepperLayout)
-        stepperLayout!!.adapter = IntroductionAdapter(supportFragmentManager, this)
+        stepperLayout!!.adapter = CUPConfigAdapter(supportFragmentManager, this)
     }
 }

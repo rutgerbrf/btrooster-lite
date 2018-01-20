@@ -2,17 +2,16 @@ package nl.viasalix.btroosterlite.cupconfig
 
 import android.support.v4.app.Fragment
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.VerificationError
 import nl.viasalix.btroosterlite.R
-import org.jetbrains.anko.find
 
 class CUPConfigFragment1 : Fragment(), Step {
     private var etSurname: EditText? = null
@@ -36,6 +35,10 @@ class CUPConfigFragment1 : Fragment(), Step {
         else {
             tvErrorCode!!.visibility = View.INVISIBLE
             ivError!!.visibility = View.INVISIBLE
+
+            CUPConfig.name = etSurname!!.text.toString()
+            Log.d("surname: ", etSurname!!.text.toString())
+
             null
         }
     }
