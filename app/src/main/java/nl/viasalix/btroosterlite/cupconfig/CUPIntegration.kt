@@ -23,7 +23,6 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Base64
 import android.util.Log
-import android.view.View
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.RequestQueue
@@ -48,18 +47,23 @@ class CUPIntegration(context: Context) {
     private var sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private var availableNames: MutableMap<String, String> = HashMap()
     private val url = "https://" + MainActivity.AUTHORITY + "/CupServlet"
-    private var callbackListener: (Map<String, String>) -> Unit = {}
+    private var namesCallbackListener: (Map<String, String>) -> Unit = {}
+    private var logInCallbackListener: (String) -> Unit = {}
 
     init {
-        if (sharedPreferences.getString("ci_clientKey", "").isBlank()) {
-            getToken(true)
+        if (sharedPreferences.getString("ci_preservationToken", "").isBlank()) {
+            if (sharedPreferences.getString("ci_clientKey", "").isBlank()) {
+                getToken(true)
+            } else {
+                getToken(false)
+            }
         } else {
-            getToken(false)
+            if (sharedPreferences.getString("ci_clientKey", "").isBlank()) {
+                getToken(true)
+            } else {
+                getToken(false)
+            }
         }
-
-        Log.d("CREATESSION", "YO BOI")
-
-//        createSession()
     }
 
     enum class ErrorCode(val code: String) {
@@ -98,6 +102,12 @@ class CUPIntegration(context: Context) {
         PreservationToken("Bewaartoken")
     }
 
+    enum class ResponseType {
+        SearchNames,
+        LogIn,
+        PreservationToken
+    }
+
     private fun getToken(genClientKey: Boolean) {
         if (genClientKey)
             sharedPreferences.edit().putString("ci_clientKey", generateClientKey()).apply()
@@ -107,7 +117,7 @@ class CUPIntegration(context: Context) {
 
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
-                    handleResponse(response)
+                    handleResponse(response, ResponseType.PreservationToken)
                     Log.d("RESPONSE: GETTOKEN", response)
                 },
                 Response.ErrorListener {
@@ -146,13 +156,13 @@ class CUPIntegration(context: Context) {
                 Base64.DEFAULT
         ).take(32)
     }
-    
+
     fun searchNames(letters: String, callbackListener: (Map<String, String>) -> Unit) {
-        this.callbackListener = callbackListener
+        this.namesCallbackListener = callbackListener
 
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
-                    handleResponse(response)
+                    handleResponse(response, ResponseType.SearchNames)
                     Log.v("RESP: SEARCHNAMES", response)
                 },
                 Response.ErrorListener {
@@ -193,10 +203,12 @@ class CUPIntegration(context: Context) {
         queue.add(stringRequest)
     }
 
-    fun logIn(userName: String, pinCode: String) {
+    fun logIn(userName: String, pinCode: String, callbackListener: (error: String) -> Unit) {
+        this.logInCallbackListener = callbackListener
+
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
-                    handleResponse(response)
+                    handleResponse(response, ResponseType.LogIn)
                     Log.v("RESP: LOGIN", response)
                 },
                 Response.ErrorListener {
@@ -238,20 +250,21 @@ class CUPIntegration(context: Context) {
         queue.add(stringRequest)
     }
 
-    private fun handleResponse(response: String) {
+    private fun handleResponse(response: String, respType: ResponseType) {
         if (response.isNotEmpty()) {
             if (response.startsWith("ERR"))
-                handleError(response.split("\n")[0].trim())
+                handleError(response.split("\n")[0].trim(), respType)
             else {
                 Log.d("handleNormalResponse", response)
-                handleNormalResponse(response)
+                handleNormalResponse(response, respType)
             }
         }
     }
 
-    private fun handleNormalResponse(response: String) {
+    private fun handleNormalResponse(response: String, respType: ResponseType) {
         val keys: MutableList<String> = ArrayList()
         val values: MutableList<String> = ArrayList()
+        var okRes = ""
 
         response.split("\n").forEach {
             if (it.split("|").size > 1) {
@@ -262,8 +275,6 @@ class CUPIntegration(context: Context) {
             }
         }
 
-        var isNames: Boolean = false
-
         keys.forEach {
             when (it) {
                 ResponseHeaders.PreservationToken.header -> {
@@ -273,21 +284,27 @@ class CUPIntegration(context: Context) {
                     Log.d("BEWAARTOKEN", values[keys.indexOf(it)].trim())
                 }
                 ResponseHeaders.Ok.header -> {
+                    okRes = "Ok"
                 }
             // Neemt aan dat de response een lijst van namen is
                 else -> {
-                    isNames = true
-                    availableNames.put(it, values[keys.indexOf(it)])
+                    if (respType == ResponseType.SearchNames)
+                        availableNames.put(it, values[keys.indexOf(it)])
                 }
             }
         }
 
-        if (isNames)
-            callbackListener(availableNames)
+        if (respType == ResponseType.SearchNames)
+            namesCallbackListener(availableNames)
+        else if (respType == ResponseType.LogIn)
+            logInCallbackListener(okRes)
     }
 
-    private fun handleError(error: String) {
+    private fun handleError(error: String, respType: ResponseType) {
         val key = error.split("|")[1]
+
+        Log.d("handleError key", key)
+        Log.d("handleError [0]", error.split("|")[0])
 
         try {
             when (key) {
@@ -323,19 +340,22 @@ class CUPIntegration(context: Context) {
                     throw NullPointerException("PinCodeNull")
             }
         } catch (e: Exception) {
-            if (e.message == ErrorCode.ClientKeyInvalidLength.code) {
+            if (e.message == "ClientKeyInvalidLength") {
                 if (error.split("|")[2].isNotEmpty()) {
                     Log.e("ERROR",
                             e.message +
                                     error.split("|")[2])
                 }
-            } else if (e.message == ErrorCode.Text.code) {
+            } else if (e.message == "Text") {
                 if (error.split("|")[2].isNotEmpty() &&
                         error.split("|")[3].isNotEmpty()) {
                     Log.e("ERROR",
-                            e.message +
-                                    error.split("|")[2] +
-                                    error.split("|")[3])
+                            e.message + "(" +
+                                    error.split("|")[2] + "): \"" +
+                                    error.split("|")[3] + "\"")
+
+                    if (respType == ResponseType.LogIn)
+                        logInCallbackListener(error.split("|")[3])
                 }
             } else {
                 Log.e("ERROR", e.message)

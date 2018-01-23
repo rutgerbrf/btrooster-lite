@@ -19,13 +19,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_error_code"
+        android:id="@+id/tv_error_code_s3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="Er mogen 3-7 karakters worden ingevuld"
         android:textColor="#D50000"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -33,7 +32,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/iv_error"
+        android:id="@+id/iv_error_s3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="22dp"
@@ -41,7 +40,7 @@
         android:scaleType="center"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/tv_error_code"
+        app:layout_constraintEnd_toStartOf="@+id/tv_error_code_s3"
         app:srcCompat="@drawable/ic_error_red_24dp" />
 
     <EditText

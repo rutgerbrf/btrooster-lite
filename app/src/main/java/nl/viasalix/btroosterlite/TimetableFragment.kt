@@ -60,8 +60,6 @@ import java.util.Stack
 import java.util.regex.Pattern
 
 import android.content.Context.CONNECTIVITY_SERVICE
-import android.provider.CalendarContract
-import java.time.Year
 
 class TimetableFragment : Fragment() {
     private var weekSpinner: Spinner? = null
@@ -144,6 +142,8 @@ class TimetableFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
+        TimetableIntegration(activity!!, "Goes", "16204")
 
         val toolbar = activity.findViewById<Toolbar>(R.id.toolbar)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
@@ -435,4 +435,4 @@ class TimetableFragment : Fragment() {
                     resources.displayMetrics).toInt()
         }
     }
-}// Lege constructor is nodig om een fragment te kunnen gebruiken
+}

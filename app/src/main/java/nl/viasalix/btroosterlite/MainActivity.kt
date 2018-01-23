@@ -27,7 +27,6 @@ import android.os.Bundle
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
-import nl.viasalix.btroosterlite.cupconfig.CUPConfig
 import nl.viasalix.btroosterlite.cupconfig.CUPIntegration
 import nl.viasalix.btroosterlite.introduction.IntroductionActivity
 
@@ -74,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        CUPConfig.integration = CUPIntegration(this)
+        Singleton.cupIntegration = CUPIntegration(this)
     }
 
     private fun tabSelected(position: Int, wasSelected: Boolean) {

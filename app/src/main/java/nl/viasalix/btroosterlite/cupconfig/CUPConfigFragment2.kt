@@ -12,6 +12,7 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.VerificationError
+import nl.viasalix.btroosterlite.Singleton
 import nl.viasalix.btroosterlite.R
 import org.jetbrains.anko.support.v4.defaultSharedPreferences
 
@@ -40,7 +41,7 @@ class CUPConfigFragment2 : Fragment(), Step {
 
         nameMap.clear()
 
-        CUPConfig.integration!!.searchNames(CUPConfig.name, {
+        Singleton.cupIntegration!!.searchNames(Singleton.name, {
             nameMap = it.toMutableMap()
 
             it.forEach {
