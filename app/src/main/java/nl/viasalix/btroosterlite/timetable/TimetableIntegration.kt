@@ -1,8 +1,9 @@
-package nl.viasalix.btroosterlite
+package nl.viasalix.btroosterlite.timetable
 
 import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
+import android.database.Cursor
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
@@ -13,7 +14,11 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.cupconfig.CUPIntegration
+import org.jetbrains.anko.custom.async
+import org.jetbrains.anko.doAsync
+import java.sql.Time
 import java.util.regex.Pattern
 
 class TimetableIntegration(private var context: Context,
@@ -25,34 +30,70 @@ class TimetableIntegration(private var context: Context,
     private val queue = Volley.newRequestQueue(context)
     private val dbHelper = TimetableDbHelper(context)
 
-    fun getIndexes(callback: (String) -> Unit) {
+    fun getIndexes(callback: (String, Boolean) -> Unit) {
         if (online(context)) {
             val builder = Uri.Builder()
             builder.scheme("https")
                     .authority(MainActivity.AUTHORITY)
-                    .appendPath("RoosterEmbedServlet")
-                    .appendQueryParameter("indexOphalen", "1")
+                    .appendPath("api")
+                    .appendPath("RoosterApiServlet")
+                    .appendQueryParameter("actie", "weken")
                     .appendQueryParameter("locatie", location)
             val url = builder.build().toString()
+
+            Log.d("url", url)
 
             val stringRequest = StringRequest(Request.Method.GET, url,
                     { response ->
                         sharedPreferences.edit().putString("t_indexes", response).apply()
                         Log.d("or", response)
-                        callback(response)
+                        callback(response, true)
                     }) { error -> Log.d("error", error.message) }
             queue.add(stringRequest)
         } else {
             val response = sharedPreferences.getString("t_indexes", null)
-            callback(response)
+            callback(response, false)
         }
     }
 
-    fun downloadAvailableTimetables() {
+    private fun handleResponse(response: String?): MutableList<Int> {
+        val availableWeeks: MutableList<Int> = mutableListOf()
 
+        if (response != null) {
+            availableWeeks.clear()
+
+            val responses = response.trim().split("\n")
+
+            responses
+                    .filter { it.isNotEmpty() }
+                    .map { it.split("|") }
+                    .forEachIndexed { i, responseStringSplit -> availableWeeks.add(i, responseStringSplit[0].toInt()) }
+        }
+
+        return availableWeeks
     }
 
-    fun loadTimetable(week: Int, webView: WebView) {
+    fun downloadAvailableTimetables() {
+        val onlyWifiPref = sharedPreferences.getBoolean("t_preload_only_wifi", true)
+
+        if (online(context)) {
+            if (wifiIsConnected(context) == onlyWifiPref) {
+                getIndexes { it, _ ->
+                    val response = handleResponse(it)
+
+                    doAsync {
+                        response.forEach {
+                            downloadTimetable(it, {})
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun downloadTimetable(week: Int, callback: (String) -> Unit) {
+        val identifier = "$code|$week"
+
         if (online(context)) {
             val typeString = getType(code)
 
@@ -68,9 +109,15 @@ class TimetableIntegration(private var context: Context,
 
             val stringRequest = object : StringRequest(Request.Method.GET, url,
                     Response.Listener<String> {
-                        if (recordExists("$code|$week")) {
-                            updateTimetable("$code|$week", it)
-                            webView.loadData(it, "text/html; charset=UTF-8", null)
+                        Log.d("data (getTimetable, ttInteg", "data: $it")
+                        Log.d("recexists", "${recordExists(identifier)}")
+
+                        if (recordExists(identifier)) {
+                            updateTimetable(identifier, it)
+                            callback(it)
+                        } else {
+                            saveTimetableToDatabase(identifier, it)
+                            callback(it)
                         }
                     },
                     Response.ErrorListener {
@@ -102,8 +149,28 @@ class TimetableIntegration(private var context: Context,
 
             queue.add(stringRequest)
         } else {
+            if (recordExists(identifier)) {
+                val data = loadTimetableFromDatabase(identifier)
 
+                if (data.isNotEmpty()) {
+                    callback(data)
+                } else {
+                    callback(errorMessage)
+                }
+            } else {
+                callback(errorMessage)
+            }
         }
+    }
+
+    fun loadTimetable(week: Int, webView: WebView) {
+        downloadTimetable(week, {
+            loadDataInWebView(it, webView)
+        })
+    }
+
+    fun loadDataInWebView(data: String, webView: WebView) {
+        webView.loadData(data, "text/html; charset=UTF-8", null)
     }
 
     fun saveTimetableToDatabase(identifier: String, timetable: String) {
@@ -114,6 +181,8 @@ class TimetableIntegration(private var context: Context,
             put(TimetableContract.Timetable.COLUMN_NAME_TIMETABLE, timetable)
         }
 
+        Log.d("SAVING", "SAVING DATA: id: $identifier, tt: $timetable")
+
         val newRowId = db?.insert(TimetableContract.Timetable.TABLE_NAME, null, values)
     }
 
@@ -121,11 +190,10 @@ class TimetableIntegration(private var context: Context,
         val db = dbHelper.writableDatabase
 
         val values = ContentValues().apply {
-            put(TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER, identifier)
             put(TimetableContract.Timetable.COLUMN_NAME_TIMETABLE, timetable)
         }
 
-        val selection = "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} LIKE ?"
+        val selection = "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} = ?"
         val selectionArgs = arrayOf(identifier)
         val count = db.update(
                 TimetableContract.Timetable.TABLE_NAME,
@@ -134,7 +202,7 @@ class TimetableIntegration(private var context: Context,
                 selectionArgs)
     }
 
-    fun loadTimetableFromDatabase(identifier: String) {
+    fun loadTimetableFromDatabase(identifier: String): String {
         val db = dbHelper.readableDatabase
 
         val projection = arrayOf(TimetableContract.Timetable.COLUMN_NAME_TIMETABLE)
@@ -160,7 +228,13 @@ class TimetableIntegration(private var context: Context,
             }
         }
 
-        Log.d("TTS: TTI", timetables.joinToString())
+        Log.d("test ltfd", "yo")
+        Log.d("timetables", timetables.joinToString())
+
+        if (timetables.isNotEmpty())
+            return timetables[0]
+        else
+            return ""
     }
 
     fun deleteTimetable(identifier: String) {
@@ -173,21 +247,26 @@ class TimetableIntegration(private var context: Context,
     }
 
     fun recordExists(identifier: String): Boolean {
-        val db = dbHelper.writableDatabase
+        val db = dbHelper.readableDatabase
 
+        val selection = "SELECT * FROM ${TimetableContract.Timetable.TABLE_NAME} WHERE ${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} = ?"
+        val selectionArgs = arrayOf(identifier)
+        val cursor = db.rawQuery(selection, selectionArgs)
 
-        val cursor = db.rawQuery(
-                "SELECT * FROM ${TimetableContract.Timetable.TABLE_NAME}" +
-                        "WHERE ${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} = ?",
-                arrayOf(identifier))
+        Log.d("cursor.count", cursor.count.toString())
+        if (cursor.count <= 0) {
+            cursor.close()
+            return false
+        }
 
-        if (cursor != null)
-            return true
-
-        return false
+        cursor.close()
+        return true
     }
 
     companion object {
+        const val errorMessage =
+                "Dit rooster kon niet geladen worden"
+
         fun getType(code: String?): String {
             val docentPatternInput = "([A-Za-z]){3}"
             val leerlingPatternInput = "([0-9]){5}"
@@ -213,12 +292,12 @@ class TimetableIntegration(private var context: Context,
             return networkInfo != null && networkInfo.isConnected
         }
 
-        fun mobileIsConnected(context: Context): Boolean {
+        fun wifiIsConnected(context: Context): Boolean {
             val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val mobile = connMgr.getNetworkInfo(
-                    ConnectivityManager.TYPE_MOBILE)
+            val wifi = connMgr.getNetworkInfo(
+                    ConnectivityManager.TYPE_WIFI)
 
-            return mobile.isConnected
+            return wifi.isConnected
         }
     }
 }

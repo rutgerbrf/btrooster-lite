@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nl.viasalix.btroosterlite
+package nl.viasalix.btroosterlite.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -25,6 +25,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
+import nl.viasalix.btroosterlite.R
 
 class SettingsActivity : AppCompatActivity() {
     private var toolbar: Toolbar? = null

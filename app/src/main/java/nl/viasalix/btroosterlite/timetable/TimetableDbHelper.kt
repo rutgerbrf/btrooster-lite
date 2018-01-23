@@ -1,9 +1,8 @@
-package nl.viasalix.btroosterlite
+package nl.viasalix.btroosterlite.timetable
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.provider.BaseColumns
 
 private const val SQL_CREATE_TIMETABLES =
         "CREATE TABLE ${TimetableContract.Timetable.TABLE_NAME} (" +
@@ -35,13 +34,5 @@ class TimetableDbHelper(context: Context) : SQLiteOpenHelper(context,
         // Versie verhogen wanneer schema veranderd
         val DATABASE_VERSION = 1
         val DATABASE_NAME = "BTRoosterTTS.db"
-    }
-}
-
-object TimetableContract {
-    object Timetable : BaseColumns {
-        const val TABLE_NAME = "timetable"
-        const val COLUMN_NAME_IDENTIFIER = "testyouboi"
-        const val COLUMN_NAME_TIMETABLE = "html"
     }
 }

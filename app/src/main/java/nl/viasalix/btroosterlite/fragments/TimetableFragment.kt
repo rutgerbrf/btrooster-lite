@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nl.viasalix.btroosterlite
+package nl.viasalix.btroosterlite.fragments
 
 import android.app.Fragment
 import android.content.Context
@@ -60,6 +60,11 @@ import java.util.Stack
 import java.util.regex.Pattern
 
 import android.content.Context.CONNECTIVITY_SERVICE
+import nl.viasalix.btroosterlite.activities.MainActivity
+import nl.viasalix.btroosterlite.R
+import nl.viasalix.btroosterlite.activities.SettingsActivity
+import nl.viasalix.btroosterlite.timetable.TimetableIntegration
+import org.jetbrains.anko.defaultSharedPreferences
 
 class TimetableFragment : Fragment() {
     private var weekSpinner: Spinner? = null
@@ -74,9 +79,10 @@ class TimetableFragment : Fragment() {
     private var sharedPreferences: SharedPreferences? = null
     private var currentView: View? = null
     private var webView: WebView? = null
-    private var webViewPL: WebView? = null
+    // private var webViewPL: WebView? = null
     private var pagesToLoad = Stack<String>()
     private var mListener: OnFragmentInteractionListener? = null
+    private var ttInteg: TimetableIntegration? = null
 
     private val currentWeekOfYear: Int
         get() = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR)
@@ -93,20 +99,9 @@ class TimetableFragment : Fragment() {
 
     private fun online(): Boolean {
         val connectivityManager = activity.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        var networkInfo: NetworkInfo? = null
-        if (connectivityManager != null) {
-            networkInfo = connectivityManager.activeNetworkInfo
-        }
+        var networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
 
         return networkInfo != null && networkInfo.isConnected
-    }
-
-    private fun mobileIsConnected(): Boolean {
-        val connMgr = activity.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        val mobile = connMgr.getNetworkInfo(
-                ConnectivityManager.TYPE_MOBILE)
-
-        return mobile.isConnected
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -134,7 +129,6 @@ class TimetableFragment : Fragment() {
         // Inflate the layout for this fragment
         currentView = inflater.inflate(R.layout.fragment_timetable, container, false)
         webView = currentView!!.findViewById(R.id.web_view)
-        webViewPL = currentView!!.findViewById(R.id.web_view_preload)
         weekSpinner = currentView!!.findViewById(R.id.week_spinner)
 
         return currentView
@@ -142,8 +136,6 @@ class TimetableFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-
-        TimetableIntegration(activity!!, "Goes", "16204")
 
         val toolbar = activity.findViewById<Toolbar>(R.id.toolbar)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
@@ -157,6 +149,13 @@ class TimetableFragment : Fragment() {
         webView!!.settings.displayZoomControls = false
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+
+        if (sharedPreferences!!.getBoolean("t_preload", false))
+            ttInteg!!.downloadAvailableTimetables()
+
+        loadSharedPreferences()
+
+        ttInteg = TimetableIntegration(activity!!, location!!, code!!)
 
         if (loadSharedPreferences() != 1)
             loadTimetable(true)
@@ -270,107 +269,29 @@ class TimetableFragment : Fragment() {
     }
 
     private fun loadTimetable(getIndexes: Boolean) {
-        webView!!.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-
-        if (online()) {
-            webView!!.settings.cacheMode = WebSettings.LOAD_NO_CACHE
-        } else {
-            webView!!.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-        }
-
         if (getIndexes) {
             getIndexes()
         } else {
-            getTimetable(
-                    sharedPreferences!!.getString("t_week",
-                            Integer.toString(currentWeekOfYear)))
-            if (sharedPreferences!!.getBoolean("t_preload", false)) {
-                val onlyWifiPref = sharedPreferences!!.getBoolean(
-                        "t_preload_only_wifi",
-                        true)
-
-                if (online()) {
-                    if (mobileIsConnected() != onlyWifiPref) {
-                        preloadTimetables()
-                    }
-                }
-            } else {
-                webViewPL!!.destroy()
-            }
+            getTimetable(sharedPreferences!!.getString("t_week",
+                    currentWeekOfYear.toString()))
         }
     }
 
-    private fun preloadTimetables() {
-        pagesToLoad.empty()
-
-        Stream.of(availableWeeks).forEach { it ->
-            pagesToLoad.push(
-                    buildTimetableURL(it)
-            )
-        }
-
-        class PreloadClient : WebViewClient() {
-            override fun onPageFinished(view: WebView, url: String) {
-                super.onPageFinished(view, url)
-                if (!pagesToLoad.isEmpty())
-                    view.loadUrl(pagesToLoad.pop())
-            }
-        }
-
-        val client = PreloadClient()
-        webViewPL!!.webViewClient = client
-
-        webViewPL!!.loadUrl(pagesToLoad.pop())
-    }
-
-    private fun buildTimetableURL(week: String?): String {
-        val typeString = getType(code)
-
-        val builder = Uri.Builder()
-        builder.scheme("https")
-                .authority(MainActivity.AUTHORITY)
-                .appendPath("RoosterEmbedServlet")
-                .appendQueryParameter("code", code)
-                .appendQueryParameter("locatie", location)
-                .appendQueryParameter("type", typeString)
-                .appendQueryParameter("week", week)
-        val url = builder.build().toString()
-
-        Log.v("URL built", url)
-
-        return url
-    }
-
-    private fun getTimetable(week: String?) {
-        webView!!.loadUrl(buildTimetableURL(week))
+    private fun getTimetable(week: String) {
+        ttInteg!!.loadTimetable(week.toInt(), webView!!)
     }
 
     private fun getIndexes() {
-        if (online()) {
-            val queue = Volley.newRequestQueue(activity)
-            val builder = Uri.Builder()
-            builder.scheme("https")
-                    .authority(MainActivity.AUTHORITY)
-                    .appendPath("RoosterEmbedServlet")
-                    .appendQueryParameter("indexOphalen", "1")
-                    .appendQueryParameter("locatie", location)
-            val url = builder.build().toString()
-
-            val stringRequest = StringRequest(Request.Method.GET, url,
-                    { response ->
-                        sharedPreferences!!.edit().putString("t_indexes", response).apply()
-                        Log.d("or", response)
-                        handleResponse(response)
-                    }) { error -> Log.d("error", error.message) }
-            queue.add(stringRequest)
-        } else {
-            val response = sharedPreferences!!.getString("t_indexes", null)
-            handleResponse(response)
-            getTimetable(
-                    sharedPreferences!!.getString(
-                            "t_week",
-                            Integer.toString(currentWeekOfYear))
-            )
+        ttInteg!!.getIndexes { it, wasOnline ->
+            if (wasOnline) {
+                handleResponse(it)
+                getTimetable(
+                        sharedPreferences!!.getString(
+                                "t_week",
+                                currentWeekOfYear.toString()))
+            } else {
+                handleResponse(it)
+            }
         }
     }
 
@@ -380,13 +301,11 @@ class TimetableFragment : Fragment() {
             availableWeeksNames.clear()
 
             var i = 0
-
-            Log.d("response", response)
-            val responses = response.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val responses = response.trim().split("\n")
 
             for (responseString in responses) {
                 if (responseString.isNotEmpty()) {
-                    val responseStringSplit = responseString.split("\\|".toRegex(), 2).toTypedArray()
+                    val responseStringSplit = responseString.split("|")
 
                     availableWeeks.add(i, responseStringSplit[0])
                     availableWeeksNames.add(i, responseStringSplit[1])

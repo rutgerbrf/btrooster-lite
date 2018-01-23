@@ -11,9 +11,9 @@ import android.view.ViewGroup
 import android.widget.*
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.VerificationError
-import nl.viasalix.btroosterlite.MainActivity
+import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.R
-import nl.viasalix.btroosterlite.TimetableFragment
+import nl.viasalix.btroosterlite.fragments.TimetableFragment
 import nl.viasalix.btroosterlite.cupconfig.CUPConfigActivity
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.support.v4.alert

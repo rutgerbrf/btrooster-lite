@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nl.viasalix.btroosterlite
+package nl.viasalix.btroosterlite.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -34,7 +34,8 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import nl.viasalix.btroosterlite.cupconfig.CUPIntegration
+import nl.viasalix.btroosterlite.R
+import nl.viasalix.btroosterlite.activities.SettingsActivity
 
 class CUPFragment : Fragment() {
     private var currentView: View? = null

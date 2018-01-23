@@ -11,7 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.VerificationError
-import nl.viasalix.btroosterlite.Singleton
+import nl.viasalix.btroosterlite.singleton.Singleton
 import nl.viasalix.btroosterlite.R
 
 class CUPConfigFragment1 : Fragment(), Step {

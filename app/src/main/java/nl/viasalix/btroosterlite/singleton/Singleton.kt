@@ -1,4 +1,4 @@
-package nl.viasalix.btroosterlite
+package nl.viasalix.btroosterlite.singleton
 
 import nl.viasalix.btroosterlite.cupconfig.CUPIntegration
 

@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nl.viasalix.btroosterlite
+package nl.viasalix.btroosterlite.activities
 
 import android.content.Intent
 import android.graphics.Color
@@ -27,8 +27,13 @@ import android.os.Bundle
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
+import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.cupconfig.CUPIntegration
+import nl.viasalix.btroosterlite.fragments.CUPFragment
+import nl.viasalix.btroosterlite.fragments.TestTimetableFragment
+import nl.viasalix.btroosterlite.fragments.TimetableFragment
 import nl.viasalix.btroosterlite.introduction.IntroductionActivity
+import nl.viasalix.btroosterlite.singleton.Singleton
 
 class MainActivity : AppCompatActivity() {
     private var currentFragment: Fragment? = null
@@ -119,6 +124,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        val AUTHORITY = "1-dot-1-dot-0-dot-btrfrontend.appspot.com"
+        val AUTHORITY = "1d1d1-dot-btrfrontend.appspot.com"
     }
 }

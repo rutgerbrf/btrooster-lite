@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nl.viasalix.btroosterlite
+package nl.viasalix.btroosterlite.fragments
 
 import android.app.Fragment
 import android.content.Intent
@@ -49,6 +49,9 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import java.util.ArrayList
 
 import android.content.Context.CONNECTIVITY_SERVICE
+import nl.viasalix.btroosterlite.activities.MainActivity
+import nl.viasalix.btroosterlite.R
+import nl.viasalix.btroosterlite.activities.SettingsActivity
 
 class TestTimetableFragment : Fragment() {
     private var currentView: View? = null

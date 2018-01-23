@@ -29,7 +29,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import nl.viasalix.btroosterlite.MainActivity
+import nl.viasalix.btroosterlite.activities.MainActivity
 import java.security.InvalidParameterException
 import java.security.SecureRandom
 import java.util.*
@@ -46,22 +46,23 @@ class CUPIntegration(context: Context) {
     private var queue: RequestQueue = Volley.newRequestQueue(context)
     private var sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private var availableNames: MutableMap<String, String> = HashMap()
-    private val url = "https://" + MainActivity.AUTHORITY + "/CupServlet"
+    private val url = "https://" + MainActivity.AUTHORITY + "/api/CupApiServlet"
     private var namesCallbackListener: (Map<String, String>) -> Unit = {}
     private var logInCallbackListener: (String) -> Unit = {}
 
+    val PRESTOK = "ci_preservationToken"
+    val CLIENTKEY = "ci_clientKey"
+
     init {
-        if (sharedPreferences.getString("ci_preservationToken", "").isBlank()) {
-            if (sharedPreferences.getString("ci_clientKey", "").isBlank()) {
+        if (sharedPreferences.getString(PRESTOK, "").isEmpty()) {
+            if (sharedPreferences.getString(CLIENTKEY, "").isEmpty()) {
                 getToken(true)
             } else {
                 getToken(false)
             }
         } else {
-            if (sharedPreferences.getString("ci_clientKey", "").isBlank()) {
+            if (sharedPreferences.getString(CLIENTKEY, "").isEmpty()) {
                 getToken(true)
-            } else {
-                getToken(false)
             }
         }
     }
@@ -110,7 +111,7 @@ class CUPIntegration(context: Context) {
 
     private fun getToken(genClientKey: Boolean) {
         if (genClientKey)
-            sharedPreferences.edit().putString("ci_clientKey", generateClientKey()).apply()
+            sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
 
         Log.d("GETTOKEN", "YE BOI")
         System.setProperty("http.keepAlive", "false")
@@ -137,7 +138,7 @@ class CUPIntegration(context: Context) {
                     hashMapOf(
                             Params.ClientKey.param to
                                     sharedPreferences.getString(
-                                            "ci_clientKey",
+                                            CLIENTKEY,
                                             ""))
         }
 
@@ -189,16 +190,16 @@ class CUPIntegration(context: Context) {
                     hashMapOf(
                             Params.ClientKey.param to
                                     sharedPreferences.getString(
-                                            "ci_clientKey",
+                                            CLIENTKEY,
                                             ""),
                             Params.PreservationToken.param to
                                     sharedPreferences.getString(
-                                            "ci_preservationToken",
+                                            PRESTOK,
                                             "")
                     )
         }
 
-        Log.d("PRESTOK (SN)", sharedPreferences.getString("ci_preservationToken", "NOTHING"))
+        Log.d("PRESTOK (SN)", sharedPreferences.getString(PRESTOK, "NOTHING"))
 
         queue.add(stringRequest)
     }
@@ -236,16 +237,16 @@ class CUPIntegration(context: Context) {
                     hashMapOf(
                             Params.ClientKey.param to
                                     sharedPreferences.getString(
-                                            "ci_clientKey",
+                                            CLIENTKEY,
                                             ""),
                             Params.PreservationToken.param to
                                     sharedPreferences.getString(
-                                            "ci_preservationToken",
+                                            PRESTOK,
                                             "")
                     )
         }
 
-        Log.d("PTOK", sharedPreferences.getString("ci_preservationToken", ""))
+        Log.d("PTOK", sharedPreferences.getString(PRESTOK, ""))
 
         queue.add(stringRequest)
     }
@@ -279,7 +280,7 @@ class CUPIntegration(context: Context) {
             when (it) {
                 ResponseHeaders.PreservationToken.header -> {
                     sharedPreferences.edit()
-                            .putString("ci_preservationToken", values[keys.indexOf(it)].trim())
+                            .putString(PRESTOK, values[keys.indexOf(it)].trim())
                             .apply()
                     Log.d("BEWAARTOKEN", values[keys.indexOf(it)].trim())
                 }
