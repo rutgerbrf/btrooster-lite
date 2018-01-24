@@ -28,7 +28,7 @@ import android.os.Bundle
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import nl.viasalix.btroosterlite.R
-import nl.viasalix.btroosterlite.cupconfig.CUPIntegration
+import nl.viasalix.btroosterlite.cup.CUPIntegration
 import nl.viasalix.btroosterlite.fragments.CUPFragment
 import nl.viasalix.btroosterlite.fragments.TestTimetableFragment
 import nl.viasalix.btroosterlite.fragments.TimetableFragment

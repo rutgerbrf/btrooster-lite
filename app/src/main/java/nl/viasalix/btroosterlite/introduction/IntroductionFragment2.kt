@@ -14,7 +14,7 @@ import com.stepstone.stepper.VerificationError
 import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.fragments.TimetableFragment
-import nl.viasalix.btroosterlite.cupconfig.CUPConfigActivity
+import nl.viasalix.btroosterlite.cup.cupconfig.CUPConfigActivity
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.support.v4.defaultSharedPreferences

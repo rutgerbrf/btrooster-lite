@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nl.viasalix.btroosterlite.cupconfig
+package nl.viasalix.btroosterlite.cup
 
 import android.content.Context
 import android.content.SharedPreferences

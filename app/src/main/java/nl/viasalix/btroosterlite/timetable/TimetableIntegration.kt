@@ -14,7 +14,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import nl.viasalix.btroosterlite.activities.MainActivity
-import nl.viasalix.btroosterlite.cupconfig.CUPIntegration
+import nl.viasalix.btroosterlite.cup.CUPIntegration
 import org.jetbrains.anko.doAsync
 import java.util.regex.Pattern
 
