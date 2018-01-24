@@ -29,7 +29,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 15
-        versionName "1.7.2-ALPHA"
+        versionName "1.8.0-ALPHA"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

@@ -29,6 +29,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -53,11 +54,14 @@ class CUPFragment : Fragment() {
         webView = currentView!!.findViewById<View>(R.id.web_view) as WebView
 
         webView!!.settings.javaScriptEnabled = true
+
         webView!!.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 return false
             }
         }
+
+        webView!!.webChromeClient = WebChromeClient()
 
         return currentView
     }
@@ -98,17 +102,11 @@ class CUPFragment : Fragment() {
             (activity as AppCompatActivity).supportActionBar!!.title = "CUP"
         }
 
+
         webView!!.loadUrl("https://ccgobb.cupweb6.nl/")
     }
 
     private fun loadCUP() {
         webView!!.loadUrl("https://ccgobb.cupweb6.nl/")
     }
-
-//    companion object {
-//
-//        fun newInstance(): CUPFragment {
-//            return CUPFragment()
-//        }
-//    }
 }
