@@ -24,7 +24,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
@@ -39,19 +38,13 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebSettings
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
 
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import com.annimon.stream.Stream
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 import java.util.ArrayList
@@ -60,11 +53,9 @@ import java.util.Stack
 import java.util.regex.Pattern
 
 import android.content.Context.CONNECTIVITY_SERVICE
-import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.activities.SettingsActivity
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
-import org.jetbrains.anko.defaultSharedPreferences
 
 class TimetableFragment : Fragment() {
     private var weekSpinner: Spinner? = null
@@ -95,13 +86,6 @@ class TimetableFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.appbar_mainactivity_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    private fun online(): Boolean {
-        val connectivityManager = activity.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        var networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
-
-        return networkInfo != null && networkInfo.isConnected
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -223,10 +207,10 @@ class TimetableFragment : Fragment() {
 
         builder.setView(layout)
 
-        builder.setPositiveButton("OK") { dialog, which ->
+        builder.setPositiveButton("OK") { _, _ ->
             sharedPreferences!!.edit().putString("code", input.text.toString()).apply()
             onStart()
-        }.setNegativeButton("Annuleren") { dialog, which ->
+        }.setNegativeButton("Annuleren") { dialog, _ ->
                     activity.finish()
                     dialog.cancel()
                 }

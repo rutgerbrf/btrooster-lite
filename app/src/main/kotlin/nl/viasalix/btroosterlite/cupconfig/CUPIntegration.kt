@@ -113,7 +113,7 @@ class CUPIntegration(context: Context) {
         if (genClientKey)
             sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
 
-        Log.d("GETTOKEN", "YE BOI")
+        Log.d("GETTOKEN()", genClientKey.toString())
         System.setProperty("http.keepAlive", "false")
 
         val stringRequest = object : StringRequest(Request.Method.POST, url,

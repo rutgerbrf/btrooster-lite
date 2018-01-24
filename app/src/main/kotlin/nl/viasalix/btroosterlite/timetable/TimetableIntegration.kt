@@ -3,7 +3,6 @@ package nl.viasalix.btroosterlite.timetable
 import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
-import android.database.Cursor
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
@@ -16,9 +15,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.cupconfig.CUPIntegration
-import org.jetbrains.anko.custom.async
 import org.jetbrains.anko.doAsync
-import java.sql.Time
 import java.util.regex.Pattern
 
 class TimetableIntegration(private var context: Context,
