@@ -53,21 +53,21 @@ class TimetableIntegration(private var context: Context,
         }
     }
 
-    private fun handleResponse(response: String?): MutableList<Int> {
-        val availableWeeks: MutableList<Int> = mutableListOf()
+    private fun handleResponse(response: String?): MutableMap<Int, String> {
+        val indexes: MutableMap<Int, String> = mutableMapOf()
 
         if (response != null) {
-            availableWeeks.clear()
-
             val responses = response.trim().split("\n")
 
             responses
                     .filter { it.isNotEmpty() }
                     .map { it.split("|") }
-                    .forEachIndexed { i, responseStringSplit -> availableWeeks.add(i, responseStringSplit[0].toInt()) }
+                    .forEach { responseWeek ->
+                        indexes[responseWeek[0].toInt()] = ""
+                    }
         }
 
-        return availableWeeks
+        return indexes
     }
 
     fun downloadAvailableTimetables() {
@@ -80,7 +80,7 @@ class TimetableIntegration(private var context: Context,
 
                     doAsync {
                         response.forEach {
-                            downloadTimetable(it, {})
+                            downloadTimetable(it.key, {})
                         }
                     }
                 }
@@ -88,12 +88,28 @@ class TimetableIntegration(private var context: Context,
         }
     }
 
+    /**
+     *
+     * Functie die het rooster met de gegeven week downloadt en daarna (eventueel) de callback
+     * uitvoert.
+     *
+     * @param week      week in het jaar van het rooster
+     * @param callback  functie die wordt uitgevoerd als de stringRequest een response heeft
+     *
+     */
     fun downloadTimetable(week: Int, callback: (String) -> Unit) {
+        /*
+         * Identifier die wordt gebruikt als key in de database
+         * Ziet er als volgt uit: "<code>|<week>"
+         */
+
         val identifier = "$code|$week"
 
+        // Check of de gebruiker online is
         if (online(context)) {
             val typeString = getType(code)
 
+            // Maak de URL
             val builder = Uri.Builder()
             builder.scheme("https")
                     .authority(MainActivity.AUTHORITY)
@@ -103,6 +119,12 @@ class TimetableIntegration(private var context: Context,
                     .appendQueryParameter("type", typeString)
                     .appendQueryParameter("week", week.toString())
             val url = builder.build().toString()
+
+
+            /*
+             *  Maak een nieuw StringRequest aan en override een aantal functies om de goede
+             *  parameters mee te geven
+             */
 
             val stringRequest = object : StringRequest(Request.Method.GET, url,
                     Response.Listener<String> {
@@ -146,15 +168,22 @@ class TimetableIntegration(private var context: Context,
 
             queue.add(stringRequest)
         } else {
+            // Als de gebruiker offline is wordt de volgende code uitgoevoerd
+
+            // Check of het rooster al in de database staat
             if (recordExists(identifier)) {
+                // Laad het rooster uit de database
                 val data = loadTimetableFromDatabase(identifier)
 
                 if (data.isNotEmpty()) {
+                    // Voer de callback uit met de response als argument
                     callback(data)
                 } else {
+                    // Geef een foutmelding
                     callback(errorMessage)
                 }
             } else {
+                // Geef een foutmelding
                 callback(errorMessage)
             }
         }

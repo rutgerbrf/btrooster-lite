@@ -47,8 +47,8 @@ class CUPIntegration(context: Context) {
     private var sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private var availableNames: MutableMap<String, String> = HashMap()
     private val url = "https://" + MainActivity.AUTHORITY + "/api/CupApiServlet"
-    private var namesCallbackListener: (Map<String, String>) -> Unit = {}
-    private var logInCallbackListener: (String) -> Unit = {}
+    private var namesCallback: (Map<String, String>) -> Unit = {}
+    private var logInCallback: (String) -> Unit = {}
 
     val PRESTOK = "ci_preservationToken"
     val CLIENTKEY = "ci_clientKey"
@@ -56,15 +56,15 @@ class CUPIntegration(context: Context) {
     init {
         if (sharedPreferences.getString(PRESTOK, "").isEmpty()) {
             if (sharedPreferences.getString(CLIENTKEY, "").isEmpty()) {
-                getToken(true)
+                sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
+                getToken()
             } else {
-                getToken(false)
+                sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
+                getToken()
             }
-        } else {
-            if (sharedPreferences.getString(CLIENTKEY, "").isEmpty()) {
-                getToken(true)
-            }
-        }
+        } else
+            if (sharedPreferences.getString(CLIENTKEY, "").isEmpty())
+                sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
     }
 
     enum class ErrorCode(val code: String) {
@@ -109,29 +109,28 @@ class CUPIntegration(context: Context) {
         PreservationToken
     }
 
-    private fun getToken(genClientKey: Boolean) {
-        if (genClientKey)
-            sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
-
-        Log.d("GETTOKEN()", genClientKey.toString())
+    /**
+     * Functie om het bewaartoken op te halen
+     */
+    private fun getToken() {
+        // Zorg dat de request eenmalig wordt verstuurd
         System.setProperty("http.keepAlive", "false")
 
+        // Maak de stringRequest
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
                     handleResponse(response, ResponseType.PreservationToken)
                     Log.d("RESPONSE: GETTOKEN", response)
                 },
-                Response.ErrorListener {
-
-                }) {
+                Response.ErrorListener {}) {
             override fun getBodyContentType() =
                     "application/x-www-form-urlencoded; charset=UTF-8"
 
             /**
-             *
              * Maakt een Map<String, String> van headers in het volgende formaat:
              * Client-Key=<sp/ci_clientKey>
              *
+             * @return  map van headers
              */
 
             override fun getHeaders(): Map<String, String> =
@@ -142,12 +141,20 @@ class CUPIntegration(context: Context) {
                                             ""))
         }
 
+        // Zorg ervoor dat het request maximaal één keer wordt verstuurd
         stringRequest.retryPolicy = DefaultRetryPolicy(20 * 1000, 0,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
+        // Voeg het request toe aan de queue
         queue.add(stringRequest)
     }
 
+    /**
+     * Genereert een clientKey in de vorm van een String met een SecureRandom en
+     * encodet deze met Base64 zodat deze als POST parameter kan worden gestuurd
+     *
+     * @return  clientKey
+     */
     private fun generateClientKey(): String {
         val bytes = ByteArray(32)
         SecureRandom().nextBytes(bytes)
@@ -158,8 +165,15 @@ class CUPIntegration(context: Context) {
         ).take(32)
     }
 
-    fun searchNames(letters: String, callbackListener: (Map<String, String>) -> Unit) {
-        this.namesCallbackListener = callbackListener
+    /**
+     * Functie om op CUP namen te zoeken op (begin)letters van de achternaam
+     *
+     * @param letters   letters om mee te zoeken
+     * @param callback  functie die wordt uitgevoerd na de response
+     *
+     */
+    fun searchNames(letters: String, callback: (Map<String, String>) -> Unit) {
+        this.namesCallback = callback
 
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
@@ -179,11 +193,11 @@ class CUPIntegration(context: Context) {
                     )
 
             /**
-             *
              * Maakt een Map<String, String> van headers in het volgende formaat:
              * Client-Key=<sp/ci_clientKey>
              * Bewaartoken=<sp/ci_preservationToken>
              *
+             * @return  map van headers
              */
 
             override fun getHeaders(): Map<String, String> =
@@ -204,8 +218,15 @@ class CUPIntegration(context: Context) {
         queue.add(stringRequest)
     }
 
-    fun logIn(userName: String, pinCode: String, callbackListener: (error: String) -> Unit) {
-        this.logInCallbackListener = callbackListener
+    /**
+     * Functie om op CUP in te loggen
+     *
+     * @param name      naam waarmee wordt ingelogd
+     * @param pinCode   pincode, nodig om mee in te loggen
+     * @param callback  functie die wordt uitgevoerd na een response
+     */
+    fun logIn(name: String, pinCode: String, callback: (error: String) -> Unit) {
+        this.logInCallback = callback
 
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
@@ -221,18 +242,17 @@ class CUPIntegration(context: Context) {
             override fun getParams(): MutableMap<String, String> =
                     mutableMapOf(
                             "actie" to Actions.LogIn.action,
-                            Params.UserName.param to userName,
+                            Params.UserName.param to name,
                             Params.PinCode.param to pinCode
                     )
 
             /**
-             *
              * Maakt een Map<String, String> van headers in het volgende formaat:
              * Client-Key=<sp/ci_clientKey>
              * Bewaartoken=<sp/ci_preservationToken>
              *
+             * @return  map van headers
              */
-
             override fun getHeaders(): Map<String, String> =
                     hashMapOf(
                             Params.ClientKey.param to
@@ -296,9 +316,9 @@ class CUPIntegration(context: Context) {
         }
 
         if (respType == ResponseType.SearchNames)
-            namesCallbackListener(availableNames)
+            namesCallback(availableNames)
         else if (respType == ResponseType.LogIn)
-            logInCallbackListener(okRes)
+            logInCallback(okRes)
     }
 
     private fun handleError(error: String, respType: ResponseType) {
@@ -356,7 +376,7 @@ class CUPIntegration(context: Context) {
                                     error.split("|")[3] + "\"")
 
                     if (respType == ResponseType.LogIn)
-                        logInCallbackListener(error.split("|")[3])
+                        logInCallback(error.split("|")[3])
                 }
             } else {
                 Log.e("ERROR", e.message)
