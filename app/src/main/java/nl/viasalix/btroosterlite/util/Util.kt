@@ -11,5 +11,17 @@ class Util {
 
             return networkInfo != null && networkInfo.isConnected
         }
+
+        fun <K, V>getIndexByKey(map: LinkedHashMap<K, V>, key: K) : Int? {
+            var i = 0
+
+            map.forEach {
+                if (it.key == key)
+                    return i
+                i++
+            }
+
+            return null
+        }
     }
 }

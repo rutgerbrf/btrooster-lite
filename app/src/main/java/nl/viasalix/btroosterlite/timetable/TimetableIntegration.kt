@@ -3,10 +3,7 @@ package nl.viasalix.btroosterlite.timetable
 import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.net.Uri
-import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.preference.PreferenceManager
 import android.util.Log
@@ -56,30 +53,13 @@ class TimetableIntegration(private var context: Context,
         }
     }
 
-    private fun handleResponse(response: String?): MutableMap<Int, String> {
-        val indexes: MutableMap<Int, String> = mutableMapOf()
-
-        if (response != null) {
-            val responses = response.trim().split("\n")
-
-            responses
-                    .filter { it.isNotEmpty() }
-                    .map { it.split("|") }
-                    .forEach { responseWeek ->
-                        indexes[responseWeek[0].toInt()] = ""
-                    }
-        }
-
-        return indexes
-    }
-
     fun downloadAvailableTimetables() {
         val onlyWifiPref = sharedPreferences.getBoolean("t_preload_only_wifi", true)
 
         if (online(context)) {
             if (wifiIsConnected(context) == onlyWifiPref) {
                 getIndexes { it, _ ->
-                    val response = handleResponse(it)
+                    val response = handleIndexResponse(it)
 
                     doAsync {
                         response.forEach {
@@ -112,6 +92,8 @@ class TimetableIntegration(private var context: Context,
         if (online(context)) {
             val typeString = getType(code)
 
+            val weekString: String = week.toString(2)
+
             // Maak de URL
             val builder = Uri.Builder()
             builder.scheme("https")
@@ -131,9 +113,6 @@ class TimetableIntegration(private var context: Context,
 
             val stringRequest = object : StringRequest(Request.Method.GET, url,
                     Response.Listener<String> {
-                        Log.d("data (getTimetable, ttInteg", "data: $it")
-                        Log.d("recexists", "${recordExists(identifier)}")
-
                         if (recordExists(identifier)) {
                             updateTimetable(identifier, it)
                             callback(it)
@@ -323,6 +302,23 @@ class TimetableIntegration(private var context: Context,
                 return true
             } else
                 return false
+        }
+
+        fun handleIndexResponse(response: String?): LinkedHashMap<Int, String> {
+            val indexes: LinkedHashMap<Int, String> = linkedMapOf()
+
+            if (response != null) {
+                val responses = response.trim().split("\n")
+
+                responses
+                        .filter { it.isNotEmpty() }
+                        .map { it.split("|") }
+                        .forEach { responseWeek ->
+                            indexes[responseWeek[0].toInt()] = responseWeek[1]
+                        }
+            }
+
+            return indexes
         }
     }
 }

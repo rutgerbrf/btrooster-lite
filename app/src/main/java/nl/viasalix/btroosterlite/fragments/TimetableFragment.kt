@@ -22,8 +22,6 @@ import android.app.Fragment
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
@@ -47,15 +45,18 @@ import android.widget.Spinner
 
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
-import java.util.ArrayList
 import java.util.Calendar
 import java.util.Stack
 import java.util.regex.Pattern
 
-import android.content.Context.CONNECTIVITY_SERVICE
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.activities.SettingsActivity
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
+import nl.viasalix.btroosterlite.util.Util.Companion.getIndexByKey
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.defaultSharedPreferences
+import org.jetbrains.anko.noButton
+import org.jetbrains.anko.yesButton
 
 class TimetableFragment : Fragment() {
     private var weekSpinner: Spinner? = null
@@ -64,8 +65,7 @@ class TimetableFragment : Fragment() {
     private var location: String? = ""
     private var type = ""
     // Variabelen om beschikbare weken weer te geven
-    private var availableWeeks: MutableList<String> = ArrayList()
-    private var availableWeeksNames: MutableList<String> = ArrayList()
+    private var availableWeeks: LinkedHashMap<Int, String> = linkedMapOf()
     // Initialiseer benodigde variabelen
     private var sharedPreferences: SharedPreferences? = null
     private var currentView: View? = null
@@ -91,7 +91,8 @@ class TimetableFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_reload -> {
-                loadTimetable(true)
+                loadTimetable()
+                getIndexes()
                 return true
             }
             R.id.action_settings -> {
@@ -141,18 +142,20 @@ class TimetableFragment : Fragment() {
 
         ttInteg = TimetableIntegration(activity!!, location!!, code!!)
 
-        if (loadSharedPreferences() != 1)
-            loadTimetable(true)
+        if (loadSharedPreferences() != 1) {
+            getIndexes()
+            loadTimetable()
+        }
     }
 
     private fun loadSharedPreferences(): Int {
         if (!sharedPreferences!!.contains("code")) {
-            showCodeDialog()
+            showCodeAlert()
             return 1
         }
 
         if (!sharedPreferences!!.contains("location")) {
-            showLocationDialog()
+            showLocationAlert()
             return 1
         }
 
@@ -162,6 +165,34 @@ class TimetableFragment : Fragment() {
         type = getType(code)
 
         return 0
+    }
+
+    private fun showCodeAlert() {
+        alert(
+            "Je hebt geen leerlingnummer/roostercode ingesteld. Zolang deze niet staat ingesteld, zal het rooster niet geladen kunnen worden",
+            "Waarschuwing") {
+
+            yesButton {
+                onStart()
+            }
+
+            noButton {
+                activity!!.finish()
+            }
+        }
+    }
+
+    private fun showLocationAlert() {
+        alert("Je hebt geen locatie ingesteld. Zolang deze niet staat ingesteld, zal het rooster niet geladen kunnen worden",
+                "Waarschuwing") {
+            yesButton {
+                onStart()
+            }
+
+            noButton {
+                activity!!.finish()
+            }
+        }
     }
 
     private fun getType(code: String?): String {
@@ -182,64 +213,6 @@ class TimetableFragment : Fragment() {
         return "none"
     }
 
-    private fun showCodeDialog() {
-        val builder = AlertDialog.Builder(activity)
-        builder.setTitle("Code")
-
-        val layout = LinearLayout(activity)
-        val layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT)
-
-        layout.layoutParams = layoutParams
-        val input = EditText(activity)
-        input.inputType = InputType.TYPE_CLASS_TEXT
-        input.layoutParams = layoutParams
-
-        val margin_left_right_bottom = getPixelValue(activity, 24)
-        val margin_top = getPixelValue(activity, 20)
-        layoutParams.setMargins(margin_left_right_bottom,
-                margin_top,
-                margin_left_right_bottom,
-                margin_left_right_bottom)
-
-        layout.addView(input)
-
-        builder.setView(layout)
-
-        builder.setPositiveButton("OK") { _, _ ->
-            sharedPreferences!!.edit().putString("code", input.text.toString()).apply()
-            onStart()
-        }.setNegativeButton("Annuleren") { dialog, _ ->
-                    activity.finish()
-                    dialog.cancel()
-                }
-
-        builder.show()
-    }
-
-    private fun showLocationDialog() {
-        val builder = AlertDialog.Builder(activity)
-        builder.setTitle("Locatie")
-        val items = locaties
-
-        builder.setSingleChoiceItems(items, -1) { dialog, which -> }
-
-        builder.setPositiveButton("OK") { dialog, which ->
-            val selectedPosition = (dialog as AlertDialog).listView.checkedItemPosition
-            sharedPreferences!!.edit().putString("location", locatiesURL[selectedPosition]).apply()
-            Log.d("selected", Integer.toString(selectedPosition))
-            onStart()
-        }
-
-        builder.setNegativeButton("Annuleren") { dialog, which ->
-            activity.finish()
-            dialog.cancel()
-        }
-
-        builder.show()
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is OnFragmentInteractionListener) {
@@ -252,74 +225,61 @@ class TimetableFragment : Fragment() {
         mListener = null
     }
 
-    private fun loadTimetable(getIndexes: Boolean) {
-        if (getIndexes) {
-            getIndexes()
-        } else {
-            getTimetable(sharedPreferences!!.getString("t_week",
-                    currentWeekOfYear.toString()))
-        }
+    private fun loadTimetable() {
+        getTimetable(sharedPreferences!!.getInt("t_week",
+                currentWeekOfYear))
     }
 
-    private fun getTimetable(week: String) {
-        ttInteg!!.loadTimetable(week.toInt(), webView!!)
+    private fun getTimetable(week: Int) {
+        ttInteg!!.loadTimetable(week, webView!!)
     }
 
     private fun getIndexes() {
         ttInteg!!.getIndexes { it, wasOnline ->
             if (wasOnline) {
-                handleResponse(it)
+                handleIndexResponse(it)
                 getTimetable(
-                        sharedPreferences!!.getString(
+                        defaultSharedPreferences.getInt(
                                 "t_week",
-                                currentWeekOfYear.toString()))
+                                currentWeekOfYear))
             } else {
-                handleResponse(it)
+                handleIndexResponse(it)
             }
         }
     }
 
-    private fun handleResponse(response: String?) {
+    private fun handleIndexResponse(response: String?) {
         if (response != null) {
-            availableWeeks.clear()
-            availableWeeksNames.clear()
-
-            var i = 0
-            val responses = response.trim().split("\n")
-
-            for (responseString in responses) {
-                if (responseString.isNotEmpty()) {
-                    val responseStringSplit = responseString.split("|")
-
-                    availableWeeks.add(i, responseStringSplit[0])
-                    availableWeeksNames.add(i, responseStringSplit[1])
-                    ++i
-                }
-            }
+            val availableWeeks = TimetableIntegration.handleIndexResponse(response)
 
             if (activity != null) {
                 val adapter = ArrayAdapter(
                         activity,
                         android.R.layout.simple_spinner_dropdown_item,
-                        availableWeeksNames)
+                        availableWeeks.values.toList())
 
                 weekSpinner!!.adapter = adapter
-
-                weekSpinner!!.setSelection(
-                        availableWeeks.indexOf(
-                                sharedPreferences!!.getString(
-                                        "t_week",
-                                        Integer.toString(currentWeekOfYear))))
 
                 weekSpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
                         sharedPreferences!!.edit().putString("t_week", availableWeeks[position]).apply()
 
-                        loadTimetable(false)
+                        loadTimetable()
                     }
 
                     override fun onNothingSelected(adapterView: AdapterView<*>) {}
                 }
+
+                val indexToSet =
+                        getIndexByKey(availableWeeks,
+                                defaultSharedPreferences.getInt(
+                                        "t_week",
+                                        currentWeekOfYear))
+
+                if (indexToSet != null)
+                    weekSpinner!!.setSelection(indexToSet)
+                else
+                    weekSpinner!!.setSelection(2)
             }
         }
     }
