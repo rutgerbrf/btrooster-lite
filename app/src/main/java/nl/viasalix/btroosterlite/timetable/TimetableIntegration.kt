@@ -6,6 +6,8 @@ import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
+import android.net.wifi.WifiInfo
+import android.net.wifi.WifiManager
 import android.preference.PreferenceManager
 import android.util.Log
 import android.webkit.WebView
@@ -15,6 +17,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.cup.CUPIntegration
+import nl.viasalix.btroosterlite.util.Util.Companion.online
 import org.jetbrains.anko.doAsync
 import java.util.regex.Pattern
 
@@ -195,7 +198,7 @@ class TimetableIntegration(private var context: Context,
         })
     }
 
-    fun loadDataInWebView(data: String, webView: WebView) {
+    private fun loadDataInWebView(data: String, webView: WebView) {
         webView.loadData(data, "text/html; charset=UTF-8", null)
     }
 
@@ -207,9 +210,7 @@ class TimetableIntegration(private var context: Context,
             put(TimetableContract.Timetable.COLUMN_NAME_TIMETABLE, timetable)
         }
 
-        Log.d("SAVING", "SAVING DATA: id: $identifier, tt: $timetable")
-
-        val newRowId = db?.insert(TimetableContract.Timetable.TABLE_NAME, null, values)
+        db?.insert(TimetableContract.Timetable.TABLE_NAME, null, values)
     }
 
     fun updateTimetable(identifier: String, timetable: String) {
@@ -221,14 +222,14 @@ class TimetableIntegration(private var context: Context,
 
         val selection = "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} = ?"
         val selectionArgs = arrayOf(identifier)
-        val count = db.update(
+        db.update(
                 TimetableContract.Timetable.TABLE_NAME,
                 values,
                 selection,
                 selectionArgs)
     }
 
-    fun loadTimetableFromDatabase(identifier: String): String {
+    private fun loadTimetableFromDatabase(identifier: String): String {
         val db = dbHelper.readableDatabase
 
         val projection = arrayOf(TimetableContract.Timetable.COLUMN_NAME_TIMETABLE)
@@ -254,16 +255,13 @@ class TimetableIntegration(private var context: Context,
             }
         }
 
-        Log.d("test ltfd", "yo")
-        Log.d("timetables", timetables.joinToString())
-
-        if (timetables.isNotEmpty())
-            return timetables[0]
+        return if (timetables.isNotEmpty())
+            timetables[0]
         else
-            return ""
+            ""
     }
 
-    fun deleteTimetable(identifier: String) {
+    private fun deleteTimetable(identifier: String) {
         val db = dbHelper.writableDatabase
 
         val selection = "${TimetableContract.Timetable.COLUMN_NAME_TIMETABLE} LIKE ?" +
@@ -300,7 +298,8 @@ class TimetableIntegration(private var context: Context,
             val docentPattern = Pattern.compile(docentPatternInput)
             val leerlingPattern = Pattern.compile(leerlingPatternInput)
 
-            if (!docentPattern.matcher(code!!).matches() && !leerlingPattern.matcher(code).matches()) {
+            if (!docentPattern.matcher(code!!).matches() &&
+                    !leerlingPattern.matcher(code).matches()) {
                 return "c"
             } else if (docentPattern.matcher(code).matches()) {
                 return "t"
@@ -311,19 +310,19 @@ class TimetableIntegration(private var context: Context,
             return "none"
         }
 
-        fun online(context: Context): Boolean {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
-
-            return networkInfo != null && networkInfo.isConnected
-        }
-
         fun wifiIsConnected(context: Context): Boolean {
-            val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val wifi = connMgr.getNetworkInfo(
-                    ConnectivityManager.TYPE_WIFI)
+            val manager = context.applicationContext.getSystemService(Context.WIFI_SERVICE)
+                    as WifiManager
 
-            return wifi.isConnected
+            if (manager.isWifiEnabled) {
+                val wifiInfo = manager.connectionInfo
+
+                if (wifiInfo.networkId == -1)
+                    return false
+
+                return true
+            } else
+                return false
         }
     }
 }

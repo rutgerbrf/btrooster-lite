@@ -15,7 +15,7 @@ import com.stepstone.stepper.VerificationError
 import nl.viasalix.btroosterlite.singleton.Singleton
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.cup.CUPIntegration
-import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.online
+import nl.viasalix.btroosterlite.util.Util.Companion.online
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.support.v4.defaultSharedPreferences
@@ -50,17 +50,6 @@ class CUPConfigFragment2 : Fragment(), Step {
             if (defaultSharedPreferences.getString("ci_preservationToken", "").isEmpty()) {
                 Singleton.cupIntegration = CUPIntegration(activity!!)
             }
-        } else {
-            alert("Je bent niet verbonden met het internet. Opnieuw proberen?",
-                    "Opnieuw proberen?") {
-                yesButton {
-                    searchNames()
-                }
-
-                noButton {
-                    activity!!.finish()
-                }
-            }
 
             Singleton.cupIntegration!!.searchNames(Singleton.name, {
                 nameMap = it.toMutableMap()
@@ -72,8 +61,24 @@ class CUPConfigFragment2 : Fragment(), Step {
                     rgName!!.addView(rb)
                 }
             })
+        } else {
+            alertNotConnected()
         }
     }
+
+    private fun alertNotConnected() {
+        alert("Je bent niet verbonden met het internet. Opnieuw proberen?",
+                "Opnieuw proberen?") {
+            yesButton {
+                searchNames()
+            }
+
+            noButton {
+                activity!!.finish()
+            }
+        }
+    }
+
 
     override fun verifyStep(): VerificationError? {
         if (rgName!!.checkedRadioButtonId == -1)

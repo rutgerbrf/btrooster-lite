@@ -34,10 +34,10 @@ class CUPConfigFragment3 : Fragment(), Step {
     }
 
     override fun verifyStep(): VerificationError? {
-        var test = defaultSharedPreferences.getStringSet("cc_name", mutableSetOf())
-        test.first()
+        var name = defaultSharedPreferences.getStringSet("cc_name", mutableSetOf())
+        name.first()
 
-        Singleton.cupIntegration!!.logIn(test.first(), etPinCode!!.text.toString(), {
+        Singleton.cupIntegration!!.logIn(name.first(), etPinCode!!.text.toString(), {
             Log.d("it", it)
 
             if (it == "" || it == "Ok") {
