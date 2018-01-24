@@ -92,8 +92,6 @@ class TimetableIntegration(private var context: Context,
         if (online(context)) {
             val typeString = getType(code)
 
-            val weekString: String = week.toString(2)
-
             // Maak de URL
             val builder = Uri.Builder()
             builder.scheme("https")
@@ -102,7 +100,7 @@ class TimetableIntegration(private var context: Context,
                     .appendQueryParameter("code", code)
                     .appendQueryParameter("locatie", location)
                     .appendQueryParameter("type", typeString)
-                    .appendQueryParameter("week", week.toString())
+                    .appendQueryParameter("week", String.format("%02d", week))
             val url = builder.build().toString()
 
 
