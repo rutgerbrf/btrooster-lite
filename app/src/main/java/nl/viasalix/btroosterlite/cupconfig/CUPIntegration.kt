@@ -36,10 +36,10 @@ import java.util.*
 import kotlin.collections.HashMap
 
 /**
- *
  * CUP integratie voor het rooster
- * APIDOC: https://crooster.tk/doc/api.html
+ * @see <a href="https://crooster.tk/doc/api.html">APIDOC</a>
  *
+ * @param context   context die moet worden meegegeven voor de sharedPreferences
  */
 
 class CUPIntegration(context: Context) {
@@ -54,17 +54,12 @@ class CUPIntegration(context: Context) {
     val CLIENTKEY = "ci_clientKey"
 
     init {
-        if (sharedPreferences.getString(PRESTOK, "").isEmpty()) {
-            if (sharedPreferences.getString(CLIENTKEY, "").isEmpty()) {
-                sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
-                getToken()
-            } else {
-                sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
-                getToken()
-            }
-        } else
-            if (sharedPreferences.getString(CLIENTKEY, "").isEmpty())
-                sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
+        // Checkt of de clientKey en bewaartoken al bestaan, anders worden deze gemaakt
+        if (sharedPreferences.getString(CLIENTKEY, "").isEmpty())
+            sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
+
+        if (sharedPreferences.getString(PRESTOK, "").isEmpty())
+            getToken()
     }
 
     enum class ErrorCode(val code: String) {
@@ -111,6 +106,8 @@ class CUPIntegration(context: Context) {
 
     /**
      * Functie om het bewaartoken op te halen
+     *
+     * @see <a href="https://crooster.tk/doc/api.html">APIDOC</a>
      */
     private fun getToken() {
         // Zorg dat de request eenmalig wordt verstuurd
@@ -131,6 +128,7 @@ class CUPIntegration(context: Context) {
              * Client-Key=<sp/ci_clientKey>
              *
              * @return  map van headers
+             * @see     <a href="https://crooster.tk/doc/api.html">APIDOC</a>
              */
 
             override fun getHeaders(): Map<String, String> =
@@ -170,7 +168,7 @@ class CUPIntegration(context: Context) {
      *
      * @param letters   letters om mee te zoeken
      * @param callback  functie die wordt uitgevoerd na de response
-     *
+     * @see             <a href="https://crooster.tk/doc/api.html">APIDOC</a>
      */
     fun searchNames(letters: String, callback: (Map<String, String>) -> Unit) {
         this.namesCallback = callback
@@ -224,6 +222,7 @@ class CUPIntegration(context: Context) {
      * @param name      naam waarmee wordt ingelogd
      * @param pinCode   pincode, nodig om mee in te loggen
      * @param callback  functie die wordt uitgevoerd na een response
+     * @see             <a href="https://crooster.tk/doc/api.html">APIDOC</a>
      */
     fun logIn(name: String, pinCode: String, callback: (error: String) -> Unit) {
         this.logInCallback = callback
@@ -271,6 +270,10 @@ class CUPIntegration(context: Context) {
         queue.add(stringRequest)
     }
 
+    /**
+     * Functie om te bepalen of een response een foutmelding is of niet.
+     * Voert daarna de corresponderende functie uit.
+     */
     private fun handleResponse(response: String, respType: ResponseType) {
         if (response.isNotEmpty()) {
             if (response.startsWith("ERR"))
@@ -282,6 +285,12 @@ class CUPIntegration(context: Context) {
         }
     }
 
+    /**
+     * Functie om normaal antwoord te behandelen
+     *
+     * @param   response    response van API
+     * @param   respType    type response: welke callback moet worden uitgevoerd
+     */
     private fun handleNormalResponse(response: String, respType: ResponseType) {
         val keys: MutableList<String> = ArrayList()
         val values: MutableList<String> = ArrayList()
@@ -304,9 +313,11 @@ class CUPIntegration(context: Context) {
                             .apply()
                     Log.d("BEWAARTOKEN", values[keys.indexOf(it)].trim())
                 }
+
                 ResponseHeaders.Ok.header -> {
                     okRes = "Ok"
                 }
+
             // Neemt aan dat de response een lijst van namen is
                 else -> {
                     if (respType == ResponseType.SearchNames)
@@ -321,13 +332,20 @@ class CUPIntegration(context: Context) {
             logInCallback(okRes)
     }
 
+    /**
+     * Functie die errors gehandelt
+     *
+     * @param error     foutmelding van de API
+     * @param respType  type response: bepaalt welke callback moet worden gedraaid
+     * @see             <a href="https://crooster.tk/doc/api.html">APIDOC</a>
+     */
     private fun handleError(error: String, respType: ResponseType) {
+        // Type error
         val key = error.split("|")[1]
 
-        Log.d("handleError key", key)
-        Log.d("handleError [0]", error.split("|")[0])
-
         try {
+            // Check de vorm van de exception
+
             when (key) {
                 ErrorCode.ClientKeyNull.code ->
                     throw NullPointerException("ClientKeyNull")
@@ -368,6 +386,11 @@ class CUPIntegration(context: Context) {
                                     error.split("|")[2])
                 }
             } else if (e.message == "Text") {
+                /*
+                 * Foutmelding in de vorm van:
+                 * "ERROR: (<actie>): <foutmelding>"
+                 */
+
                 if (error.split("|")[2].isNotEmpty() &&
                         error.split("|")[3].isNotEmpty()) {
                     Log.e("ERROR",
@@ -379,6 +402,9 @@ class CUPIntegration(context: Context) {
                         logInCallback(error.split("|")[3])
                 }
             } else {
+                /*
+                 * Als de foutmelding niet bekend is, spuw dan een error uit over de log
+                 */
                 Log.e("ERROR", e.message)
             }
         }
