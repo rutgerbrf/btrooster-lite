@@ -28,7 +28,7 @@ android {
         applicationId "nl.viasalix.btroosterlite"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 15
+        versionCode 17
         versionName "1.8.0-ALPHA"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
