@@ -29,11 +29,15 @@ class CUPConfigAdapter(fm: FragmentManager, context: Context) : AbstractFragment
     }
 
     @NonNull
-    override fun getViewModel(@IntRange(from = 0) position: Int): StepViewModel {
-        return StepViewModel.Builder(context)
-                .setTitle("BTRooster Lite")
-                .create()
-    }
+    override fun getViewModel(@IntRange(from = 0) position: Int): StepViewModel =
+            StepViewModel.Builder(context)
+                    .setTitle("BTRooster Lite")
+                    .setEndButtonLabel(
+                            if (position == getCount() - 1)
+                                "Klaar"
+                            else
+                                "Volgende"
+                    ).setBackButtonLabel("Terug").create()
 
     override fun getCount() = 3
 }

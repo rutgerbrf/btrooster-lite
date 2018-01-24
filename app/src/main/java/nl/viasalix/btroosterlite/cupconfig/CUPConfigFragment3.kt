@@ -1,5 +1,6 @@
 package nl.viasalix.btroosterlite.cupconfig
 
+import android.content.Intent
 import android.support.v4.app.Fragment
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,7 @@ import com.stepstone.stepper.Step
 import com.stepstone.stepper.VerificationError
 import nl.viasalix.btroosterlite.singleton.Singleton
 import nl.viasalix.btroosterlite.R
+import nl.viasalix.btroosterlite.activities.MainActivity
 import org.jetbrains.anko.support.v4.defaultSharedPreferences
 
 class CUPConfigFragment3 : Fragment(), Step {
@@ -41,6 +43,14 @@ class CUPConfigFragment3 : Fragment(), Step {
             if (it == "" || it == "Ok") {
                 tvErrorCode!!.visibility = View.INVISIBLE
                 tvErrorCode!!.visibility = View.INVISIBLE
+
+                defaultSharedPreferences.edit()
+                        .putBoolean("cupPossible", true)
+                        .putBoolean("cupConfigured", true)
+                        .putBoolean("cupCancelled", false)
+                        .apply()
+
+                startActivity(Intent(activity!!, MainActivity::class.java))
             } else
                 onError(VerificationError(it))
         })

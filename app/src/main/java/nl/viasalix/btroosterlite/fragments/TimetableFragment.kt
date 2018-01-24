@@ -297,27 +297,29 @@ class TimetableFragment : Fragment() {
                 }
             }
 
-            val adapter = ArrayAdapter(
-                    activity,
-                    android.R.layout.simple_spinner_dropdown_item,
-                    availableWeeksNames)
+            if (activity != null) {
+                val adapter = ArrayAdapter(
+                        activity,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        availableWeeksNames)
 
-            weekSpinner!!.adapter = adapter
+                weekSpinner!!.adapter = adapter
 
-            weekSpinner!!.setSelection(
-                    availableWeeks.indexOf(
-                            sharedPreferences!!.getString(
-                                    "t_week",
-                                    Integer.toString(currentWeekOfYear))))
+                weekSpinner!!.setSelection(
+                        availableWeeks.indexOf(
+                                sharedPreferences!!.getString(
+                                        "t_week",
+                                        Integer.toString(currentWeekOfYear))))
 
-            weekSpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
-                    sharedPreferences!!.edit().putString("t_week", availableWeeks[position]).apply()
+                weekSpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
+                        sharedPreferences!!.edit().putString("t_week", availableWeeks[position]).apply()
 
-                    loadTimetable(false)
+                        loadTimetable(false)
+                    }
+
+                    override fun onNothingSelected(adapterView: AdapterView<*>) {}
                 }
-
-                override fun onNothingSelected(adapterView: AdapterView<*>) {}
             }
         }
     }

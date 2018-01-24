@@ -14,7 +14,11 @@ import com.stepstone.stepper.Step
 import com.stepstone.stepper.VerificationError
 import nl.viasalix.btroosterlite.singleton.Singleton
 import nl.viasalix.btroosterlite.R
+import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.online
+import org.jetbrains.anko.noButton
+import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.support.v4.defaultSharedPreferences
+import org.jetbrains.anko.yesButton
 
 class CUPConfigFragment2 : Fragment(), Step {
     private var rgName: RadioGroup? = null
@@ -41,16 +45,33 @@ class CUPConfigFragment2 : Fragment(), Step {
 
         nameMap.clear()
 
-        Singleton.cupIntegration!!.searchNames(Singleton.name, {
-            nameMap = it.toMutableMap()
-
-            it.forEach {
-                val rb = RadioButton(activity)
-                rb.text = it.value
-
-                rgName!!.addView(rb)
+        if (online(activity!!)) {
+            if (defaultSharedPreferences.getString("ci_preservationToken", "").isEmpty()) {
+                Singleton.cupIntegration = CUPIntegration(activity!!)
             }
-        })
+        } else {
+            alert("Je bent niet verbonden met het internet. Opnieuw proberen?",
+                    "Opnieuw proberen?") {
+                yesButton {
+                    searchNames()
+                }
+
+                noButton {
+                    activity!!.finish()
+                }
+            }
+
+            Singleton.cupIntegration!!.searchNames(Singleton.name, {
+                nameMap = it.toMutableMap()
+
+                it.forEach {
+                    val rb = RadioButton(activity)
+                    rb.text = it.value
+
+                    rgName!!.addView(rb)
+                }
+            })
+        }
     }
 
     override fun verifyStep(): VerificationError? {
