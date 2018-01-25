@@ -53,6 +53,27 @@ class TimetableIntegration(private var context: Context,
         }
     }
 
+    /**
+     * Functie die de URL om het rooster op te halen bouwt
+     *
+     * @param week  week in het jaar van het rooster
+     * @return      URL om het rooster op te halen
+     */
+    fun buildURL(week: Int): String {
+        // Bepaalt of de gebruiker een docent, klas of leerling is
+        val typeString = code.getType()
+
+        val builder = Uri.Builder()
+        builder.scheme("https")
+                .authority(MainActivity.AUTHORITY)
+                .appendPath("RoosterEmbedServlet")
+                .appendQueryParameter("code", code)
+                .appendQueryParameter("locatie", location)
+                .appendQueryParameter("type", typeString)
+                .appendQueryParameter("week", String.format("%02d", week))
+        return builder.build().toString()
+    }
+
     fun downloadAvailableTimetables() {
         val onlyWifiPref = sharedPreferences.getBoolean("t_preload_only_wifi", true)
 
@@ -72,15 +93,13 @@ class TimetableIntegration(private var context: Context,
     }
 
     /**
-     *
      * Functie die het rooster met de gegeven week downloadt en daarna (eventueel) de callback
      * uitvoert.
      *
      * @param week      week in het jaar van het rooster
      * @param callback  functie die wordt uitgevoerd als de stringRequest een response heeft
-     *
      */
-    fun downloadTimetable(week: Int, callback: (String) -> Unit) {
+    private fun downloadTimetable(week: Int, callback: (String) -> Unit) {
         /*
          * Identifier die wordt gebruikt als key in de database
          * Ziet er als volgt uit: "<code>|<week>"
@@ -90,26 +109,13 @@ class TimetableIntegration(private var context: Context,
 
         // Check of de gebruiker online is
         if (online(context)) {
-            val typeString = getType(code)
-
-            // Maak de URL
-            val builder = Uri.Builder()
-            builder.scheme("https")
-                    .authority(MainActivity.AUTHORITY)
-                    .appendPath("RoosterEmbedServlet")
-                    .appendQueryParameter("code", code)
-                    .appendQueryParameter("locatie", location)
-                    .appendQueryParameter("type", typeString)
-                    .appendQueryParameter("week", String.format("%02d", week))
-            val url = builder.build().toString()
-
-
             /*
              *  Maak een nieuw StringRequest aan en override een aantal functies om de goede
              *  parameters mee te geven
              */
 
-            val stringRequest = object : StringRequest(Request.Method.GET, url,
+            val stringRequest = object : StringRequest(
+                    Request.Method.GET, buildURL(week),
                     Response.Listener<String> {
                         if (recordExists(identifier)) {
                             updateTimetable(identifier, it)
@@ -132,7 +138,6 @@ class TimetableIntegration(private var context: Context,
                  * Bewaartoken=<sp/ci_preservationToken>
                  *
                  */
-
                 override fun getHeaders(): Map<String, String> =
                         hashMapOf(
                                 CUPIntegration.Params.ClientKey.param to
@@ -268,19 +273,19 @@ class TimetableIntegration(private var context: Context,
         const val errorMessage =
                 "Dit rooster kon niet geladen worden"
 
-        fun getType(code: String?): String {
+        fun String?.getType(): String {
             val docentPatternInput = "([A-Za-z]){3}"
             val leerlingPatternInput = "([0-9]){5}"
 
             val docentPattern = Pattern.compile(docentPatternInput)
             val leerlingPattern = Pattern.compile(leerlingPatternInput)
 
-            if (!docentPattern.matcher(code!!).matches() &&
-                    !leerlingPattern.matcher(code).matches()) {
+            if (!docentPattern.matcher(this!!).matches() &&
+                    !leerlingPattern.matcher(this).matches()) {
                 return "c"
-            } else if (docentPattern.matcher(code).matches()) {
+            } else if (docentPattern.matcher(this).matches()) {
                 return "t"
-            } else if (leerlingPattern.matcher(code).matches()) {
+            } else if (leerlingPattern.matcher(this).matches()) {
                 return "s"
             }
 
