@@ -30,25 +30,26 @@ class CUPConfigFragment1 : Fragment(), Step {
         ivError = activity!!.findViewById(R.id.iv_error)
     }
 
-    override fun verifyStep(): VerificationError? {
+    override fun verifyStep(): VerificationError? =
         return if (etSurname!!.text.length < 3 || etSurname!!.text.length > 7)
             VerificationError("INCORRECT_SIZE")
         else {
+            // Correct ingevuld, laat de foutmelding (niet meer) zien (voor als de gebruiker terugkomt)
             tvErrorCode!!.visibility = View.INVISIBLE
             ivError!!.visibility = View.INVISIBLE
 
+            // Zet de letters in de singleton voor gebruik in het volgende fragment
             Singleton.name = etSurname!!.text.toString()
-            Log.d("surname: ", etSurname!!.text.toString())
 
             null
         }
-    }
 
     override fun onSelected() {}
 
     override fun onError(error: VerificationError) {
         when (error.errorMessage) {
             "INCORRECT_SIZE" -> {
+                // Foutmelding staat hardcoded in res/layout/cconf_step1.xml
                 tvErrorCode!!.visibility = View.VISIBLE
                 ivError!!.visibility = View.VISIBLE
             }
