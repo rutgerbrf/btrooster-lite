@@ -24,31 +24,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.text.InputType
-import android.util.Log
-import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.WebView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.Spinner
-
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-
-import java.util.Calendar
-import java.util.Stack
-import java.util.regex.Pattern
-
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.activities.SettingsActivity
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
@@ -58,23 +41,22 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.yesButton
+import java.util.*
+import java.util.regex.Pattern
+import kotlin.collections.LinkedHashMap
 
 class TimetableFragment : Fragment() {
     private var weekSpinner: Spinner? = null
-    // Opslag 'roostercode', location en type
+    // Opslag code, location en type
     private var code: String? = ""
     private var location: String? = ""
     private var type = ""
-    // Variabelen om beschikbare weken weer te geven
-    private var availableWeeks: LinkedHashMap<Int, String> = linkedMapOf()
     // Initialiseer benodigde variabelen
     private var sharedPreferences: SharedPreferences? = null
     private var currentView: View? = null
     private var webView: WebView? = null
-    // private var webViewPL: WebView? = null
-    private var pagesToLoad = Stack<String>()
     private var mListener: OnFragmentInteractionListener? = null
-    private var ttInteg: TimetableIntegration? = null
+    private var ttIntegration: TimetableIntegration? = null
 
     private val currentWeekOfYear: Int
         get() = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR)
@@ -138,10 +120,10 @@ class TimetableFragment : Fragment() {
 
         loadSharedPreferences()
 
-        ttInteg = TimetableIntegration(activity!!, location!!, code!!)
+        ttIntegration = TimetableIntegration(activity!!, location!!, code!!)
 
         if (loadSharedPreferences() != 1) {
-            getIndexes()
+            getIndexes(true)
             loadTimetable()
         }
     }
@@ -172,8 +154,8 @@ class TimetableFragment : Fragment() {
 
     private fun showCodeAlert() {
         alert(
-            "Je hebt geen leerlingnummer/roostercode ingesteld. Zolang deze niet staat ingesteld, zal het rooster niet geladen kunnen worden",
-            "Waarschuwing") {
+                "Je hebt geen leerlingnummer/roostercode ingesteld. Zolang deze niet staat ingesteld, zal het rooster niet geladen kunnen worden",
+                "Waarschuwing") {
 
             yesButton {
                 onStart()
@@ -232,18 +214,18 @@ class TimetableFragment : Fragment() {
         getTimetable(sharedPreferences!!.getInt("t_week",
                 currentWeekOfYear))
         if (sharedPreferences!!.getBoolean("t_preload", false)) {
-            ttInteg!!.downloadAvailableTimetables()
+            ttIntegration!!.downloadAvailableTimetables()
         }
     }
 
     private fun getTimetable(week: Int) {
-        ttInteg!!.loadTimetable(week, webView!!)
+        ttIntegration!!.loadTimetable(week, webView!!)
     }
 
-    private fun getIndexes() {
-        ttInteg!!.getIndexes { it, wasOnline ->
+    private fun getIndexes(deleteUnusedTimetables: Boolean = false) {
+        ttIntegration!!.getIndexes { it, wasOnline ->
             if (wasOnline) {
-                handleIndexResponse(it)
+                handleIndexResponse(it, deleteUnusedTimetables)
                 getTimetable(
                         defaultSharedPreferences.getInt(
                                 "t_week",
@@ -254,9 +236,12 @@ class TimetableFragment : Fragment() {
         }
     }
 
-    private fun handleIndexResponse(response: String?) {
+    private fun handleIndexResponse(response: String?, deleteUnusedTimetables: Boolean = false) {
         if (response != null) {
             val availableWeeks = TimetableIntegration.handleIndexResponse(response)
+
+            if (deleteUnusedTimetables)
+                ttIntegration!!.deleteUnusedTimetables(availableWeeks.keys.toList())
 
             if (activity != null) {
                 val adapter = ArrayAdapter(
@@ -302,13 +287,5 @@ class TimetableFragment : Fragment() {
         var locaties = arrayOf("Goes Klein Frankrijk", "Goes Noordhoeklaan", "Goes Stationspark", "Krabbendijke Appelstraat", "Krabbendijke Kerkpolder", "Middelburg", "Tholen")
         // Locaties die in de request URL moeten te komen staan
         var locatiesURL = arrayOf("Goes", "GoesNoordhoeklaan", "GoesStationspark", "KrabbendijkeAppelstraat", "KrabbendijkeKerkpolder", "Middelburg", "Tholen")
-
-        private fun getPixelValue(context: Context, dimenId: Int): Int {
-            val resources = context.resources
-            return TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    dimenId.toFloat(),
-                    resources.displayMetrics).toInt()
-        }
     }
 }

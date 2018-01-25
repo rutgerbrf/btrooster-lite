@@ -15,11 +15,7 @@ class IntroductionFragment1 : Fragment(), Step {
 
     override fun verifyStep(): VerificationError? = null
 
-    override fun onSelected() {
+    override fun onSelected() {}
 
-    }
-
-    override fun onError(error: VerificationError) {
-
-    }
+    override fun onError(error: VerificationError) {}
 }

@@ -205,8 +205,7 @@ class TimetableIntegration(private var context: Context,
 
         val selection = "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} LIKE ?"
         val selectionArgs = arrayOf(identifier)
-        val count = db.update(
-                TimetableContract.Timetable.TABLE_NAME,
+        db.update(TimetableContract.Timetable.TABLE_NAME,
                 values,
                 selection,
                 selectionArgs)
@@ -242,6 +241,12 @@ class TimetableIntegration(private var context: Context,
             timetables[0]
         else
             ""
+    }
+
+    fun deleteUnusedTimetables(weeks: List<Int>) {
+        val db =dbHelper.writableDatabase
+
+        val sql = ""
     }
 
     private fun deleteTimetable(identifier: String) {

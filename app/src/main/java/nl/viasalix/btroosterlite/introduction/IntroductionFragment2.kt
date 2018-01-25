@@ -113,9 +113,7 @@ class IntroductionFragment2 : Fragment(), Step {
         return null
     }
 
-    override fun onSelected() {
-
-    }
+    override fun onSelected() {}
 
     override fun onError(error: VerificationError) {
         when (error.errorMessage) {
