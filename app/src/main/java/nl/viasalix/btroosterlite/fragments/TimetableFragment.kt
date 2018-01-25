@@ -53,6 +53,7 @@ import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.activities.SettingsActivity
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 import nl.viasalix.btroosterlite.util.Util.Companion.getIndexByKey
+import nl.viasalix.btroosterlite.util.Util.Companion.getKeyByIndex
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.noButton
@@ -135,9 +136,6 @@ class TimetableFragment : Fragment() {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
 
-        if (sharedPreferences!!.getBoolean("t_preload", false))
-            ttInteg!!.downloadAvailableTimetables()
-
         loadSharedPreferences()
 
         ttInteg = TimetableIntegration(activity!!, location!!, code!!)
@@ -164,6 +162,11 @@ class TimetableFragment : Fragment() {
         location = sharedPreferences!!.getString("location", locaties[0])
         type = getType(code)
 
+        try {
+            defaultSharedPreferences.getInt("t_week", currentWeekOfYear)
+        } catch (e: ClassCastException) {
+            defaultSharedPreferences.edit().putInt("t_week", currentWeekOfYear).apply()
+        }
         return 0
     }
 
@@ -228,6 +231,9 @@ class TimetableFragment : Fragment() {
     private fun loadTimetable() {
         getTimetable(sharedPreferences!!.getInt("t_week",
                 currentWeekOfYear))
+        if (sharedPreferences!!.getBoolean("t_preload", false)) {
+            ttInteg!!.downloadAvailableTimetables()
+        }
     }
 
     private fun getTimetable(week: Int) {
@@ -262,7 +268,12 @@ class TimetableFragment : Fragment() {
 
                 weekSpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
-                        sharedPreferences!!.edit().putString("t_week", availableWeeks[position]).apply()
+                        val week = getKeyByIndex(availableWeeks, position)
+
+                        if (week != null)
+                            sharedPreferences!!.edit().putInt("t_week", week).apply()
+                        else
+                            sharedPreferences!!.edit().putInt("t_week", currentWeekOfYear).apply()
 
                         loadTimetable()
                     }

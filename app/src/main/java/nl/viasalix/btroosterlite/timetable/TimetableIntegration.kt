@@ -84,6 +84,7 @@ class TimetableIntegration(private var context: Context,
 
                     doAsync {
                         response.forEach {
+                            Log.d("TimetableIntegration", "Downloading timetable for week ${it.key}")
                             downloadTimetable(it.key, {})
                         }
                     }
@@ -202,9 +203,9 @@ class TimetableIntegration(private var context: Context,
             put(TimetableContract.Timetable.COLUMN_NAME_TIMETABLE, timetable)
         }
 
-        val selection = "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} = ?"
+        val selection = "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} LIKE ?"
         val selectionArgs = arrayOf(identifier)
-        db.update(
+        val count = db.update(
                 TimetableContract.Timetable.TABLE_NAME,
                 values,
                 selection,
@@ -259,7 +260,6 @@ class TimetableIntegration(private var context: Context,
         val selectionArgs = arrayOf(identifier)
         val cursor = db.rawQuery(selection, selectionArgs)
 
-        Log.d("cursor.count", cursor.count.toString())
         if (cursor.count <= 0) {
             cursor.close()
             return false

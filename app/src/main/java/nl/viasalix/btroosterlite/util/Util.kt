@@ -23,5 +23,17 @@ class Util {
 
             return null
         }
+
+        fun <K, V>getKeyByIndex(map: LinkedHashMap<K, V>, index: Int) : K? {
+            var i = 0
+
+            map.forEach {
+                if (i == index)
+                    return it.key
+                i++
+            }
+
+            return null
+        }
     }
 }

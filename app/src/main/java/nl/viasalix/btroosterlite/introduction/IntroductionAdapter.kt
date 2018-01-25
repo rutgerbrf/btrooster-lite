@@ -31,7 +31,7 @@ class IntroductionAdapter(fm: FragmentManager, context: Context) : AbstractFragm
             StepViewModel.Builder(context)
                 .setTitle("BTRooster Lite")
                     .setEndButtonLabel(
-                            if (position == getCount() - 1)
+                            if (position == count - 1)
                                 "Klaar"
                             else
                                 "Volgende"
