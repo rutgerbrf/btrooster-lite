@@ -124,6 +124,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        val AUTHORITY = "1d1d1-dot-btrfrontend.appspot.com"
+        const val AUTHORITY = "1d1d1-dot-btrfrontend.appspot.com"
     }
 }

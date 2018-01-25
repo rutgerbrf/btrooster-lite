@@ -52,5 +52,4 @@
         <activity android:name=".introduction.IntroductionActivity"
             android:screenOrientation="portrait" />
     </application>
-
 </manifest>

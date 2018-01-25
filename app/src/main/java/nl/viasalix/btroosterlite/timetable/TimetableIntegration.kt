@@ -61,7 +61,7 @@ class TimetableIntegration(private var context: Context,
      */
     fun buildURL(week: Int): String {
         // Bepaalt of de gebruiker een docent, klas of leerling is
-        val typeString = code.getType()
+        val typeString = getType(code)
 
         val builder = Uri.Builder()
         builder.scheme("https")
@@ -273,19 +273,19 @@ class TimetableIntegration(private var context: Context,
         const val errorMessage =
                 "Dit rooster kon niet geladen worden"
 
-        fun String?.getType(): String {
+        fun getType(code: String): String {
             val docentPatternInput = "([A-Za-z]){3}"
             val leerlingPatternInput = "([0-9]){5}"
 
             val docentPattern = Pattern.compile(docentPatternInput)
             val leerlingPattern = Pattern.compile(leerlingPatternInput)
 
-            if (!docentPattern.matcher(this!!).matches() &&
-                    !leerlingPattern.matcher(this).matches()) {
+            if (!docentPattern.matcher(code).matches() &&
+                    !leerlingPattern.matcher(code).matches()) {
                 return "c"
-            } else if (docentPattern.matcher(this).matches()) {
+            } else if (docentPattern.matcher(code).matches()) {
                 return "t"
-            } else if (leerlingPattern.matcher(this).matches()) {
+            } else if (leerlingPattern.matcher(code).matches()) {
                 return "s"
             }
 

@@ -1,8 +1,5 @@
 package nl.viasalix.btroosterlite
 
-import android.content.Context
-import com.nhaarman.mockito_kotlin.mock
-import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.handleIndexResponse
 import org.junit.Assert.assertEquals
@@ -23,12 +20,13 @@ class TimetableIntegrationTest {
     }
 
     @Test
-    fun testURLBuilder() {
-        val context: Context = mock()
-        val ttInteg = TimetableIntegration(context, "Goes", "12345")
-        val expected = "https://${MainActivity.AUTHORITY}/RoosterEmbedServlet?week=06&code=12345&locatie=Goes"
-        val actual = ttInteg.buildURL(6)
+    fun testGetType() {
+        val actualClass = TimetableIntegration.getType("go1a")
+        val actualStudent = TimetableIntegration.getType("12345")
+        val actualTeacher = TimetableIntegration.getType("abc")
 
-        assertEquals(expected, actual)
+        assertEquals(actualClass, "c")
+        assertEquals(actualStudent, "s")
+        assertEquals(actualTeacher, "t")
     }
 }
