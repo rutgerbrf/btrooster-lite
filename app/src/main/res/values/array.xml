@@ -20,7 +20,7 @@
 -->
 
 <resources>
-    <string-array name="locatieArray">
+    <string-array name="locatieArray" translatable="false">
         <item>Goes Klein Frankrijk</item>
         <item>Goes Noordhoeklaan</item>
         <item>Goes Stationspark</item>
@@ -30,7 +30,7 @@
         <item>Tholen</item>
     </string-array>
 
-    <string-array name="locatieValues">
+    <string-array name="locatieValues" translatable="false">
         <item>Goes</item>
         <item>GoesNoorhoeklaan</item>
         <item>GoesStationspark</item>
