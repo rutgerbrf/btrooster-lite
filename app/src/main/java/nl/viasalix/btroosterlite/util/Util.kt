@@ -30,7 +30,7 @@ class Util {
             return networkInfo != null && networkInfo.isConnected
         }
 
-        fun <K, V>getIndexByKey(map: LinkedHashMap<K, V>, key: K) : Int? {
+        fun <K, V> getIndexByKey(map: LinkedHashMap<K, V>, key: K): Int? {
             var i = 0
 
             map.forEach {
@@ -42,7 +42,7 @@ class Util {
             return null
         }
 
-        fun <K, V>getKeyByIndex(map: LinkedHashMap<K, V>, index: Int) : K? {
+        fun <K, V> getKeyByIndex(map: LinkedHashMap<K, V>, index: Int): K? {
             var i = 0
 
             map.forEach {

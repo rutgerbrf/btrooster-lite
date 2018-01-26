@@ -20,8 +20,7 @@
     package="nl.viasalix.btroosterlite">
 
     <uses-sdk>
-        17
-    </uses-sdk>
+        17</uses-sdk>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -43,13 +42,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
             android:theme="@style/Theme.AppCompat.Light" />
-        <activity android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
             android:theme="@style/Theme.AppCompat.Light" />
-        <activity android:name=".cup.cupconfig.CUPConfigActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".introduction.IntroductionActivity"
+        <activity
+            android:name=".cup.cupconfig.CUPConfigActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".introduction.IntroductionActivity"
             android:screenOrientation="portrait" />
     </application>
 </manifest>

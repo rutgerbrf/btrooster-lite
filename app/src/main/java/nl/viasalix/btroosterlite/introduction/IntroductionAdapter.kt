@@ -18,12 +18,12 @@
 
 package nl.viasalix.btroosterlite.introduction
 
-import android.support.v4.app.FragmentManager
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.IntRange
 import android.support.annotation.NonNull
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.adapter.AbstractFragmentStepAdapter
 import com.stepstone.stepper.viewmodel.StepViewModel
@@ -47,7 +47,7 @@ class IntroductionAdapter(fm: FragmentManager, context: Context) : AbstractFragm
     @NonNull
     override fun getViewModel(@IntRange(from = 0) position: Int): StepViewModel =
             StepViewModel.Builder(context)
-                .setTitle("BTRooster Lite")
+                    .setTitle("BTRooster Lite")
                     .setEndButtonLabel(
                             if (position == count - 1)
                                 "Klaar"

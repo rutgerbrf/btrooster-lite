@@ -19,8 +19,8 @@
 package nl.viasalix.btroosterlite.cup.cupconfig
 
 import android.content.Intent
-import android.support.v4.app.Fragment
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,9 +30,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.VerificationError
-import nl.viasalix.btroosterlite.singleton.Singleton
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.activities.MainActivity
+import nl.viasalix.btroosterlite.singleton.Singleton
 import org.jetbrains.anko.support.v4.defaultSharedPreferences
 
 class CUPConfigFragment3 : Fragment(), Step {

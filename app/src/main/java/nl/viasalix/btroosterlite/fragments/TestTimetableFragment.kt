@@ -19,6 +19,7 @@
 package nl.viasalix.btroosterlite.fragments
 
 import android.app.Fragment
+import android.content.Context.CONNECTIVITY_SERVICE
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
@@ -29,26 +30,18 @@ import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-
-import android.content.Context.CONNECTIVITY_SERVICE
-import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.R
+import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.activities.SettingsActivity
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 

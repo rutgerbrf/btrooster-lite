@@ -34,7 +34,9 @@ class TimetableIntegrationAndroidTest {
     private var context: Context? = null
 
     @Before
-    fun setup() { context = InstrumentationRegistry.getContext() }
+    fun setup() {
+        context = InstrumentationRegistry.getContext()
+    }
 
     @Test
     @SmallTest

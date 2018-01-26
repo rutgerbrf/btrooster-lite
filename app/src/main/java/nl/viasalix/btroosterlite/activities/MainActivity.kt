@@ -18,13 +18,12 @@
 
 package nl.viasalix.btroosterlite.activities
 
+import android.app.Fragment
 import android.content.Intent
 import android.graphics.Color
-import android.app.Fragment
+import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import nl.viasalix.btroosterlite.R

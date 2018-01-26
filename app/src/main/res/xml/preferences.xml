@@ -17,30 +17,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-        android:title="Informatie">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Informatie">
         <EditTextPreference
             android:key="code"
-            android:title="Code"
-            android:summary="Code waarmee leerlingen en docenten en klassen worden ingeroosterd - niet hoofdlettergevoelig" />
+            android:summary="Code waarmee leerlingen en docenten en klassen worden ingeroosterd - niet hoofdlettergevoelig"
+            android:title="Code" />
         <ListPreference
-            android:key="location"
-            android:title="Locatie"
-            android:summary="Locatie van Calvijn College waar je/u les krijgt/geeft"
             android:entries="@array/locatieArray"
-            android:entryValues="@array/locatieValues" />
+            android:entryValues="@array/locatieValues"
+            android:key="location"
+            android:summary="Locatie van Calvijn College waar je/u les krijgt/geeft"
+            android:title="Locatie" />
         <SwitchPreference
-            android:key="t_preload"
             android:defaultValue="false"
-            android:title="Roosters van te voren laden"
-            android:summary="Roosters van beschikbare weken van tevoren laden (bij WiFi)" />
+            android:key="t_preload"
+            android:summary="Roosters van beschikbare weken van tevoren laden (bij WiFi)"
+            android:title="Roosters van te voren laden" />
         <SwitchPreference
-            android:key="t_preload_only_wifi"
             android:defaultValue="true"
-            android:title="Roosters alleen met WiFi van tevoren laden"
+            android:dependency="t_preload"
+            android:key="t_preload_only_wifi"
             android:summaryOff="Roosters met WiFi en mobiele netwerken van tevoren laden"
             android:summaryOn="Roosters alleen met WiFi van tevoren laden"
-            android:dependency="t_preload" />
+            android:title="Roosters alleen met WiFi van tevoren laden" />
     </PreferenceCategory>
 </PreferenceScreen>

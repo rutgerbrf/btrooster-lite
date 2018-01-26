@@ -18,9 +18,8 @@
 
 package nl.viasalix.btroosterlite.cup.cupconfig
 
-import android.support.v4.app.Fragment
 import android.os.Bundle
-import android.util.Log
+import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,8 +28,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.VerificationError
-import nl.viasalix.btroosterlite.singleton.Singleton
 import nl.viasalix.btroosterlite.R
+import nl.viasalix.btroosterlite.singleton.Singleton
 
 class CUPConfigFragment1 : Fragment(), Step {
     private var etSurname: EditText? = null
@@ -49,18 +48,18 @@ class CUPConfigFragment1 : Fragment(), Step {
     }
 
     override fun verifyStep(): VerificationError? =
-        if (etSurname!!.text.length < 3 || etSurname!!.text.length > 7)
-            VerificationError("INCORRECT_SIZE")
-        else {
-            // Correct ingevuld, laat de foutmelding (niet meer) zien (voor als de gebruiker terugkomt)
-            tvErrorCode!!.visibility = View.INVISIBLE
-            ivError!!.visibility = View.INVISIBLE
+            if (etSurname!!.text.length < 3 || etSurname!!.text.length > 7)
+                VerificationError("INCORRECT_SIZE")
+            else {
+                // Correct ingevuld, laat de foutmelding (niet meer) zien (voor als de gebruiker terugkomt)
+                tvErrorCode!!.visibility = View.INVISIBLE
+                ivError!!.visibility = View.INVISIBLE
 
-            // Zet de letters in de singleton voor gebruik in het volgende fragment
-            Singleton.name = etSurname!!.text.toString()
+                // Zet de letters in de singleton voor gebruik in het volgende fragment
+                Singleton.name = etSurname!!.text.toString()
 
-            null
-        }
+                null
+            }
 
     override fun onSelected() {}
 

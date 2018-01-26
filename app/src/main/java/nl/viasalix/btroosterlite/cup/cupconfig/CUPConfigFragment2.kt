@@ -18,8 +18,8 @@
 
 package nl.viasalix.btroosterlite.cup.cupconfig
 
-import android.support.v4.app.Fragment
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,9 +30,9 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.VerificationError
-import nl.viasalix.btroosterlite.singleton.Singleton
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.cup.CUPIntegration
+import nl.viasalix.btroosterlite.singleton.Singleton
 import nl.viasalix.btroosterlite.util.Util.Companion.online
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.support.v4.alert

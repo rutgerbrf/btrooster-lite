@@ -18,19 +18,17 @@
 
 package nl.viasalix.btroosterlite.cup.cupconfig
 
-import android.support.v4.app.FragmentManager
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.IntRange
 import android.support.annotation.NonNull
 import android.support.v4.app.Fragment
-import android.util.Log
+import android.support.v4.app.FragmentManager
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.adapter.AbstractFragmentStepAdapter
 import com.stepstone.stepper.viewmodel.StepViewModel
 
 class CUPConfigAdapter(fm: FragmentManager, context: Context) : AbstractFragmentStepAdapter(fm, context) {
-
     override fun createStep(position: Int): Step {
         val step: Fragment = when (position) {
             0 -> CUPConfigFragment1()
@@ -51,11 +49,12 @@ class CUPConfigAdapter(fm: FragmentManager, context: Context) : AbstractFragment
             StepViewModel.Builder(context)
                     .setTitle("BTRooster Lite")
                     .setEndButtonLabel(
-                            if (position == getCount() - 1)
+                            if (position == count - 1)
                                 "Klaar"
                             else
                                 "Volgende"
                     ).setBackButtonLabel("Terug").create()
 
+    // De hoeveelheid aan stappen
     override fun getCount() = 3
 }

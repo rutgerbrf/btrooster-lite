@@ -43,7 +43,6 @@ import org.jetbrains.anko.noButton
 import org.jetbrains.anko.yesButton
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.LinkedHashMap
 
 class TimetableFragment : Fragment() {
     private var weekSpinner: Spinner? = null
