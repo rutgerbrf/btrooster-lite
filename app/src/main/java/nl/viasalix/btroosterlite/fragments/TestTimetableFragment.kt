@@ -46,12 +46,11 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
-import java.util.ArrayList
-
 import android.content.Context.CONNECTIVITY_SERVICE
 import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.activities.SettingsActivity
+import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 
 class TestTimetableFragment : Fragment() {
     private var currentView: View? = null
@@ -62,10 +61,9 @@ class TestTimetableFragment : Fragment() {
     private var code: String? = null
     private var location: String? = null
 
-    private var availableTestweeks: MutableList<String> = ArrayList()
-    private var availableTestweeksNames: MutableList<String> = ArrayList()
-
     private var menuHasLoaded = false
+
+    private var responseList = linkedMapOf<String, String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,7 +156,7 @@ class TestTimetableFragment : Fragment() {
                 .appendQueryParameter("code", code)
                 .appendQueryParameter("locatie", location)
                 .appendQueryParameter("type", "leerlingen")
-                .appendQueryParameter("toetsweek", availableTestweeks[weekChange])
+                .appendQueryParameter("toetsweek", responseList.keys.toList()[weekChange])
         val url = builder.build().toString()
 
         webView!!.loadUrl(url)
@@ -179,54 +177,42 @@ class TestTimetableFragment : Fragment() {
                     { response ->
                         sharedPreferences!!.edit().putString("tt_indexes", response).apply()
                         Log.d("or", response)
-                        handleResponse(response)
+                        handleIndexResponse(response)
                     }) { error -> Log.d("error", error.message) }
 
             queue.add(stringRequest)
         } else {
             val response = sharedPreferences!!.getString("tt_indexes", null)
-            handleResponse(response)
+            handleIndexResponse(response)
             getTestTimetable()
         }
     }
 
-    private fun handleResponse(response: String?) {
-        availableTestweeks.clear()
-        availableTestweeksNames.clear()
+    private fun handleIndexResponse(response: String?) {
+        if (response != null) {
+            responseList = TimetableIntegration.handleTWIndexResponse(response)
 
-        var i = 0
+            if (activity != null) {
+                val adapter = ArrayAdapter(
+                        activity,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        responseList.values.toList())
 
-        val responses = response!!.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                weekSpinner!!.adapter = adapter
+                menuHasLoaded = true
 
-        for (responseString in responses) {
-            if (responseString.isNotEmpty()) {
-                val responseStringSplit = responseString.split("\\|".toRegex(), 2).toTypedArray()
+                weekSpinner!!.setSelection(sharedPreferences!!.getInt("tt_weekChange", 1))
 
-                availableTestweeks.add(i, responseStringSplit[0])
-                availableTestweeksNames.add(i, responseStringSplit[1])
-                ++i
+                weekSpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
+                        sharedPreferences!!.edit().putInt("tt_weekChange", position).apply()
+
+                        loadTestTimetable(false)
+                    }
+
+                    override fun onNothingSelected(adapterView: AdapterView<*>) {}
+                }
             }
-        }
-
-        val adapter = ArrayAdapter(
-                activity,
-                android.R.layout.simple_spinner_dropdown_item,
-                availableTestweeksNames)
-
-        weekSpinner!!.adapter = adapter
-
-        menuHasLoaded = true
-
-        weekSpinner!!.setSelection(sharedPreferences!!.getInt("tt_weekChange", 1))
-
-        weekSpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
-                sharedPreferences!!.edit().putInt("tt_weekChange", position).apply()
-
-                loadTestTimetable(false)
-            }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>) {}
         }
     }
 }// Required empty public constructor

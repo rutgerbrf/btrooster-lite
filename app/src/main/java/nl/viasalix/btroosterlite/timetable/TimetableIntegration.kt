@@ -332,5 +332,22 @@ class TimetableIntegration(private var context: Context,
 
             return indexes
         }
+
+        fun handleTWIndexResponse(response: String?): LinkedHashMap<String, String> {
+            val indexes: LinkedHashMap<String, String> = linkedMapOf()
+
+            if (response != null) {
+                val responses = response.trim().split("\n")
+
+                responses
+                        .filter { it.isNotEmpty() }
+                        .map { it.split("|") }
+                        .forEach { responseWeek ->
+                            indexes[responseWeek[0]] = responseWeek[1]
+                        }
+            }
+
+            return indexes
+        }
     }
 }
