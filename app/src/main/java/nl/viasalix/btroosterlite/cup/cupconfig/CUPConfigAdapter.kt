@@ -32,15 +32,15 @@ import com.stepstone.stepper.viewmodel.StepViewModel
 class CUPConfigAdapter(fm: FragmentManager, context: Context) : AbstractFragmentStepAdapter(fm, context) {
 
     override fun createStep(position: Int): Step {
-        val step = when (position) {
+        val step: Fragment = when (position) {
             0 -> CUPConfigFragment1()
             1 -> CUPConfigFragment2()
             2 -> CUPConfigFragment3()
             else -> CUPConfigFragment1()
-        } as Fragment
+        }
 
-        Log.d("position", Integer.toString(position))
         val b = Bundle()
+
         b.putInt("0", position)
         step.arguments = b
         return step as Step
