@@ -107,18 +107,10 @@ class CUPConfigFragment2 : Fragment(), Step {
             tvErrorCode!!.visibility = View.INVISIBLE
             ivError!!.visibility = View.INVISIBLE
 
-            var key = ""
             nameMap.forEach {
                 if (it.value == selectedText)
-                    key = it.key
+                    defaultSharedPreferences.edit().putString("cc_name", it.key).apply()
             }
-
-            val nameKeyVal: Set<String> = setOf(
-                    key,
-                    selectedText
-            )
-
-            defaultSharedPreferences.edit().putStringSet("cc_name", nameKeyVal).apply()
         }
 
         return null

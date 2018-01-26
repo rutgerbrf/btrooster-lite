@@ -117,7 +117,6 @@ class CUPIntegration(context: Context) {
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
                     handleResponse(response, ResponseType.PreservationToken)
-                    Log.d("RESPONSE: GETTOKEN", response)
                 },
                 Response.ErrorListener {}) {
             override fun getBodyContentType() =

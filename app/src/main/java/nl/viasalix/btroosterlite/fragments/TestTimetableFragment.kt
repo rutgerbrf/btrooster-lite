@@ -144,7 +144,7 @@ class TestTimetableFragment : Fragment() {
 
         val builder = Uri.Builder()
         builder.scheme(MainActivity.SCHEME)
-                .authority(MainActivity.AUTHORITY)
+                .encodedAuthority(MainActivity.AUTHORITY)
                 .appendPath("ToetsroosterEmbedServlet")
                 .appendQueryParameter("code", code)
                 .appendQueryParameter("locatie", location)
@@ -160,7 +160,7 @@ class TestTimetableFragment : Fragment() {
             val queue = Volley.newRequestQueue(activity)
             val builder = Uri.Builder()
             builder.scheme(MainActivity.SCHEME)
-                    .authority(MainActivity.AUTHORITY)
+                    .encodedAuthority(MainActivity.AUTHORITY)
                     .appendPath("ToetsroosterEmbedServlet")
                     .appendQueryParameter("indexOphalen", "1")
                     .appendQueryParameter("locatie", location)

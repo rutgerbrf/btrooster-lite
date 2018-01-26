@@ -50,7 +50,7 @@ class TimetableIntegration(private var context: Context,
         if (online(context)) {
             val builder = Uri.Builder()
             builder.scheme(MainActivity.SCHEME)
-                    .authority(MainActivity.AUTHORITY)
+                    .encodedAuthority(MainActivity.AUTHORITY)
                     .appendPath("api")
                     .appendPath("RoosterApiServlet")
                     .appendQueryParameter("actie", "weken")
@@ -84,7 +84,7 @@ class TimetableIntegration(private var context: Context,
 
         val builder = Uri.Builder()
         builder.scheme(MainActivity.SCHEME)
-                .authority(MainActivity.AUTHORITY)
+                .encodedAuthority(MainActivity.AUTHORITY)
                 .appendPath("RoosterEmbedServlet")
                 .appendQueryParameter("code", code)
                 .appendQueryParameter("locatie", location)
