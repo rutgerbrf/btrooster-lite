@@ -6,3 +6,7 @@ android:
   - tools
   - platform-tools
   - tools
+  - extra-android-m2repository
+
+before_install:
+-yes | sdkmanager "platforms;android-27"
