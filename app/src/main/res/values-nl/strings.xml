@@ -42,4 +42,5 @@
     <string name="settings_preload_only_wifi_on">Roosters alleen met Wi-Fi van tevoren laden</string>
     <string name="settings_preload_only_wifi_off">Roosters met Wi-Fi en mobiele netwerken van tevoren laden</string>
     <string name="settings_preload_only_wifi_title">Roosters alleen met Wi-Fi van tevoren laden</string>
+    <string name="int_error_code_not_accepted">Leerlingnummers en docentencodes worden geaccepteerd</string>
 </resources>

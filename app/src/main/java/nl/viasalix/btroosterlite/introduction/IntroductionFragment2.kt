@@ -33,6 +33,7 @@ import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.cup.cupconfig.CUPConfigActivity
 import nl.viasalix.btroosterlite.fragments.TimetableFragment
+import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.support.v4.defaultSharedPreferences
@@ -75,56 +76,60 @@ class IntroductionFragment2 : Fragment(), Step {
         else if (!rbG13!!.isChecked && !rbG46!!.isChecked)
             return VerificationError("NO_GRADE")
         else {
-            val location: String = TimetableFragment.locatiesURL[spLocation!!.selectedItemPosition]
+            if (TimetableIntegration.getType(etCode!!.text.toString()) != "c") {
+                val location: String = TimetableFragment.locatiesURL[spLocation!!.selectedItemPosition]
 
-            ivError!!.visibility = View.INVISIBLE
-            tvErrorCode!!.visibility = View.INVISIBLE
+                ivError!!.visibility = View.INVISIBLE
+                tvErrorCode!!.visibility = View.INVISIBLE
 
-            sharedPreferences!!.edit()
-                    .putString("code", etCode!!.text.toString())
-                    .putString("location", location)
-                    .apply()
-
-            sharedPreferences!!.edit()
-                    .putBoolean("firstLaunch", false)
-                    .apply()
-
-            if (rbG46!!.isChecked && location == "Goes") {
-                Log.d("isChecked", rbG46!!.isChecked.toString())
-                Log.d("location", location)
-
-                alert(getString(R.string.alert_cupintegration_text),
-                        getString(R.string.alert_cupintegration_title)) {
-                    yesButton {
-                        sharedPreferences!!.edit()
-                                .putBoolean("cupPossible", true)
-                                .putBoolean("cupConfigured", false)
-                                .putBoolean("cupCancelled", false)
-                                .apply()
-
-                        startActivity(Intent(activity, CUPConfigActivity::class.java))
-                        activity!!.finish()
-                    }
-                    noButton {
-                        sharedPreferences!!.edit()
-                                .putBoolean("cupPossible", true)
-                                .putBoolean("cupConfigured", false)
-                                .putBoolean("cupCancelled", true)
-                                .apply()
-
-                        startActivity(Intent(activity, MainActivity::class.java))
-                        activity!!.finish()
-                    }
-                }.show()
-            } else {
                 sharedPreferences!!.edit()
-                        .putBoolean("cupPossible", false)
-                        .putBoolean("cupConfigured", false)
-                        .putBoolean("cupCancelled", false)
+                        .putString("code", etCode!!.text.toString())
+                        .putString("location", location)
                         .apply()
 
-                startActivity(Intent(activity, MainActivity::class.java))
-                activity!!.finish()
+                sharedPreferences!!.edit()
+                        .putBoolean("firstLaunch", false)
+                        .apply()
+
+                if (rbG46!!.isChecked && location == "Goes") {
+                    Log.d("isChecked", rbG46!!.isChecked.toString())
+                    Log.d("location", location)
+
+                    alert(getString(R.string.alert_cupintegration_text),
+                            getString(R.string.alert_cupintegration_title)) {
+                        yesButton {
+                            sharedPreferences!!.edit()
+                                    .putBoolean("cupPossible", true)
+                                    .putBoolean("cupConfigured", false)
+                                    .putBoolean("cupCancelled", false)
+                                    .apply()
+
+                            startActivity(Intent(activity, CUPConfigActivity::class.java))
+                            activity!!.finish()
+                        }
+                        noButton {
+                            sharedPreferences!!.edit()
+                                    .putBoolean("cupPossible", true)
+                                    .putBoolean("cupConfigured", false)
+                                    .putBoolean("cupCancelled", true)
+                                    .apply()
+
+                            startActivity(Intent(activity, MainActivity::class.java))
+                            activity!!.finish()
+                        }
+                    }.show()
+                } else {
+                    sharedPreferences!!.edit()
+                            .putBoolean("cupPossible", false)
+                            .putBoolean("cupConfigured", false)
+                            .putBoolean("cupCancelled", false)
+                            .apply()
+
+                    startActivity(Intent(activity, MainActivity::class.java))
+                    activity!!.finish()
+                }
+            } else {
+                return VerificationError("NOT_ACCEPTED")
             }
         }
 
@@ -144,6 +149,11 @@ class IntroductionFragment2 : Fragment(), Step {
                 ivError!!.visibility = View.VISIBLE
                 tvErrorCode!!.visibility = View.VISIBLE
                 tvErrorCode!!.text = getString(R.string.error_nograde)
+            }
+            "NOT_ACCEPTED" -> {
+                ivError!!.visibility = View.VISIBLE
+                tvErrorCode!!.visibility = View.VISIBLE
+                tvErrorCode!!.text = getString(R.string.int_error_code_not_accepted)
             }
         }
     }

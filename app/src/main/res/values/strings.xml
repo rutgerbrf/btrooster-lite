@@ -43,6 +43,7 @@
     <string name="settings_preload_only_wifi_on">Only preload timetables using Wi-Fi</string>
     <string name="settings_preload_only_wifi_off">Preload timetables using Wi-Fi and mobile networks</string>
     <string name="settings_preload_only_wifi_title">Only preload timetable using Wi-Fi</string>
+    <string name="int_error_code_not_accepted">Only student numbers and teacher codes are accepted</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 
