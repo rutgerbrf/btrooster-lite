@@ -250,24 +250,17 @@ class TimetableIntegration(private var context: Context,
 
             weeks.forEachIndexed { index, it ->
                 selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER}!=$code|$it"
-                if (weeks.size > index + 1)
-                    selection += " AND "
+                selection += if (weeks.size > index + 1)
+                    " AND "
+                else
+                    ";"
             }
 
             Log.d("QUERY", selection)
 
-            db.rawQuery(selection, null)
+            db.execSQL(selection)
         }
     }
-
-//    private fun deleteTimetable(identifier: String) {
-//        val db = dbHelper.writableDatabase
-//
-//        val selection = "${TimetableContract.Timetable.COLUMN_NAME_TIMETABLE} LIKE ?" +
-//                "AND ${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} LIKE ?"
-//        val selectionArgs = arrayOf(identifier)
-//        db.delete(TimetableContract.Timetable.TABLE_NAME, selection, selectionArgs)
-//    }
 
     fun recordExists(identifier: String): Boolean {
         val db = dbHelper.readableDatabase
