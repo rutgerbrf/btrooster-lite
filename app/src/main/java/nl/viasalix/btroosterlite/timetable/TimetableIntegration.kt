@@ -247,19 +247,16 @@ class TimetableIntegration(private var context: Context,
         if (weeks.isNotEmpty()) {
             val db = dbHelper.writableDatabase
             var selection = "DELETE FROM ${TimetableContract.Timetable.TABLE_NAME} WHERE "
-            val selectionArgs = arrayListOf<String>()
 
             weeks.forEachIndexed { index, it ->
-                selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER}!=?"
-                selectionArgs.add("$code|$it")
+                selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER}!=$code|$it"
                 if (weeks.size > index + 1)
                     selection += " AND "
             }
 
             Log.d("QUERY", selection)
-            Log.d("SELARGS", selectionArgs.joinToString())
 
-            db.rawQuery(selection, selectionArgs.toTypedArray())
+            db.rawQuery(selection, null)
         }
     }
 
