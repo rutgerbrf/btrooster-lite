@@ -250,7 +250,7 @@ class TimetableIntegration(private var context: Context,
             val selectionArgs = arrayListOf<String>()
 
             weeks.forEachIndexed { index, it ->
-                selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} != ?"
+                selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER}!=?"
                 selectionArgs.add("$code|$it")
                 if (weeks.size > index + 1)
                     selection += " AND "
