@@ -90,7 +90,7 @@ class TestTimetableFragment : Fragment() {
             }
             R.id.action_opensource -> {
                 val ossIntent = Intent(activity, OssLicensesMenuActivity::class.java)
-                ossIntent.putExtra("title", "Open-source licenties")
+                ossIntent.putExtra("title", getString(R.string.opensource_licences))
                 activity.startActivity(ossIntent)
             }
         }
@@ -143,7 +143,7 @@ class TestTimetableFragment : Fragment() {
         val weekChange = sharedPreferences!!.getInt("tt_weekChange", 0)
 
         val builder = Uri.Builder()
-        builder.scheme("https")
+        builder.scheme(MainActivity.SCHEME)
                 .authority(MainActivity.AUTHORITY)
                 .appendPath("ToetsroosterEmbedServlet")
                 .appendQueryParameter("code", code)
@@ -159,7 +159,7 @@ class TestTimetableFragment : Fragment() {
         if (online()) {
             val queue = Volley.newRequestQueue(activity)
             val builder = Uri.Builder()
-            builder.scheme("https")
+            builder.scheme(MainActivity.SCHEME)
                     .authority(MainActivity.AUTHORITY)
                     .appendPath("ToetsroosterEmbedServlet")
                     .appendQueryParameter("indexOphalen", "1")

@@ -21,25 +21,25 @@
     <PreferenceCategory android:title="Informatie">
         <EditTextPreference
             android:key="code"
-            android:summary="Code waarmee leerlingen en docenten en klassen worden ingeroosterd - niet hoofdlettergevoelig"
-            android:title="Code" />
+            android:summary="@string/settings_code_summary"
+            android:title="@string/settings_code_title" />
         <ListPreference
             android:entries="@array/locatieArray"
             android:entryValues="@array/locatieValues"
             android:key="location"
-            android:summary="Locatie van Calvijn College waar je/u les krijgt/geeft"
-            android:title="Locatie" />
+            android:summary="@string/settings_location_summary"
+            android:title="@string/settings_location_title" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="t_preload"
-            android:summary="Roosters van beschikbare weken van tevoren laden (bij WiFi)"
-            android:title="Roosters van te voren laden" />
+            android:summary="@string/settings_preload_summary"
+            android:title="@string/settings_preload_title" />
         <SwitchPreference
             android:defaultValue="true"
             android:dependency="t_preload"
             android:key="t_preload_only_wifi"
-            android:summaryOff="Roosters met WiFi en mobiele netwerken van tevoren laden"
-            android:summaryOn="Roosters alleen met WiFi van tevoren laden"
-            android:title="Roosters alleen met WiFi van tevoren laden" />
+            android:summaryOff="@string/settings_preload_only_wifi_off"
+            android:summaryOn="@string/settings_preload_only_wifi_on"
+            android:title="@string/settings_preload_only_wifi_title" />
     </PreferenceCategory>
 </PreferenceScreen>

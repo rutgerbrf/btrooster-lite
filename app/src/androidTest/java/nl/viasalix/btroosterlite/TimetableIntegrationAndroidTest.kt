@@ -24,6 +24,7 @@ import android.support.test.filters.SmallTest
 import android.support.test.runner.AndroidJUnit4
 import junit.framework.Assert.assertEquals
 import nl.viasalix.btroosterlite.activities.MainActivity.Companion.AUTHORITY
+import nl.viasalix.btroosterlite.activities.MainActivity.Companion.SCHEME
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 import org.junit.Before
 import org.junit.Test
@@ -42,7 +43,7 @@ class TimetableIntegrationAndroidTest {
     @SmallTest
     fun testURLBuilder() {
         val ttIntegration = TimetableIntegration(context!!, "Goes", "12345")
-        val expected = "https://$AUTHORITY/RoosterEmbedServlet?code=12345&locatie=Goes&type=s&week=06"
+        val expected = "$SCHEME://$AUTHORITY/RoosterEmbedServlet?code=12345&locatie=Goes&type=s&week=06"
         val actual = ttIntegration.buildURL(6)
 
         assertEquals(expected, actual)

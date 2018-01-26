@@ -46,19 +46,19 @@ class CUPIntegration(context: Context) {
     private var queue: RequestQueue = Volley.newRequestQueue(context)
     private var sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private var availableNames: MutableMap<String, String> = HashMap()
-    private val url = "https://" + MainActivity.AUTHORITY + "/api/CupApiServlet"
+    private val url = MainActivity.SCHEME + "://" + MainActivity.AUTHORITY + "/api/CupApiServlet"
     private var namesCallback: (Map<String, String>) -> Unit = {}
     private var logInCallback: (String) -> Unit = {}
 
-    val PRESTOK = "ci_preservationToken"
-    val CLIENTKEY = "ci_clientKey"
+    val keyPreservationToken = "ci_preservationToken"
+    val keyClientKey = "ci_clientKey"
 
     init {
-        // Checkt of de clientKey en bewaartoken al bestaan, anders worden deze gemaakt
-        if (sharedPreferences.getString(CLIENTKEY, "").isEmpty())
-            sharedPreferences.edit().putString(CLIENTKEY, generateClientKey()).apply()
+        // Checkt of de keyClientKey en bewaartoken al bestaan, anders worden deze gemaakt
+        if (sharedPreferences.getString(keyClientKey, "").isEmpty())
+            sharedPreferences.edit().putString(keyClientKey, generateClientKey()).apply()
 
-        if (sharedPreferences.getString(PRESTOK, "").isEmpty())
+        if (sharedPreferences.getString(keyPreservationToken, "").isEmpty())
             getToken()
     }
 
@@ -135,7 +135,7 @@ class CUPIntegration(context: Context) {
                     hashMapOf(
                             Params.ClientKey.param to
                                     sharedPreferences.getString(
-                                            CLIENTKEY,
+                                            keyClientKey,
                                             ""))
         }
 
@@ -148,10 +148,10 @@ class CUPIntegration(context: Context) {
     }
 
     /**
-     * Genereert een clientKey in de vorm van een String met een SecureRandom en
+     * Genereert een keyClientKey in de vorm van een String met een SecureRandom en
      * encodet deze met Base64 zodat deze als POST parameter kan worden gestuurd
      *
-     * @return  clientKey
+     * @return  keyClientKey
      */
     private fun generateClientKey(): String {
         val bytes = ByteArray(32)
@@ -202,16 +202,14 @@ class CUPIntegration(context: Context) {
                     hashMapOf(
                             Params.ClientKey.param to
                                     sharedPreferences.getString(
-                                            CLIENTKEY,
+                                            keyClientKey,
                                             ""),
                             Params.PreservationToken.param to
                                     sharedPreferences.getString(
-                                            PRESTOK,
+                                            keyPreservationToken,
                                             "")
                     )
         }
-
-        Log.d("PRESTOK (SN)", sharedPreferences.getString(PRESTOK, "NOTHING"))
 
         queue.add(stringRequest)
     }
@@ -230,7 +228,6 @@ class CUPIntegration(context: Context) {
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
                     handleResponse(response, ResponseType.LogIn)
-                    Log.v("RESP: LOGIN", response)
                 },
                 Response.ErrorListener {
 
@@ -256,16 +253,16 @@ class CUPIntegration(context: Context) {
                     hashMapOf(
                             Params.ClientKey.param to
                                     sharedPreferences.getString(
-                                            CLIENTKEY,
+                                            keyClientKey,
                                             ""),
                             Params.PreservationToken.param to
                                     sharedPreferences.getString(
-                                            PRESTOK,
+                                            keyPreservationToken,
                                             "")
                     )
         }
 
-        Log.d("PTOK", sharedPreferences.getString(PRESTOK, ""))
+        Log.d("PTOK", sharedPreferences.getString(keyPreservationToken, ""))
 
         queue.add(stringRequest)
     }
@@ -309,7 +306,7 @@ class CUPIntegration(context: Context) {
             when (it) {
                 ResponseHeaders.PreservationToken.header -> {
                     sharedPreferences.edit()
-                            .putString(PRESTOK, values[keys.indexOf(it)].trim())
+                            .putString(keyPreservationToken, values[keys.indexOf(it)].trim())
                             .apply()
                     Log.d("BEWAARTOKEN", values[keys.indexOf(it)].trim())
                 }
@@ -321,7 +318,7 @@ class CUPIntegration(context: Context) {
             // Neemt aan dat de response een lijst van namen is
                 else -> {
                     if (respType == ResponseType.SearchNames)
-                        availableNames.put(it, values[keys.indexOf(it)])
+                        availableNames[it] = values[keys.indexOf(it)]
                 }
             }
         }

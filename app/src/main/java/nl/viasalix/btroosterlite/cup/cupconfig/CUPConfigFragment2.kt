@@ -85,8 +85,8 @@ class CUPConfigFragment2 : Fragment(), Step {
     }
 
     private fun alertNotConnected() {
-        alert("Je bent niet verbonden met het internet. Opnieuw proberen?",
-                "Opnieuw proberen?") {
+        alert(context!!.getString(R.string.alert_notconnected_text),
+                context!!.getString(R.string.alert_notconnected_title)) {
             yesButton {
                 searchNames()
             }

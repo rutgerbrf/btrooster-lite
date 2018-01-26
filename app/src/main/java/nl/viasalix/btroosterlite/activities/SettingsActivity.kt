@@ -34,7 +34,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         toolbar = findViewById<View>(R.id.toolbar) as Toolbar
-        toolbar!!.title = "Instellingen"
+        toolbar!!.title = getString(R.string.title_activity_settings)
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         toolbar!!.setNavigationOnClickListener { onBackPressed() }
@@ -51,7 +51,7 @@ class SettingsActivity : AppCompatActivity() {
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
-        if (actionBar != null) actionBar.title = "Instellingen"
+        if (actionBar != null) actionBar.title = getString(R.string.title_activity_settings)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

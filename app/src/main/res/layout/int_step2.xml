@@ -13,7 +13,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="Code"
+        android:hint="@string/int_code"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,7 +45,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
-        android:text="Leerlingnummer of roostercode"
+        android:text="@string/int_stn_or_tc"
         app:layout_constraintBottom_toTopOf="@+id/et_code"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -56,7 +56,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
-        android:text="Klas"
+        android:text="@string/int_class"
         app:layout_constraintBottom_toTopOf="@+id/rbG13"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -67,7 +67,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
-        android:text="Locatie"
+        android:text="@string/int_location"
         app:layout_constraintBottom_toTopOf="@+id/sp_location"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -78,7 +78,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="48dp"
-        android:text="Instellingen"
+        android:text="@string/title_activity_settings"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -91,7 +91,7 @@
         android:layout_marginBottom="24dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="Code niet ingevuld"
+        android:text="@string/int_error_code_not_entered"
         android:textColor="#D50000"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -121,7 +121,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
         android:layout_marginTop="8dp"
-        android:text="Klas 1-3"
+        android:text="@string/int_grade_1_through_3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -135,7 +135,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="8dp"
-        android:text="Klas 4-6"
+        android:text="@string/int_grade_4_through_6"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/rbG13"
         app:layout_constraintTop_toTopOf="parent"

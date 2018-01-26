@@ -93,8 +93,8 @@ class IntroductionFragment2 : Fragment(), Step {
                 Log.d("isChecked", rbG46!!.isChecked.toString())
                 Log.d("location", location)
 
-                alert("Door in te loggen op CUP kun je je geselecteerde lessen zien in je rooster. Wil je dit doen?",
-                        "CUP integratie") {
+                alert(getString(R.string.alert_cupintegration_text),
+                        getString(R.string.alert_cupintegration_title)) {
                     yesButton {
                         sharedPreferences!!.edit()
                                 .putBoolean("cupPossible", true)
@@ -138,12 +138,12 @@ class IntroductionFragment2 : Fragment(), Step {
             "NO_CODE" -> {
                 ivError!!.visibility = View.VISIBLE
                 tvErrorCode!!.visibility = View.VISIBLE
-                tvErrorCode!!.text = "Code niet ingevuld"
+                tvErrorCode!!.text = getString(R.string.error_nocode)
             }
             "NO_GRADE" -> {
                 ivError!!.visibility = View.VISIBLE
                 tvErrorCode!!.visibility = View.VISIBLE
-                tvErrorCode!!.text = "Geen klas geselecteerd"
+                tvErrorCode!!.text = getString(R.string.error_nograde)
             }
         }
     }

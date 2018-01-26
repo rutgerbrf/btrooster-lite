@@ -77,7 +77,7 @@ class CUPFragment : Fragment() {
             }
             R.id.action_opensource -> {
                 val ossIntent = Intent(activity, OssLicensesMenuActivity::class.java)
-                ossIntent.putExtra("title", "Open-source licenties")
+                ossIntent.putExtra("title", getString(R.string.opensource_licences))
                 activity.startActivity(ossIntent)
             }
         }
@@ -93,7 +93,7 @@ class CUPFragment : Fragment() {
 
         if ((activity as AppCompatActivity).supportActionBar != null) {
             (activity as AppCompatActivity).supportActionBar!!.setDisplayShowTitleEnabled(true)
-            (activity as AppCompatActivity).supportActionBar!!.title = "CUP"
+            (activity as AppCompatActivity).supportActionBar!!.title = getString(R.string.CUP)
         }
 
 

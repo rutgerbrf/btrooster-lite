@@ -83,7 +83,7 @@ class TimetableFragment : Fragment() {
             }
             R.id.action_opensource -> {
                 val ossIntent = Intent(activity, OssLicensesMenuActivity::class.java)
-                ossIntent.putExtra("title", "Open-source licenties")
+                ossIntent.putExtra("title", getString(R.string.opensource_licences))
                 activity.startActivity(ossIntent)
             }
         }
@@ -152,9 +152,8 @@ class TimetableFragment : Fragment() {
     }
 
     private fun showCodeAlert() {
-        alert(
-                "Je hebt geen leerlingnummer/roostercode ingesteld. Zolang deze niet staat ingesteld, zal het rooster niet geladen kunnen worden",
-                "Waarschuwing") {
+        alert(getString(R.string.alert_nocode_text),
+                getString(R.string.warning)) {
 
             yesButton {
                 onStart()
@@ -167,8 +166,8 @@ class TimetableFragment : Fragment() {
     }
 
     private fun showLocationAlert() {
-        alert("Je hebt geen locatie ingesteld. Zolang deze niet staat ingesteld, zal het rooster niet geladen kunnen worden",
-                "Waarschuwing") {
+        alert(getString(R.string.alert_nolocation_text),
+                getString(R.string.warning)) {
             yesButton {
                 onStart()
             }

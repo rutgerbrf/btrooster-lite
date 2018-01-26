@@ -27,6 +27,7 @@ import android.support.v4.app.FragmentManager
 import com.stepstone.stepper.Step
 import com.stepstone.stepper.adapter.AbstractFragmentStepAdapter
 import com.stepstone.stepper.viewmodel.StepViewModel
+import nl.viasalix.btroosterlite.R
 
 class CUPConfigAdapter(fm: FragmentManager, context: Context) : AbstractFragmentStepAdapter(fm, context) {
     override fun createStep(position: Int): Step {
@@ -47,13 +48,13 @@ class CUPConfigAdapter(fm: FragmentManager, context: Context) : AbstractFragment
     @NonNull
     override fun getViewModel(@IntRange(from = 0) position: Int): StepViewModel =
             StepViewModel.Builder(context)
-                    .setTitle("BTRooster Lite")
+                    .setTitle(context.getString(R.string.app_name))
                     .setEndButtonLabel(
                             if (position == count - 1)
-                                "Klaar"
+                                context.getString(R.string.done)
                             else
-                                "Volgende"
-                    ).setBackButtonLabel("Terug").create()
+                                context.getString(R.string.next)
+                    ).setBackButtonLabel(context.getString(R.string.back)).create()
 
     // De hoeveelheid aan stappen
     override fun getCount() = 3

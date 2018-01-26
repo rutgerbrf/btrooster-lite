@@ -30,6 +30,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.cup.CUPIntegration
 import nl.viasalix.btroosterlite.util.Util.Companion.online
@@ -48,7 +49,7 @@ class TimetableIntegration(private var context: Context,
     fun getIndexes(callback: (String, Boolean) -> Unit) {
         if (online(context)) {
             val builder = Uri.Builder()
-            builder.scheme("https")
+            builder.scheme(MainActivity.SCHEME)
                     .authority(MainActivity.AUTHORITY)
                     .appendPath("api")
                     .appendPath("RoosterApiServlet")
@@ -82,7 +83,7 @@ class TimetableIntegration(private var context: Context,
         val typeString = getType(code)
 
         val builder = Uri.Builder()
-        builder.scheme("https")
+        builder.scheme(MainActivity.SCHEME)
                 .authority(MainActivity.AUTHORITY)
                 .appendPath("RoosterEmbedServlet")
                 .appendQueryParameter("code", code)
@@ -151,11 +152,11 @@ class TimetableIntegration(private var context: Context,
                         "application/x-www-form-urlencoded; charset=UTF-8"
 
                 /**
-                 *
                  * Maakt een Map<String, String> van headers in het volgende formaat:
                  * Client-Key=<sp/ci_clientKey>
                  * Bewaartoken=<sp/ci_preservationToken>
                  *
+                 * @return  map van headers
                  */
                 override fun getHeaders(): Map<String, String> =
                         hashMapOf(
@@ -184,11 +185,11 @@ class TimetableIntegration(private var context: Context,
                     callback(data)
                 } else {
                     // Geef een foutmelding
-                    callback(errorMessage)
+                    callback(context.getString(R.string.error_timetable))
                 }
             } else {
                 // Geef een foutmelding
-                callback(errorMessage)
+                callback(context.getString(R.string.error_timetable))
             }
         }
     }
@@ -297,9 +298,6 @@ class TimetableIntegration(private var context: Context,
     }
 
     companion object {
-        const val errorMessage =
-                "Dit rooster kon niet geladen worden"
-
         fun getType(code: String): String {
             val docentPatternInput = "([A-Za-z]){3}"
             val leerlingPatternInput = "([0-9]){5}"

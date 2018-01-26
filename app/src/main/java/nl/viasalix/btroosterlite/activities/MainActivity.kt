@@ -43,9 +43,9 @@ class MainActivity : AppCompatActivity() {
 
         val bottomNavigation = findViewById<AHBottomNavigation>(R.id.bottom_navigation)
 
-        val itemTimetable = AHBottomNavigationItem("Rooster", R.drawable.ic_border_all_black_24dp, R.color.colorBottomNavigationPrimary)
-        val itemCup = AHBottomNavigationItem("CUP", R.drawable.ic_event_black_24dp, R.color.colorBottomNavigationPrimary)
-        val itemTestTimetable = AHBottomNavigationItem("Toetsrooster", R.drawable.ic_chrome_reader_mode_black_24dp, R.color.colorBottomNavigationPrimary)
+        val itemTimetable = AHBottomNavigationItem(getString(R.string.timetable), R.drawable.ic_border_all_black_24dp, R.color.colorBottomNavigationPrimary)
+        val itemCup = AHBottomNavigationItem(getString(R.string.CUP), R.drawable.ic_event_black_24dp, R.color.colorBottomNavigationPrimary)
+        val itemTestTimetable = AHBottomNavigationItem(getString(R.string.test_timetable), R.drawable.ic_chrome_reader_mode_black_24dp, R.color.colorBottomNavigationPrimary)
         bottomNavigation.addItem(itemTimetable)
         bottomNavigation.addItem(itemCup)
         bottomNavigation.addItem(itemTestTimetable)
@@ -124,5 +124,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val AUTHORITY = "1d1d1-dot-btrfrontend.appspot.com"
+        const val SCHEME = "https"
+
+        // In-house testing
+//        const val SCHEME = "http"
+//        const val AUTHORITY = "192.168.178.73:8080"
     }
 }
