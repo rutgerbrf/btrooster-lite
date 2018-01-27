@@ -68,14 +68,15 @@ class TestTimetableFragment : Fragment() {
         // Inflate the layout for this fragment
         currentView = inflater.inflate(R.layout.fragment_test_timetable, container, false)
         webView = currentView!!.findViewById(R.id.web_view)
-        weekSpinner = currentView!!.findViewById(R.id.tt_week_spinner)
+        weekSpinner = currentView!!.findViewById(R.id.week_spinner)
 
         return currentView
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
+        menu.clear()
         inflater.inflate(R.menu.appbar_mainactivity_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -208,4 +209,4 @@ class TestTimetableFragment : Fragment() {
             }
         }
     }
-}// Required empty public constructor
+}

@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             is TimetableFragment -> 0
             is CUPFragment -> 1
             is TestTimetableFragment -> 2
-            else -> 0
+            else -> 1
         }
 
         bottomNavigation.setOnTabSelectedListener { position, wasSelected ->
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                 0 -> launchTimetableFragment()
                 1 -> launchCUPFragment()
                 2 -> launchTestTimetableFragment()
-                else -> launchTimetableFragment()
+                else -> launchCUPFragment()
             }
         }
     }
