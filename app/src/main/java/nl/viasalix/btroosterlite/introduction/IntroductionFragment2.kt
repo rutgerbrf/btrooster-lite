@@ -47,6 +47,7 @@ class IntroductionFragment2 : Fragment(), Step {
     private var sharedPreferences: SharedPreferences? = null
     private var rbG13: RadioButton? = null
     private var rbG46: RadioButton? = null
+    private var rbTeacher: RadioButton? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.int_step2, container, false)
@@ -60,13 +61,21 @@ class IntroductionFragment2 : Fragment(), Step {
         sharedPreferences = defaultSharedPreferences
         rbG13 = activity!!.findViewById(R.id.rbG13)
         rbG46 = activity!!.findViewById(R.id.rbG46)
+        rbTeacher = activity!!.findViewById(R.id.rbTeacher)
 
         rbG13!!.setOnClickListener {
             rbG46!!.isChecked = false
+            rbTeacher!!.isChecked = false
         }
 
         rbG46!!.setOnClickListener {
             rbG13!!.isChecked = false
+            rbTeacher!!.isChecked = false
+        }
+
+        rbTeacher!!.setOnClickListener {
+            rbG13!!.isChecked = false
+            rbG46!!.isChecked = false
         }
     }
 

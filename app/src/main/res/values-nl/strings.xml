@@ -26,7 +26,7 @@
     <string name="int_code">Code</string>
     <string name="btrooster_lite_logo">BTRooster Lite Logo</string>
     <string name="int_stn_or_tc">Leerlingnummer of roostercode</string>
-    <string name="int_class">Klas</string>
+    <string name="int_grade">Klas</string>
     <string name="int_location">Locatie</string>
     <string name="int_error_code_not_entered">Code niet ingevuld</string>
     <string name="int_grade_1_through_3">Klas 1-3</string>
@@ -43,4 +43,5 @@
     <string name="settings_preload_only_wifi_off">Roosters met Wi-Fi en mobiele netwerken van tevoren laden</string>
     <string name="settings_preload_only_wifi_title">Roosters alleen met Wi-Fi van tevoren laden</string>
     <string name="int_error_code_not_accepted">Leerlingnummers en docentencodes worden geaccepteerd</string>
+    <string name="int_teacher">Ik ben een docent</string>
 </resources>

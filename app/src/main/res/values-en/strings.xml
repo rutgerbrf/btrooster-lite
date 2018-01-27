@@ -26,7 +26,7 @@
     <string name="int_code">Code</string>
     <string name="btrooster_lite_logo">BTRooster Lite Logo</string>
     <string name="int_stn_or_tc">Student number or teacher code</string>
-    <string name="int_class">Class</string>
+    <string name="int_grade">Grade</string>
     <string name="int_location">Location</string>
     <string name="int_error_code_not_entered">Code not entered</string>
     <string name="int_grade_1_through_3">Grade 1-3</string>
@@ -43,4 +43,5 @@
     <string name="settings_preload_only_wifi_off">Preload timetables using Wi-Fi and mobile networks</string>
     <string name="settings_preload_only_wifi_title">Only preload timetable using Wi-Fi</string>
     <string name="int_error_code_not_accepted">Only student numbers and teacher codes are accepted</string>
+    <string name="int_teacher">I\'m a teacher</string>
 </resources>
