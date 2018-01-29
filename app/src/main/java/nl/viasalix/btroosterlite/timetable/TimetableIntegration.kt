@@ -332,8 +332,8 @@ class TimetableIntegration(private var context: Context,
                 return false
         }
 
-        fun handleIndexResponse(response: String?): LinkedHashMap<Int, String> {
-            val indexes: LinkedHashMap<Int, String> = linkedMapOf()
+        fun <K, V>handleIndexResponse(response: String?): LinkedHashMap<K, V> {
+            val indexes: LinkedHashMap<K, V> = linkedMapOf()
 
             if (response != null) {
                 val responses = response.trim().split("\n")
