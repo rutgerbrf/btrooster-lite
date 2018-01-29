@@ -183,7 +183,7 @@ class TestTimetableFragment : Fragment() {
 
     private fun handleIndexResponse(response: String?) {
         if (response != null) {
-            responseList = TimetableIntegration.handleTWIndexResponse(response)
+            responseList = TimetableIntegration.handleIndexResponse(response)
 
             if (activity != null) {
                 val adapter = ArrayAdapter(

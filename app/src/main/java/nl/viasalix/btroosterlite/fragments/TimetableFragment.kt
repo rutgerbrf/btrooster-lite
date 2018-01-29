@@ -236,7 +236,7 @@ class TimetableFragment : Fragment() {
 
     private fun handleIndexResponse(response: String?, deleteUnusedTimetables: Boolean = false) {
         if (response != null) {
-            val availableWeeks = TimetableIntegration.handleIndexResponse(response)
+            val availableWeeks = TimetableIntegration.handleIndexResponse<Int, String>(response)
 
             if (deleteUnusedTimetables)
                 ttIntegration!!.deleteUnusedTimetables(availableWeeks.keys.toList())

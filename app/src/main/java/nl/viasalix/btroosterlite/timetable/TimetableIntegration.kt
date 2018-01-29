@@ -99,7 +99,7 @@ class TimetableIntegration(private var context: Context,
         if (online(context)) {
             if (wifiIsConnected(context) == onlyWifiPref) {
                 getIndexes { it, _ ->
-                    val response = handleIndexResponse(it)
+                    val response = handleIndexResponse<Int, String>(it)
 
                     doAsync {
                         response.forEach {
@@ -332,7 +332,7 @@ class TimetableIntegration(private var context: Context,
                 return false
         }
 
-        fun <K, V>handleIndexResponse(response: String?): LinkedHashMap<K, V> {
+        inline fun <reified K, reified V>handleIndexResponse(response: String?): LinkedHashMap<K, V> {
             val indexes: LinkedHashMap<K, V> = linkedMapOf()
 
             if (response != null) {
@@ -341,25 +341,26 @@ class TimetableIntegration(private var context: Context,
                 responses
                         .filter { it.isNotEmpty() }
                         .map { it.split("|") }
-                        .forEach { responseWeek ->
-                            indexes[responseWeek[0].toInt()] = responseWeek[1]
-                        }
-            }
+                        .forEach {
+                            var key: K = when {
+                                K::class == Int::class -> {
+                                    it[0].toInt() as K
+                                }
+                                else -> {
+                                    it[0] as K
+                                }
+                            }
 
-            return indexes
-        }
+                            var value: V = when {
+                                V::class == Int::class -> {
+                                    it[1].toInt() as V
+                                }
+                                else -> {
+                                    it[1] as V
+                                }
+                            }
 
-        fun handleTWIndexResponse(response: String?): LinkedHashMap<String, String> {
-            val indexes: LinkedHashMap<String, String> = linkedMapOf()
-
-            if (response != null) {
-                val responses = response.trim().split("\n")
-
-                responses
-                        .filter { it.isNotEmpty() }
-                        .map { it.split("|") }
-                        .forEach { responseWeek ->
-                            indexes[responseWeek[0]] = responseWeek[1]
+                            indexes[key] = value
                         }
             }
 
