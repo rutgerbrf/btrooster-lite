@@ -2,6 +2,7 @@
 ## De open roosterapp met :zap: 
 
 [![Licentie: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Build Status](https://travis-ci.org/RutgerBroekhoff/btrooster-lite.svg?branch=develop)](https://travis-ci.org/RutgerBroekhoff/btrooster-lite)
 [![GitHub (pre-)release](https://img.shields.io/github/release/RutgerBroekhoff/btrooster-lite/all.svg)](https://github.com/RutgerBroekhoff/btrooster-lite/releases/latest)
 
 <a href='https://play.google.com/store/apps/details?id=nl.viasalix.btroosterlite&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
