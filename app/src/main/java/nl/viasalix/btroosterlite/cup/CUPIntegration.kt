@@ -87,7 +87,8 @@ class CUPIntegration(context: Context) {
 
     enum class Actions(val action: String) {
         SearchNames("zoekNamen"),
-        LogIn("logIn")
+        LogIn("logIn"),
+        WebPageURL("webPaginaURL")
     }
 
     enum class Params(val param: String) {
@@ -271,6 +272,8 @@ class CUPIntegration(context: Context) {
      * Voert daarna de corresponderende functie uit.
      */
     private fun handleResponse(response: String, respType: ResponseType) {
+        Log.d("handleResponse", response)
+
         if (response.isNotEmpty()) {
             if (response.startsWith("ERR"))
                 handleError(response.split("\n")[0].trim(), respType)
@@ -326,6 +329,47 @@ class CUPIntegration(context: Context) {
             namesCallback(availableNames)
         else if (respType == ResponseType.LogIn)
             logInCallback(okRes)
+    }
+
+    fun getCUPUrl(callback: (String) -> Unit) {
+        this.logInCallback = callback
+
+        val stringRequest = object : StringRequest(Request.Method.POST, url,
+                Response.Listener<String> { response ->
+                    callback(response)
+                },
+                Response.ErrorListener {
+
+                }) {
+            override fun getBodyContentType() =
+                    "application/x-www-form-urlencoded; charset=UTF-8"
+
+            override fun getParams(): MutableMap<String, String> =
+                    mutableMapOf(
+                            "actie" to Actions.WebPageURL.action
+                    )
+
+            /**
+             * Maakt een Map<String, String> van headers in het volgende formaat:
+             * Client-Key=<sp/ci_clientKey>
+             * Bewaartoken=<sp/ci_preservationToken>
+             *
+             * @return  map van headers
+             */
+            override fun getHeaders(): Map<String, String> =
+                    hashMapOf(
+                            Params.ClientKey.param to
+                                    sharedPreferences.getString(
+                                            keyClientKey,
+                                            ""),
+                            Params.PreservationToken.param to
+                                    sharedPreferences.getString(
+                                            keyPreservationToken,
+                                            "")
+                    )
+        }
+
+        queue.add(stringRequest)
     }
 
     /**

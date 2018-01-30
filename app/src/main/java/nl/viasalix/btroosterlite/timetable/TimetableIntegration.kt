@@ -64,7 +64,9 @@ class TimetableIntegration(private var context: Context,
                         sharedPreferences.edit().putString("t_indexes", response).apply()
                         Log.d("or", response)
                         callback(response, true)
-                    }) { error -> Log.d("error", error.message) }
+                    }) {
+                // FIXME
+            }
             queue.add(stringRequest)
         } else {
             val response = sharedPreferences.getString("t_indexes", null)
@@ -332,7 +334,7 @@ class TimetableIntegration(private var context: Context,
                 return false
         }
 
-        inline fun <reified K, reified V>handleIndexResponse(response: String?): LinkedHashMap<K, V> {
+        inline fun <reified K, reified V> handleIndexResponse(response: String?): LinkedHashMap<K, V> {
             val indexes: LinkedHashMap<K, V> = linkedMapOf()
 
             if (response != null) {

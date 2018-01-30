@@ -36,26 +36,29 @@ import nl.viasalix.btroosterlite.singleton.Singleton
 
 class MainActivity : AppCompatActivity() {
     private var currentFragment: Fragment? = null
+    private var bottomNavigation: AHBottomNavigation? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val bottomNavigation = findViewById<AHBottomNavigation>(R.id.bottom_navigation)
+        bottomNavigation = findViewById<AHBottomNavigation>(R.id.bottom_navigation)
 
         val itemTimetable = AHBottomNavigationItem(getString(R.string.timetable), R.drawable.ic_border_all_black_24dp, R.color.colorBottomNavigationPrimary)
         val itemCup = AHBottomNavigationItem(getString(R.string.CUP), R.drawable.ic_event_black_24dp, R.color.colorBottomNavigationPrimary)
         val itemTestTimetable = AHBottomNavigationItem(getString(R.string.test_timetable), R.drawable.ic_chrome_reader_mode_black_24dp, R.color.colorBottomNavigationPrimary)
-        bottomNavigation.addItem(itemTimetable)
-        bottomNavigation.addItem(itemCup)
-        bottomNavigation.addItem(itemTestTimetable)
-        bottomNavigation.defaultBackgroundColor = Color.parseColor("#FEFEFE")
-        bottomNavigation.isBehaviorTranslationEnabled = false
-        bottomNavigation.accentColor = Color.parseColor("#F63D2B")
-        bottomNavigation.inactiveColor = Color.parseColor("#747474")
-        bottomNavigation.isForceTint = true
-        bottomNavigation.titleState = AHBottomNavigation.TitleState.ALWAYS_SHOW
-        bottomNavigation.currentItem = 0
+        bottomNavigation!!.addItem(itemTimetable)
+        bottomNavigation!!.addItem(itemCup)
+        bottomNavigation!!.addItem(itemTestTimetable)
+        bottomNavigation!!.defaultBackgroundColor = Color.parseColor("#FEFEFE")
+        bottomNavigation!!.isBehaviorTranslationEnabled = false
+        bottomNavigation!!.accentColor = Color.parseColor("#F63D2B")
+        bottomNavigation!!.inactiveColor = Color.parseColor("#747474")
+        bottomNavigation!!.isForceTint = true
+        bottomNavigation!!.titleState = AHBottomNavigation.TitleState.ALWAYS_SHOW
+        bottomNavigation!!.currentItem = 0
+
+        currentFragment = null
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("firstLaunch", true)) {
             val intent = Intent(this, IntroductionActivity::class.java)
@@ -63,16 +66,16 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
-        tabSelected(bottomNavigation.currentItem, false)
+        tabSelected(bottomNavigation!!.currentItem, false)
 
-        bottomNavigation.currentItem = when (currentFragment) {
+        bottomNavigation!!.currentItem = when (currentFragment) {
             is TimetableFragment -> 0
             is CUPFragment -> 1
             is TestTimetableFragment -> 2
             else -> 0
         }
 
-        bottomNavigation.setOnTabSelectedListener { position, wasSelected ->
+        bottomNavigation!!.setOnTabSelectedListener { position, wasSelected ->
             tabSelected(position, wasSelected)
             true
         }
@@ -91,39 +94,50 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun launchTimetableFragment() {
+    fun launchTimetableFragment() {
         currentFragment = null
         currentFragment = TimetableFragment()
+
         val fragmentManager = fragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
+
         fragmentTransaction.replace(R.id.fragment_container, currentFragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
+
+        bottomNavigation!!.setCurrentItem(0, false)
     }
 
     private fun launchCUPFragment() {
         currentFragment = null
         currentFragment = CUPFragment()
+
         val fragmentManager = fragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
+
         fragmentTransaction.replace(R.id.fragment_container, currentFragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
+
+        bottomNavigation!!.setCurrentItem(1, false)
     }
 
     private fun launchTestTimetableFragment() {
         currentFragment = null
         currentFragment = TestTimetableFragment()
+
         val fragmentManager = fragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
+
         fragmentTransaction.replace(R.id.fragment_container, currentFragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
+
+        bottomNavigation!!.setCurrentItem(2, false)
     }
 
     companion object {
-        const val AUTHORITY = "1d1d1-dot-btrfrontend.appspot.com"
+        const val AUTHORITY = "1d1d2-dot-btrfrontend.appspot.com"
         const val SCHEME = "https"
 
         // In-house testing

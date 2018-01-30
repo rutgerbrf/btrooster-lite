@@ -30,7 +30,11 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import nl.viasalix.btroosterlite.R
+import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.activities.SettingsActivity
+import nl.viasalix.btroosterlite.cup.cupconfig.CUPConfigActivity
+import nl.viasalix.btroosterlite.singleton.Singleton
+import org.jetbrains.anko.*
 
 class CUPFragment : Fragment() {
     private var currentView: View? = null
@@ -96,11 +100,28 @@ class CUPFragment : Fragment() {
             (activity as AppCompatActivity).supportActionBar!!.title = getString(R.string.CUP)
         }
 
-
-        webView!!.loadUrl("https://ccgobb.cupweb6.nl/")
+        loadCUP()
     }
 
-    private fun loadCUP() {
-        webView!!.loadUrl("https://ccgobb.cupweb6.nl/")
+    private fun loggedIn() {
+        if (defaultSharedPreferences.getBoolean("cupConfigured", false)) {
+            loadCUP(true)
+        } else {
+            alert(getString(R.string.alert_cupintegration_text),
+                    getString(R.string.alert_cupintegration_title)) {
+                yesButton {
+                    startActivity<CUPConfigActivity>()
+                    activity!!.finish()
+                }
+                noButton {
+                    (activity!! as MainActivity).launchTimetableFragment()
+                }
+            }.show()
+        }
+    }
+
+    private fun loadCUP(loggedIn: Boolean = false) {
+        if (loggedIn) Singleton.cupIntegration!!.getCUPUrl { url -> webView!!.loadUrl(url.split("\n")[0]) }
+        else loggedIn()
     }
 }
