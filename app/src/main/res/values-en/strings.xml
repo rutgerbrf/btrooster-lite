@@ -17,20 +17,20 @@
     <string name="error_nocode">Code not entered</string>
     <string name="error_nograde">No grade selected</string>
     <string name="error_timetable">The timetable could not be retrieved</string>
-    <string name="cconf_37letters">3-7 letters of your last name</string>
+    <string name="cconf_37letters">3&#8211;7 letters of your last name</string>
     <string name="cconf_configure_cup">CUP Configuration</string>
-    <string name="cconf_error_37letters">Only 3-7 characters are allowed</string>
+    <string name="cconf_error_37letters">Only 3&#8211;7 characters are allowed</string>
     <string name="cconf_available_names">Available names</string>
     <string name="cconf_error_no_selection">No selection</string>
     <string name="cconf_pin_code">PIN code</string>
     <string name="int_code">Code</string>
     <string name="btrooster_lite_logo">BTRooster Lite Logo</string>
     <string name="int_stn_or_tc">Student number or teacher code</string>
-    <string name="int_class">Class</string>
+    <string name="int_grade">Grade</string>
     <string name="int_location">Location</string>
     <string name="int_error_code_not_entered">Code not entered</string>
-    <string name="int_grade_1_through_3">Grade 1-3</string>
-    <string name="int_grade_4_through_6">Grade 4-6</string>
+    <string name="int_grade_1_through_3">Grade 1&#8211;3</string>
+    <string name="int_grade_4_through_6">Grade 4&#8211;6</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_open_source">Open Source</string>
     <string name="settings_code_title">Code</string>
@@ -43,4 +43,6 @@
     <string name="settings_preload_only_wifi_off">Preload timetables using Wi-Fi and mobile networks</string>
     <string name="settings_preload_only_wifi_title">Only preload timetable using Wi-Fi</string>
     <string name="int_error_code_not_accepted">Only student numbers and teacher codes are accepted</string>
+    <string name="int_teacher">I\'m a teacher</string>
+    <string name="error">Error</string>
 </resources>

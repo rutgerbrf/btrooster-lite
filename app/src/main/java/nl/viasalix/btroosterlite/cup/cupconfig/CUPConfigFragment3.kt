@@ -62,9 +62,7 @@ class CUPConfigFragment3 : Fragment(), Step {
                 tvErrorCode!!.visibility = View.INVISIBLE
 
                 defaultSharedPreferences.edit()
-                        .putBoolean("cupPossible", true)
                         .putBoolean("cupConfigured", true)
-                        .putBoolean("cupCancelled", false)
                         .apply()
 
                 startActivity(Intent(activity!!, MainActivity::class.java))

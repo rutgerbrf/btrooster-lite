@@ -179,7 +179,7 @@ class CUPIntegration(context: Context) {
                     Log.v("RESP: SEARCHNAMES", response)
                 },
                 Response.ErrorListener {
-
+                    Log.e("ERROR", it.message)
                 }) {
             override fun getBodyContentType() =
                     "application/x-www-form-urlencoded; charset=UTF-8"

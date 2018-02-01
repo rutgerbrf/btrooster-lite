@@ -17,20 +17,20 @@
     <string name="error_nocode">Code niet ingevuld</string>
     <string name="error_nograde">Geen klas geselecteerd</string>
     <string name="error_timetable">Het rooster kon niet opgehaald worden</string>
-    <string name="cconf_37letters">3-7 letters van je achternaam</string>
+    <string name="cconf_37letters">3&#8211;7 letters van je achternaam</string>
     <string name="cconf_configure_cup">CUP instellen</string>
-    <string name="cconf_error_37letters">Er mogen 3-7 karakters worden ingevuld</string>
+    <string name="cconf_error_37letters">Er mogen 3&#8211;7 karakters worden ingevuld</string>
     <string name="cconf_available_names">Beschikbare namen</string>
     <string name="cconf_error_no_selection">Geen selectie</string>
     <string name="cconf_pin_code">Pincode</string>
     <string name="int_code">Code</string>
     <string name="btrooster_lite_logo">BTRooster Lite Logo</string>
     <string name="int_stn_or_tc">Leerlingnummer of roostercode</string>
-    <string name="int_class">Klas</string>
+    <string name="int_grade">Klas</string>
     <string name="int_location">Locatie</string>
     <string name="int_error_code_not_entered">Code niet ingevuld</string>
-    <string name="int_grade_1_through_3">Klas 1-3</string>
-    <string name="int_grade_4_through_6">Klas 4-6</string>
+    <string name="int_grade_1_through_3">Klas 1&#8211;3</string>
+    <string name="int_grade_4_through_6">Klas 4&#8211;6</string>
     <string name="menu_refresh">Herladen</string>
     <string name="menu_open_source">Open source</string>
     <string name="settings_code_title">Code</string>
@@ -43,4 +43,6 @@
     <string name="settings_preload_only_wifi_off">Roosters met Wi-Fi en mobiele netwerken van tevoren laden</string>
     <string name="settings_preload_only_wifi_title">Roosters alleen met Wi-Fi van tevoren laden</string>
     <string name="int_error_code_not_accepted">Leerlingnummers en docentencodes worden geaccepteerd</string>
+    <string name="int_teacher">Ik ben docent</string>
+    <string name="error">Fout</string>
 </resources>
