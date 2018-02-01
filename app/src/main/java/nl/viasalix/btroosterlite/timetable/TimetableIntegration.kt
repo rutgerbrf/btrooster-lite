@@ -64,9 +64,7 @@ class TimetableIntegration(private var context: Context,
                         sharedPreferences.edit().putString("t_indexes", response).apply()
                         Log.d("or", response)
                         callback(response, true)
-                    }) {
-                // FIXME
-            }
+                    }) {}
             queue.add(stringRequest)
         } else {
             val response = sharedPreferences.getString("t_indexes", null)

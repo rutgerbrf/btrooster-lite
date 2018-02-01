@@ -224,6 +224,7 @@ class TimetableFragment : Fragment() {
         ttIntegration!!.getIndexes { it, wasOnline ->
             if (wasOnline) {
                 handleIndexResponse(it, deleteUnusedTimetables)
+
                 getTimetable(
                         defaultSharedPreferences.getInt(
                                 "t_week",
