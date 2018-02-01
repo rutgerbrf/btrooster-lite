@@ -44,6 +44,7 @@ import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.activities.SettingsActivity
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
+import nl.viasalix.btroosterlite.util.Util.Companion.online
 
 class TestTimetableFragment : Fragment() {
     private var currentView: View? = null
@@ -116,27 +117,21 @@ class TestTimetableFragment : Fragment() {
         loadTestTimetable(true)
     }
 
-    private fun online(): Boolean {
-        val connectivityManager = activity.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo: NetworkInfo?
-
-        networkInfo = connectivityManager.activeNetworkInfo
-
-        return networkInfo != null && networkInfo.isConnected
-    }
-
     private fun loadTestTimetable(getIndexes: Boolean) {
         webView!!.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
 
-        if (online())
-            webView!!.settings.cacheMode = WebSettings.LOAD_NO_CACHE
-        else
-            webView!!.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+        if (activity != null) {
+            if (online(activity!!))
+                webView!!.settings.cacheMode = WebSettings.LOAD_NO_CACHE
+            else
+                webView!!.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
 
-        if (getIndexes)
-            getIndexes()
-        else
-            getTestTimetable()
+            if (getIndexes)
+                getIndexes()
+            else
+                if (responseList.isNotEmpty())
+                    getTestTimetable()
+        }
     }
 
     private fun getTestTimetable() {
@@ -156,7 +151,7 @@ class TestTimetableFragment : Fragment() {
     }
 
     private fun getIndexes() {
-        if (online()) {
+        if (online(activity)) {
             val queue = Volley.newRequestQueue(activity)
             val builder = Uri.Builder()
             builder.scheme(MainActivity.SCHEME)
@@ -177,7 +172,9 @@ class TestTimetableFragment : Fragment() {
         } else {
             val response = sharedPreferences!!.getString("tt_indexes", null)
             handleIndexResponse(response)
-            getTestTimetable()
+
+            if (responseList.isNotEmpty())
+                getTestTimetable()
         }
     }
 
@@ -208,4 +205,4 @@ class TestTimetableFragment : Fragment() {
             }
         }
     }
-}// Required empty public constructor
+}

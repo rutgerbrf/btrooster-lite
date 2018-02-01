@@ -24,10 +24,13 @@ import android.net.ConnectivityManager
 class Util {
     companion object {
         fun online(context: Context): Boolean {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val networkInfo = connectivityManager.activeNetworkInfo
+            val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = manager.activeNetworkInfo
 
-            return networkInfo != null && networkInfo.isConnected
+            var isAvailable = false
+            if (networkInfo != null && networkInfo.isConnected)
+                isAvailable = true
+            return isAvailable
         }
 
         fun <K, V> getIndexByKey(map: LinkedHashMap<K, V>, key: K): Int? {

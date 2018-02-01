@@ -64,23 +64,25 @@ class CUPConfigFragment2 : Fragment(), Step {
 
         nameMap.clear()
 
-        if (online(activity!!)) {
-            if (defaultSharedPreferences.getString("ci_preservationToken", "").isEmpty()) {
-                Singleton.cupIntegration = CUPIntegration(activity!!)
-            }
-
-            Singleton.cupIntegration!!.searchNames(Singleton.name, {
-                nameMap = it.toMutableMap()
-
-                it.forEach {
-                    val rb = RadioButton(activity)
-                    rb.text = it.value
-
-                    rgName!!.addView(rb)
+        if (activity != null) {
+            if (online(activity!!.applicationContext)) {
+                if (defaultSharedPreferences.getString("ci_preservationToken", "").isEmpty()) {
+                    Singleton.cupIntegration = CUPIntegration(activity!!)
                 }
-            })
-        } else {
-            alertNotConnected()
+
+                Singleton.cupIntegration!!.searchNames(Singleton.name, {
+                    nameMap = it.toMutableMap()
+
+                    it.forEach {
+                        val rb = RadioButton(activity)
+                        rb.text = it.value
+
+                        rgName!!.addView(rb)
+                    }
+                })
+            } else {
+                alertNotConnected()
+            }
         }
     }
 
@@ -94,7 +96,7 @@ class CUPConfigFragment2 : Fragment(), Step {
             noButton {
                 activity!!.finish()
             }
-        }
+        }.show()
     }
 
 
