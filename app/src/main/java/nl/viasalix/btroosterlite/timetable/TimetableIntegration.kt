@@ -263,21 +263,30 @@ class TimetableIntegration(private var context: Context,
     }
 
     fun deleteUnusedTimetables(weeks: List<Int>) {
-        if (weeks.isNotEmpty()) {
-            val db = dbHelper.writableDatabase
-            var selection = "DELETE FROM ${TimetableContract.Timetable.TABLE_NAME} WHERE "
+        var anyRecord = false
 
-            weeks.forEachIndexed { index, it ->
-                selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER}!=$code|$it"
-                selection += if (weeks.size > index + 1)
-                    " AND "
-                else
-                    ";"
+        weeks.forEach {
+            if (recordExists("$code|$it"))
+                anyRecord = true
+        }
+
+        if (anyRecord) {
+            if (weeks.isNotEmpty()) {
+                val db = dbHelper.writableDatabase
+                var selection = "DELETE FROM ${TimetableContract.Timetable.TABLE_NAME} WHERE "
+
+                weeks.forEachIndexed { index, it ->
+                    selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER}!=$code|$it"
+                    selection += if (weeks.size > index + 1)
+                        " AND "
+                    else
+                        ";"
+                }
+
+                Log.d("QUERY", selection)
+
+                db.execSQL(selection)
             }
-
-            Log.d("QUERY", selection)
-
-            db.execSQL(selection)
         }
     }
 
@@ -342,7 +351,7 @@ class TimetableIntegration(private var context: Context,
                         .filter { it.isNotEmpty() }
                         .map { it.split("|") }
                         .forEach {
-                            var key: K = when {
+                            val key: K = when {
                                 K::class == Int::class -> {
                                     it[0].toInt() as K
                                 }
@@ -351,7 +360,7 @@ class TimetableIntegration(private var context: Context,
                                 }
                             }
 
-                            var value: V = when {
+                            val value: V = when {
                                 V::class == Int::class -> {
                                     it[1].toInt() as V
                                 }

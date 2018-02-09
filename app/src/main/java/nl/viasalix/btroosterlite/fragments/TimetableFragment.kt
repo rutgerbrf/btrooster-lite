@@ -41,6 +41,9 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.yesButton
+import org.joda.time.DateTime
+import org.joda.time.Weeks
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
 
@@ -58,7 +61,7 @@ class TimetableFragment : Fragment() {
     private var ttIntegration: TimetableIntegration? = null
 
     private val currentWeekOfYear: Int
-        get() = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR)
+        get() = DateTime().weekOfWeekyear
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
