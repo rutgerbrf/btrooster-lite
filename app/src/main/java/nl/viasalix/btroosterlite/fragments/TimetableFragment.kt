@@ -26,6 +26,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.*
 import android.webkit.WebView
 import android.widget.AdapterView
@@ -228,11 +229,15 @@ class TimetableFragment : Fragment() {
             if (wasOnline) {
                 handleIndexResponse(it, deleteUnusedTimetables)
 
-                if (PreferenceManager.getDefaultSharedPreferences(activity) != null) {
-                    getTimetable(
-                            defaultSharedPreferences.getInt(
-                                    "t_week",
-                                    currentWeekOfYear))
+                try {
+                    if (activity != null) {
+                        getTimetable(
+                                defaultSharedPreferences.getInt(
+                                        "t_week",
+                                        currentWeekOfYear))
+                    }
+                } catch (e: NullPointerException) {
+                    Log.d("ERROR", e.message)
                 }
             } else {
                 handleIndexResponse(it)
