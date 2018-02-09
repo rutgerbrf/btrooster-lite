@@ -228,10 +228,12 @@ class TimetableFragment : Fragment() {
             if (wasOnline) {
                 handleIndexResponse(it, deleteUnusedTimetables)
 
-                getTimetable(
-                        defaultSharedPreferences.getInt(
-                                "t_week",
-                                currentWeekOfYear))
+                if (PreferenceManager.getDefaultSharedPreferences(activity) != null) {
+                    getTimetable(
+                            defaultSharedPreferences.getInt(
+                                    "t_week",
+                                    currentWeekOfYear))
+                }
             } else {
                 handleIndexResponse(it)
             }

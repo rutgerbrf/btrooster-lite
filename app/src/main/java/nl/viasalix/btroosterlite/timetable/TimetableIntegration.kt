@@ -21,6 +21,7 @@ package nl.viasalix.btroosterlite.timetable
 import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
+import android.database.sqlite.SQLiteException
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.preference.PreferenceManager
@@ -270,23 +271,27 @@ class TimetableIntegration(private var context: Context,
                 anyRecord = true
         }
 
-        if (anyRecord) {
-            if (weeks.isNotEmpty()) {
-                val db = dbHelper.writableDatabase
-                var selection = "DELETE FROM ${TimetableContract.Timetable.TABLE_NAME} WHERE "
+        try {
+            if (anyRecord) {
+                if (weeks.isNotEmpty()) {
+                    val db = dbHelper.writableDatabase
+                    var selection = "DELETE FROM ${TimetableContract.Timetable.TABLE_NAME} WHERE "
 
-                weeks.forEachIndexed { index, it ->
-                    selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER}!=$code|$it"
-                    selection += if (weeks.size > index + 1)
-                        " AND "
-                    else
-                        ";"
+                    weeks.forEachIndexed { index, it ->
+                        selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER}!=$code|$it"
+                        selection += if (weeks.size > index + 1)
+                            " AND "
+                        else
+                            ";"
+                    }
+
+                    Log.d("QUERY", selection)
+
+                    db.execSQL(selection)
                 }
-
-                Log.d("QUERY", selection)
-
-                db.execSQL(selection)
             }
+        } catch (e: SQLiteException) {
+            Log.d("ERROR", e.message)
         }
     }
 
