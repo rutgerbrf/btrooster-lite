@@ -45,4 +45,5 @@
     <string name="int_error_code_not_accepted">Only student numbers and teacher codes are accepted</string>
     <string name="int_teacher">I\'m a teacher</string>
     <string name="error">Error</string>
+    <string name="settings_information">Information</string>
 </resources>

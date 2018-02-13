@@ -18,7 +18,7 @@
 -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="Informatie">
+    <PreferenceCategory android:title="@string/settings_information">
         <EditTextPreference
             android:key="code"
             android:summary="@string/settings_code_summary"

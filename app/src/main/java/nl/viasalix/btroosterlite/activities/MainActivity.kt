@@ -44,9 +44,9 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigation = findViewById<AHBottomNavigation>(R.id.bottom_navigation)
 
-        val itemTimetable = AHBottomNavigationItem(getString(R.string.timetable), R.drawable.ic_border_all_black_24dp, R.color.colorBottomNavigationPrimary)
+        val itemTimetable = AHBottomNavigationItem(getString(R.string.timetable), R.drawable.ic_schedule_black_24dp, R.color.colorBottomNavigationPrimary)
         val itemCup = AHBottomNavigationItem(getString(R.string.CUP), R.drawable.ic_event_black_24dp, R.color.colorBottomNavigationPrimary)
-        val itemTestTimetable = AHBottomNavigationItem(getString(R.string.test_timetable), R.drawable.ic_chrome_reader_mode_black_24dp, R.color.colorBottomNavigationPrimary)
+        val itemTestTimetable = AHBottomNavigationItem(getString(R.string.test_timetable), R.drawable.ic_school_black_24dp, R.color.colorBottomNavigationPrimary)
         bottomNavigation!!.addItem(itemTimetable)
         bottomNavigation!!.addItem(itemCup)
         bottomNavigation!!.addItem(itemTestTimetable)

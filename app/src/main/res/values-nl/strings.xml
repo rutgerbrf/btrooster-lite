@@ -45,4 +45,5 @@
     <string name="int_error_code_not_accepted">Leerlingnummers en docentencodes worden geaccepteerd</string>
     <string name="int_teacher">Ik ben docent</string>
     <string name="error">Fout</string>
+    <string name="settings_information">Informatie</string>
 </resources>
