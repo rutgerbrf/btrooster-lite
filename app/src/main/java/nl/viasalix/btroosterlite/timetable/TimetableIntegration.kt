@@ -37,6 +37,7 @@ import nl.viasalix.btroosterlite.cup.CUPIntegration
 import nl.viasalix.btroosterlite.util.Util.Companion.online
 import org.jetbrains.anko.doAsync
 import java.util.regex.Pattern
+import kotlin.math.exp
 
 class TimetableIntegration(private var context: Context,
                            private var location: String,
@@ -79,9 +80,9 @@ class TimetableIntegration(private var context: Context,
      * @param week  week in het jaar van het rooster
      * @return      URL om het rooster op te halen
      */
-    fun buildURL(week: Int): String {
+    fun buildURL(week: Int, explicitType: String = ""): String {
         // Bepaalt of de gebruiker een docent, klas of leerling is
-        val typeString = getType(code)
+        val typeString = if (explicitType.isEmpty()) { getType(code) } else { explicitType }
 
         val builder = Uri.Builder()
         builder.scheme(MainActivity.SCHEME)
@@ -120,7 +121,8 @@ class TimetableIntegration(private var context: Context,
      * @param week      week in het jaar van het rooster
      * @param callback  functie die wordt uitgevoerd als de stringRequest een response heeft
      */
-    private fun downloadTimetable(week: Int, callback: (String) -> Unit) {
+    fun downloadTimetable(week: Int, callback: (String) -> Unit, saveToDatabase: Boolean = false,
+                          explicitType: String = "") {
         /*
          * Identifier die wordt gebruikt als key in de database
          * Ziet er als volgt uit: "<code>|<week>"
@@ -135,16 +137,20 @@ class TimetableIntegration(private var context: Context,
              *  parameters mee te geven
              */
 
+            Log.d("burl", buildURL(week, explicitType))
+
             val stringRequest = object : StringRequest(
-                    Request.Method.GET, buildURL(week),
+                    Request.Method.GET, buildURL(week, explicitType),
                     Response.Listener<String> {
-                        if (recordExists(identifier)) {
-                            updateTimetable(identifier, it)
-                            callback(it)
-                        } else {
-                            saveTimetableToDatabase(identifier, it)
-                            callback(it)
+                        if (saveToDatabase) {
+                            if (recordExists(identifier)) {
+                                updateTimetable(identifier, it)
+                            } else {
+                                saveTimetableToDatabase(identifier, it)
+                            }
                         }
+
+                        callback(it)
                     },
                     Response.ErrorListener {
 

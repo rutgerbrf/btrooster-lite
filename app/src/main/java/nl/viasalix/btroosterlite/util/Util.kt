@@ -20,9 +20,13 @@ package nl.viasalix.btroosterlite.util
 
 import android.content.Context
 import android.net.ConnectivityManager
+import org.joda.time.DateTime
 
 class Util {
     companion object {
+        val currentWeekOfYear: Int
+            get() = DateTime().weekOfWeekyear
+
         fun online(context: Context): Boolean {
             val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val networkInfo = manager.activeNetworkInfo

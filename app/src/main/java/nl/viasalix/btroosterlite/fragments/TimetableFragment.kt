@@ -39,6 +39,7 @@ import nl.viasalix.btroosterlite.activities.SettingsActivity
 import nl.viasalix.btroosterlite.activities.ViewTimetableActivity
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.getType
+import nl.viasalix.btroosterlite.util.Util.Companion.currentWeekOfYear
 import nl.viasalix.btroosterlite.util.Util.Companion.getIndexByKey
 import nl.viasalix.btroosterlite.util.Util.Companion.getKeyByIndex
 import org.jetbrains.anko.alert
@@ -61,9 +62,6 @@ class TimetableFragment : Fragment() {
     private var webView: WebView? = null
     private var mListener: OnFragmentInteractionListener? = null
     private var ttIntegration: TimetableIntegration? = null
-
-    private val currentWeekOfYear: Int
-        get() = DateTime().weekOfWeekyear
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

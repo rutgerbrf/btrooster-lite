@@ -62,7 +62,7 @@
         android:layout_marginTop="24dp"
         android:text="@string/vt_view"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+        app:layout_constraintTop_toBottomOf="@+id/vt_save_timetable" />
 
     <View
         android:id="@+id/view"
@@ -85,7 +85,7 @@
         app:layout_constraintTop_toTopOf="@+id/view" />
 
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/vt_save_timetable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
