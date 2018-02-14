@@ -126,7 +126,7 @@ class TimetableFragment : Fragment() {
 
         ttIntegration = TimetableIntegration(activity!!, location!!, code!!)
 
-        activity.findViewById<FloatingActionButton>(R.id.t_loadOtherTimetable)?.onClick {
+        activity.findViewById<FloatingActionButton>(R.id.t_loadOtherTimetable)?.setOnClickListener {
             startActivity(Intent(activity!!, ViewTimetableActivity::class.java))
         }
 

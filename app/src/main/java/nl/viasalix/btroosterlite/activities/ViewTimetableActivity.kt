@@ -64,9 +64,7 @@ class ViewTimetableActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        btnView!!.onClick {
-            viewTimetable()
-        }
+        btnView!!.setOnClickListener { viewTimetable() }
     }
 
     private fun processCodeInput() {
