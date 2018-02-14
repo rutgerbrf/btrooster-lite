@@ -87,6 +87,7 @@ class TimetableIntegration(private var context: Context,
         val builder = Uri.Builder()
         builder.scheme(MainActivity.SCHEME)
                 .encodedAuthority(MainActivity.AUTHORITY)
+                .appendPath("embed")
                 .appendPath("RoosterEmbedServlet")
                 .appendQueryParameter("code", code)
                 .appendQueryParameter("locatie", location)
@@ -136,8 +137,6 @@ class TimetableIntegration(private var context: Context,
              *  Maak een nieuw StringRequest aan en override een aantal functies om de goede
              *  parameters mee te geven
              */
-
-            Log.d("burl", buildURL(week, explicitType))
 
             val stringRequest = object : StringRequest(
                     Request.Method.GET, buildURL(week, explicitType),

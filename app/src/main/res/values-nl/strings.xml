@@ -37,7 +37,7 @@
     <string name="settings_code_summary">Code waarmee leerlingen en docenten en klassen worden ingeroosterd - niet hoofdlettergevoelig</string>
     <string name="settings_location_title">Locatie</string>
     <string name="settings_location_summary">Locatie van Calvijn College waar je/u les krijgt/geeft</string>
-    <string name="settings_preload_title">Roosters van te voren laden</string>
+    <string name="settings_preload_title">Roosters van tevoren laden</string>
     <string name="settings_preload_summary">Roosters van beschikbare weken van tevoren laden</string>
     <string name="settings_preload_only_wifi_on">Roosters alleen met Wi-Fi van tevoren laden</string>
     <string name="settings_preload_only_wifi_off">Roosters met Wi-Fi en mobiele netwerken van tevoren laden</string>
@@ -51,4 +51,9 @@
     <string name="vt_room">Ruimte</string>
     <string name="vt_title">Rooster bekijken</string>
     <string name="vt_save_timetable">Rooster opslaan in cache</string>
+    <string name="weeks_ago">weken geleden</string>
+    <string name="last_week">Vorige week</string>
+    <string name="current_week">Deze week</string>
+    <string name="next_week">Volgende week</string>
+    <string name="in_weeks" translatable="false">Over | weken</string>
 </resources>

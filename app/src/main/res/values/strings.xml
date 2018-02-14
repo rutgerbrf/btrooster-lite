@@ -52,6 +52,11 @@
     <string name="vt_room">Room</string>
     <string name="vt_title">View Timetable</string>
     <string name="vt_save_timetable">Save timetable to cache</string>
+    <string name="weeks_ago">weeks ago</string>
+    <string name="last_week">Last week</string>
+    <string name="current_week">Current week</string>
+    <string name="next_week">Next week</string>
+    <string name="in_weeks">In | weeks</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 

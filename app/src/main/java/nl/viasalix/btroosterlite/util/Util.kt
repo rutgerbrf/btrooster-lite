@@ -60,5 +60,16 @@ class Util {
 
             return null
         }
+
+        /* |__ GRAFSTEEN __| *
+        fun <K, V> getKeyByValue(map: LinkedHashMap<K, V>, value: V): K? {
+            map.forEach {
+                if (it.value == value)
+                    return it.key
+            }
+
+            return null
+        }
+        */
     }
 }

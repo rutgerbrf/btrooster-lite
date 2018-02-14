@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val AUTHORITY = "1d1d2-dot-btrfrontend.appspot.com"
+        const val AUTHORITY = "1d2d0-dot-btrfrontend.appspot.com"
         const val SCHEME = "https"
 
         // In-house testing

@@ -42,13 +42,19 @@ import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.getTyp
 import nl.viasalix.btroosterlite.util.Util.Companion.currentWeekOfYear
 import nl.viasalix.btroosterlite.util.Util.Companion.getIndexByKey
 import nl.viasalix.btroosterlite.util.Util.Companion.getKeyByIndex
+import nl.viasalix.btroosterlite.util.Util.Companion.getKeyByValue
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.yesButton
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.joda.time.Weeks
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
 import java.util.regex.Pattern
+import kotlin.math.absoluteValue
 
 class TimetableFragment : Fragment() {
     private var weekSpinner: Spinner? = null
@@ -233,6 +239,9 @@ class TimetableFragment : Fragment() {
     private fun handleIndexResponse(response: String?, deleteUnusedTimetables: Boolean = false) {
         if (response != null) {
             val availableWeeks = TimetableIntegration.handleIndexResponse<Int, String>(response)
+            val parsedWeekNames = parseAvailableWeeks(availableWeeks)
+
+            System.out.println(parsedWeekNames.joinToString())
 
             if (deleteUnusedTimetables)
                 ttIntegration!!.deleteUnusedTimetables(availableWeeks.keys.toList())
@@ -241,7 +250,7 @@ class TimetableFragment : Fragment() {
                 val adapter = ArrayAdapter(
                         activity,
                         android.R.layout.simple_spinner_dropdown_item,
-                        availableWeeks.values.toList())
+                        parsedWeekNames)
 
                 weekSpinner!!.adapter = adapter
 
@@ -272,6 +281,44 @@ class TimetableFragment : Fragment() {
                     weekSpinner!!.setSelection(2)
             }
         }
+    }
+
+    private fun parseAvailableWeeks(availableWeeks: LinkedHashMap<Int, String>): List<String> {
+        val weekNames = resources.getStringArray(R.array.in_weeks)
+        val currentWeek = DateTime.now(DateTimeZone.getDefault())
+                .withDayOfWeek(1)
+                .withHourOfDay(0)
+                .withMinuteOfHour(0)
+                .withSecondOfMinute(0)
+                .withMillisOfSecond(0)
+        val dateParser: DateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy")
+
+        val result = arrayListOf<String>()
+
+        availableWeeks.values.forEach { week ->
+            val date = dateParser.parseDateTime(week)
+            val dif = Weeks.weeksBetween(currentWeek, date).weeks
+
+            Log.d("week", week)
+            Log.d("date", date.toString())
+            Log.d("dif", dif.toString())
+
+            when (dif) {
+                -1 -> result.add(weekNames[1])
+                0 -> result.add(weekNames[2])
+                1 -> result.add(weekNames[3])
+
+                else -> {
+                    if (dif < 0) {
+                        result.add(dif.absoluteValue.toString() + " " + weekNames[0])
+                    } else if (dif > 1) {
+                        result.add(weekNames[4].replace("|", dif.absoluteValue.toString()))
+                    }
+                }
+            }
+        }
+
+        return result
     }
 
     internal interface OnFragmentInteractionListener

@@ -44,4 +44,12 @@
         <item>@string/vt_class</item>
         <item>@string/vt_room</item>
     </string-array>
+
+    <string-array name="in_weeks" translatable="true">
+        <item>@string/weeks_ago</item>
+        <item>@string/last_week</item>
+        <item>@string/current_week</item>
+        <item>@string/next_week</item>
+        <item>@string/in_weeks</item>
+    </string-array>
 </resources>

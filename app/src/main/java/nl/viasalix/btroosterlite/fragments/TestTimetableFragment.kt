@@ -140,6 +140,7 @@ class TestTimetableFragment : Fragment() {
         val builder = Uri.Builder()
         builder.scheme(MainActivity.SCHEME)
                 .encodedAuthority(MainActivity.AUTHORITY)
+                .appendPath("embed")
                 .appendPath("ToetsroosterEmbedServlet")
                 .appendQueryParameter("code", code)
                 .appendQueryParameter("locatie", location)
@@ -156,6 +157,7 @@ class TestTimetableFragment : Fragment() {
             val builder = Uri.Builder()
             builder.scheme(MainActivity.SCHEME)
                     .encodedAuthority(MainActivity.AUTHORITY)
+                    .appendPath("embed")
                     .appendPath("ToetsroosterEmbedServlet")
                     .appendQueryParameter("indexOphalen", "1")
                     .appendQueryParameter("locatie", location)
@@ -191,7 +193,7 @@ class TestTimetableFragment : Fragment() {
                 weekSpinner!!.adapter = adapter
                 menuHasLoaded = true
 
-                weekSpinner!!.setSelection(sharedPreferences!!.getInt("tt_weekChange", 1))
+                weekSpinner!!.setSelection(sharedPreferences!!.getInt("tt_weekChange", 0))
 
                 weekSpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {

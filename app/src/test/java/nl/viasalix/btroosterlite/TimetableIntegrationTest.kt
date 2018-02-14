@@ -32,7 +32,7 @@ class TimetableIntegrationTest {
                 17 to "Volgende Week")
 
         val testString = "15|Vorige Week\n16|Deze Week\n17|Volgende Week\n"
-        val actual = handleIndexResponse(testString)
+        val actual = handleIndexResponse<Int, String>(testString)
 
         assertEquals(expected, actual)
     }
@@ -43,7 +43,7 @@ class TimetableIntegrationTest {
         val actualStudent = TimetableIntegration.getType("12345")
         val actualTeacher = TimetableIntegration.getType("abc")
 
-        assertEquals(actualClass, "c")
+        assertEquals(actualClass, "unknown")
         assertEquals(actualStudent, "s")
         assertEquals(actualTeacher, "t")
     }
