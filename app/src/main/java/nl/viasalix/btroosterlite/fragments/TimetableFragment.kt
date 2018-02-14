@@ -146,21 +146,24 @@ class TimetableFragment : Fragment() {
         }
 
         if (loadSharedPreferences() != 1) {
-            getIndexes(activity,
-                    ttIntegration!!,
-                    {
-                        handleIndexResponse(activity,
-                                ttIntegration!!,
-                                weekSpinner!!,
-                                it,
-                                true,
-                                { loadTimetable() })
-                    },
-                    { getTimetable(defaultSharedPreferences.getInt(
-                            "t_week",
-                            currentWeekOfYear))
-                    })
-            loadTimetable()
+            if (activity != null) {
+                getIndexes(activity,
+                        ttIntegration!!,
+                        {
+                            handleIndexResponse(activity,
+                                    ttIntegration!!,
+                                    weekSpinner!!,
+                                    it,
+                                    true,
+                                    { loadTimetable() })
+                        },
+                        {
+                            getTimetable(defaultSharedPreferences.getInt(
+                                    "t_week",
+                                    currentWeekOfYear))
+                        })
+                loadTimetable()
+            }
         }
     }
 
