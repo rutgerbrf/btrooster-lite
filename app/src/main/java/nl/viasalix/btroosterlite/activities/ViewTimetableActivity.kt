@@ -66,6 +66,15 @@ class ViewTimetableActivity : AppCompatActivity() {
 
         btnView!!.setOnClickListener { viewTimetable() }
     }
+    
+    override public boolean onOptionsItemSelected(MenuItem item) {
+        when (item.id) {
+            android.R.id.home => {
+                startActivity(Intent(this, MainActivity::class))
+                finish()
+            }
+        }
+    }
 
     private fun processCodeInput() {
         if (getType(etCode!!.text.toString()) == "unknown") {
