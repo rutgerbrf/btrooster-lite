@@ -13,19 +13,23 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
 import nl.viasalix.btroosterlite.R
+import nl.viasalix.btroosterlite.fragments.TimetableFragment
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.getType
+import nl.viasalix.btroosterlite.util.Util
 import nl.viasalix.btroosterlite.util.Util.Companion.currentWeekOfYear
 import org.jetbrains.anko.defaultSharedPreferences
 
 class ViewTimetableActivity : AppCompatActivity() {
     var classSpinner: Spinner? = null
     var locationSpinner: Spinner? = null
+    var weekSpinner: Spinner? = null
     var etCode: EditText? = null
     var btnView: Button? = null
     var webView: WebView? = null
     var saveCheckBox: CheckBox? = null
     var locationValuesArray: Array<String> = arrayOf()
+    var availableWeeks: LinkedHashMap<Int, String> = linkedMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +50,7 @@ class ViewTimetableActivity : AppCompatActivity() {
 
         classSpinner = findViewById(R.id.vt_class_room)
         locationSpinner = findViewById(R.id.vt_location)
+        weekSpinner = findViewById(R.id.vt_week)
         etCode = findViewById(R.id.vt_code)
         btnView = findViewById(R.id.vt_btn_view)
         webView = findViewById(R.id.vt_webview)
@@ -67,6 +72,23 @@ class ViewTimetableActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+
+        val ttIntegration = TimetableIntegration(this,
+                defaultSharedPreferences.getString("location", "Goes"),
+                defaultSharedPreferences.getString("code", "12345"))
+
+        TimetableFragment.getIndexes(this, ttIntegration, {
+            TimetableFragment.handleIndexResponse(
+                    this,
+                    ttIntegration,
+                    weekSpinner!!,
+                    it,
+                    false,
+                    {},
+                    false,
+                    { availableWeeks = it }
+            )
+        }, {})
 
         btnView!!.setOnClickListener { viewTimetable() }
     }
@@ -104,7 +126,7 @@ class ViewTimetableActivity : AppCompatActivity() {
             TimetableIntegration(this,
                     locationValuesArray[locationSpinner!!.selectedItemPosition],
                     etCode!!.text.toString()
-            ).downloadTimetable(currentWeekOfYear,
+            ).downloadTimetable(Util.getKeyByIndex(availableWeeks, weekSpinner!!.selectedItemPosition)!!,
                     { data ->
                         webView!!.loadData(data,
                                 "text/html; charset=UTF-8",

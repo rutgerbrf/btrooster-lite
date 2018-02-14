@@ -18,10 +18,12 @@
 
 package nl.viasalix.btroosterlite.fragments
 
+import android.app.Activity
 import android.app.Fragment
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Resources
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
@@ -80,7 +82,19 @@ class TimetableFragment : Fragment() {
         when (item.itemId) {
             R.id.action_reload -> {
                 loadTimetable()
-                getIndexes()
+                getIndexes(activity,
+                        ttIntegration!!,
+                        { handleIndexResponse(activity,
+                                ttIntegration!!,
+                                weekSpinner!!,
+                                it,
+                                true,
+                                {})
+                        },
+                        { getTimetable(defaultSharedPreferences.getInt(
+                                "t_week",
+                                currentWeekOfYear))
+                        })
                 return true
             }
             R.id.action_settings -> {
@@ -132,7 +146,20 @@ class TimetableFragment : Fragment() {
         }
 
         if (loadSharedPreferences() != 1) {
-            getIndexes(true)
+            getIndexes(activity,
+                    ttIntegration!!,
+                    {
+                        handleIndexResponse(activity,
+                                ttIntegration!!,
+                                weekSpinner!!,
+                                it,
+                                true,
+                                { loadTimetable() })
+                    },
+                    { getTimetable(defaultSharedPreferences.getInt(
+                            "t_week",
+                            currentWeekOfYear))
+                    })
             loadTimetable()
         }
     }
@@ -212,112 +239,6 @@ class TimetableFragment : Fragment() {
         ttIntegration!!.loadTimetable(week, webView!!)
     }
 
-    private fun getIndexes(deleteUnusedTimetables: Boolean = false) {
-        ttIntegration!!.getIndexes { it, wasOnline ->
-            if (wasOnline) {
-                handleIndexResponse(it, deleteUnusedTimetables)
-
-                try {
-                    if (activity != null) {
-                        getTimetable(
-                                defaultSharedPreferences.getInt(
-                                        "t_week",
-                                        currentWeekOfYear))
-                    }
-                } catch (e: NullPointerException) {
-                    Log.d("ERROR", e.message)
-                }
-            } else {
-                handleIndexResponse(it)
-            }
-        }
-    }
-
-    private fun handleIndexResponse(response: String?, deleteUnusedTimetables: Boolean = false) {
-        if (response != null) {
-            val availableWeeks = TimetableIntegration.handleIndexResponse<Int, String>(response)
-            val parsedWeekNames = parseAvailableWeeks(availableWeeks)
-
-            System.out.println(parsedWeekNames.joinToString())
-
-            if (deleteUnusedTimetables)
-                ttIntegration!!.deleteUnusedTimetables(availableWeeks.keys.toList())
-
-            if (activity != null) {
-                val adapter = ArrayAdapter(
-                        activity,
-                        android.R.layout.simple_spinner_dropdown_item,
-                        parsedWeekNames)
-
-                weekSpinner!!.adapter = adapter
-
-                weekSpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
-                        val week = getKeyByIndex(availableWeeks, position)
-
-                        if (week != null)
-                            sharedPreferences!!.edit().putInt("t_week", week).apply()
-                        else
-                            sharedPreferences!!.edit().putInt("t_week", currentWeekOfYear).apply()
-
-                        loadTimetable()
-                    }
-
-                    override fun onNothingSelected(adapterView: AdapterView<*>) {}
-                }
-
-                val indexToSet =
-                        getIndexByKey(availableWeeks,
-                                defaultSharedPreferences.getInt(
-                                        "t_week",
-                                        currentWeekOfYear))
-
-                if (indexToSet != null)
-                    weekSpinner!!.setSelection(indexToSet)
-                else
-                    weekSpinner!!.setSelection(2)
-            }
-        }
-    }
-
-    private fun parseAvailableWeeks(availableWeeks: LinkedHashMap<Int, String>): List<String> {
-        val weekNames = resources.getStringArray(R.array.in_weeks)
-        val currentWeek = DateTime.now(DateTimeZone.getDefault())
-                .withDayOfWeek(1)
-                .withHourOfDay(0)
-                .withMinuteOfHour(0)
-                .withSecondOfMinute(0)
-                .withMillisOfSecond(0)
-        val dateParser: DateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy")
-
-        val result = arrayListOf<String>()
-
-        availableWeeks.values.forEach { week ->
-            val date = dateParser.parseDateTime(week)
-            val dif = Weeks.weeksBetween(currentWeek, date).weeks
-
-            Log.d("week", week)
-            Log.d("date", date.toString())
-            Log.d("dif", dif.toString())
-
-            when (dif) {
-                -1 -> result.add(weekNames[1])
-                0 -> result.add(weekNames[2])
-                1 -> result.add(weekNames[3])
-
-                else -> {
-                    if (dif < 0) {
-                        result.add(dif.absoluteValue.toString() + " " + weekNames[0])
-                    } else if (dif > 1) {
-                        result.add(weekNames[4].replace("|", dif.absoluteValue.toString()))
-                    }
-                }
-            }
-        }
-
-        return result
-    }
-
     internal interface OnFragmentInteractionListener
 
     companion object {
@@ -325,5 +246,108 @@ class TimetableFragment : Fragment() {
         var locaties = arrayOf("Goes Klein Frankrijk", "Goes Noordhoeklaan", "Goes Stationspark", "Krabbendijke Appelstraat", "Krabbendijke Kerkpolder", "Middelburg", "Tholen")
         // Locaties die in de request URL moeten te komen staan
         var locatiesURL = arrayOf("Goes", "GoesNoordhoeklaan", "GoesStationspark", "KrabbendijkeAppelstraat", "KrabbendijkeKerkpolder", "Middelburg", "Tholen")
+
+        fun parseAvailableWeeks(resources: Resources, availableWeeks: LinkedHashMap<Int, String>): List<String> {
+            val weekNames = resources.getStringArray(R.array.in_weeks)
+            val currentWeek = DateTime.now(DateTimeZone.getDefault())
+                    .withDayOfWeek(1)
+                    .withHourOfDay(0)
+                    .withMinuteOfHour(0)
+                    .withSecondOfMinute(0)
+                    .withMillisOfSecond(0)
+            val dateParser: DateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy")
+
+            val result = arrayListOf<String>()
+
+            availableWeeks.values.forEach { week ->
+                val date = dateParser.parseDateTime(week)
+                val dif = Weeks.weeksBetween(currentWeek, date).weeks
+
+                when (dif) {
+                    -1 -> result.add(weekNames[1])
+                    0 -> result.add(weekNames[2])
+                    1 -> result.add(weekNames[3])
+
+                    else -> {
+                        if (dif < 0) {
+                            result.add(dif.absoluteValue.toString() + " " + weekNames[0])
+                        } else if (dif > 1) {
+                            result.add(weekNames[4].replace("|", dif.absoluteValue.toString()))
+                        }
+                    }
+                }
+            }
+
+            return result
+        }
+
+        fun getIndexes(activity: Activity, ttIntegration: TimetableIntegration, callback: (String?) -> Unit, loadTimetableCallback: () -> Unit) {
+            ttIntegration.getIndexes { it, wasOnline ->
+                if (wasOnline) {
+                    callback(it)
+
+                    try {
+                        if (activity != null) {
+                            loadTimetableCallback()
+                        }
+                    } catch (e: NullPointerException) {
+                        Log.d("ERROR", e.message)
+                    }
+                } else {
+                    callback(it)
+                }
+            }
+        }
+
+        fun handleIndexResponse(activity: Activity, ttIntegration: TimetableIntegration, weekSpinner: Spinner, response: String?, deleteUnusedTimetables: Boolean = false, callback: () -> Unit, editSharedPreferences: Boolean = true, availableWeeksCallback: (LinkedHashMap<Int, String>) -> Unit = {}) {
+            if (response != null) {
+                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+
+                val availableWeeks = TimetableIntegration.handleIndexResponse<Int, String>(response)
+                val parsedWeekNames = parseAvailableWeeks(activity.resources, availableWeeks)
+
+                availableWeeksCallback(availableWeeks)
+
+                if (deleteUnusedTimetables)
+                    ttIntegration.deleteUnusedTimetables(availableWeeks.keys.toList())
+
+                if (activity != null) {
+                    val adapter = ArrayAdapter(
+                            activity,
+                            android.R.layout.simple_spinner_dropdown_item,
+                            parsedWeekNames)
+
+                    weekSpinner.adapter = adapter
+
+                    weekSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
+                            if (editSharedPreferences) {
+                                val week = getKeyByIndex(availableWeeks, position)
+
+                                if (week != null)
+                                    sharedPreferences?.edit()?.putInt("t_week", week)?.apply()
+                                else
+                                    sharedPreferences?.edit()?.putInt("t_week", currentWeekOfYear)?.apply()
+                            }
+
+                            callback()
+                        }
+
+                        override fun onNothingSelected(adapterView: AdapterView<*>) {}
+                    }
+
+                    val indexToSet =
+                            getIndexByKey(availableWeeks,
+                                    sharedPreferences.getInt(
+                                            "t_week",
+                                            currentWeekOfYear))
+
+                    if (indexToSet != null)
+                        weekSpinner.setSelection(indexToSet)
+                    else
+                        weekSpinner.setSelection(2)
+                }
+            }
+        }
     }
 }

@@ -111,7 +111,7 @@ class TimetableIntegration(private var context: Context,
 
                     doAsync {
                         response.forEach {
-                            downloadTimetable(it.key, {})
+                            downloadTimetable(it.key, {}, true)
                         }
                     }
                 }
@@ -126,82 +126,84 @@ class TimetableIntegration(private var context: Context,
      * @param week      week in het jaar van het rooster
      * @param callback  functie die wordt uitgevoerd als de stringRequest een response heeft
      */
-    fun downloadTimetable(week: Int, callback: (String) -> Unit, saveToDatabase: Boolean = false,
+    fun downloadTimetable(week: Int, callback: (String) -> Unit, saveToDatabase: Boolean = true,
                           explicitType: String = "") {
-        doAsync {
+        /*
+         * Identifier die wordt gebruikt als key in de database
+         * Ziet er als volgt uit: "<code>|<week>"
+         */
+
+        val identifier = "$code|$week"
+
+        // Check of de gebruiker online is
+        if (online(context)) {
             /*
-             * Identifier die wordt gebruikt als key in de database
-             * Ziet er als volgt uit: "<code>|<week>"
+             *  Maak een nieuw StringRequest aan en override een aantal functies om de goede
+             *  parameters mee te geven
              */
 
-            val identifier = "$code|$week"
+            val stringRequest = object : StringRequest(
+                    Request.Method.GET, buildURL(week, explicitType),
+                    Response.Listener<String> {
+                        if (saveToDatabase) {
+                            Log.d("std", "true")
 
-            // Check of de gebruiker online is
-            if (online(context)) {
-                /*
-                 *  Maak een nieuw StringRequest aan en override een aantal functies om de goede
-                 *  parameters mee te geven
-                 */
-
-                val stringRequest = object : StringRequest(
-                        Request.Method.GET, buildURL(week, explicitType),
-                        Response.Listener<String> {
-                            if (saveToDatabase) {
-                                if (recordExists(identifier)) {
-                                    updateTimetable(identifier, it)
-                                } else {
-                                    saveTimetableToDatabase(identifier, it)
-                                }
+                            if (recordExists(identifier)) {
+                                updateTimetable(identifier, it)
+                            } else {
+                                saveTimetableToDatabase(identifier, it)
                             }
+                        }
 
-                            callback(it)
-                        },
-                        Response.ErrorListener {
+                        callback(it)
+                    },
+                    Response.ErrorListener {
 
-                        }) {
-                    override fun getBodyContentType() =
-                            "application/x-www-form-urlencoded; charset=UTF-8"
+                    }) {
+                override fun getBodyContentType() =
+                        "application/x-www-form-urlencoded; charset=UTF-8"
 
-                    /**
-                     * Maakt een Map<String, String> van headers in het volgende formaat:
-                     * Client-Key=<sp/ci_clientKey>
-                     * Bewaartoken=<sp/ci_preservationToken>
-                     *
-                     * @return  map van headers
-                     */
-                    override fun getHeaders(): Map<String, String> =
-                            hashMapOf(
-                                    CUPIntegration.Params.ClientKey.param to
-                                            sharedPreferences.getString(
-                                                    "ci_clientKey",
-                                                    ""),
-                                    CUPIntegration.Params.PreservationToken.param to
-                                            sharedPreferences.getString(
-                                                    "ci_preservationToken",
-                                                    "")
-                            )
-                }
+                /**
+                 * Maakt een Map<String, String> van headers in het volgende formaat:
+                 * Client-Key=<sp/ci_clientKey>
+                 * Bewaartoken=<sp/ci_preservationToken>
+                 *
+                 * @return  map van headers
+                 */
+                override fun getHeaders(): Map<String, String> =
+                        hashMapOf(
+                                CUPIntegration.Params.ClientKey.param to
+                                        sharedPreferences.getString(
+                                                "ci_clientKey",
+                                                ""),
+                                CUPIntegration.Params.PreservationToken.param to
+                                        sharedPreferences.getString(
+                                                "ci_preservationToken",
+                                                "")
+                        )
+            }
 
+            doAsync {
                 queue.add(stringRequest)
-            } else {
-                // Als de gebruiker offline is wordt de volgende code uitgoevoerd
+            }
+        } else {
+            // Als de gebruiker offline is wordt de volgende code uitgoevoerd
 
-                // Check of het rooster al in de database staat
-                if (recordExists(identifier)) {
-                    // Laad het rooster uit de database
-                    val data = loadTimetableFromDatabase(identifier)
+            // Check of het rooster al in de database staat
+            if (recordExists(identifier)) {
+                // Laad het rooster uit de database
+                val data = loadTimetableFromDatabase(identifier)
 
-                    if (data.isNotEmpty()) {
-                        // Voer de callback uit met de response als argument
-                        callback(data)
-                    } else {
-                        // Geef een foutmelding
-                        callback(context.getString(R.string.error_timetable))
-                    }
+                if (data.isNotEmpty()) {
+                    // Voer de callback uit met de response als argument
+                    callback(data)
                 } else {
                     // Geef een foutmelding
                     callback(context.getString(R.string.error_timetable))
                 }
+            } else {
+                // Geef een foutmelding
+                callback(context.getString(R.string.error_timetable))
             }
         }
     }
@@ -209,7 +211,7 @@ class TimetableIntegration(private var context: Context,
     fun loadTimetable(week: Int, webView: WebView) {
         downloadTimetable(week, {
             loadDataInWebView(it, webView)
-        })
+        }, true)
     }
 
     private fun loadDataInWebView(data: String, webView: WebView) {
