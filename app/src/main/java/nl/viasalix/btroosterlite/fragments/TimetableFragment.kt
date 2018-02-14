@@ -311,42 +311,40 @@ class TimetableFragment : Fragment() {
                 if (deleteUnusedTimetables)
                     ttIntegration.deleteUnusedTimetables(availableWeeks.keys.toList())
 
-                if (activity != null) {
-                    val adapter = ArrayAdapter(
-                            activity,
-                            android.R.layout.simple_spinner_dropdown_item,
-                            parsedWeekNames)
+                val adapter = ArrayAdapter(
+                        activity,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        parsedWeekNames)
 
-                    weekSpinner.adapter = adapter
+                weekSpinner.adapter = adapter
 
-                    weekSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
-                            if (editSharedPreferences) {
-                                val week = getKeyByIndex(availableWeeks, position)
+                weekSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
+                        if (editSharedPreferences) {
+                            val week = getKeyByIndex(availableWeeks, position)
 
-                                if (week != null)
-                                    sharedPreferences?.edit()?.putInt("t_week", week)?.apply()
-                                else
-                                    sharedPreferences?.edit()?.putInt("t_week", currentWeekOfYear)?.apply()
-                            }
-
-                            callback()
+                            if (week != null)
+                                sharedPreferences?.edit()?.putInt("t_week", week)?.apply()
+                            else
+                                sharedPreferences?.edit()?.putInt("t_week", currentWeekOfYear)?.apply()
                         }
 
-                        override fun onNothingSelected(adapterView: AdapterView<*>) {}
+                        callback()
                     }
 
-                    val indexToSet =
-                            getIndexByKey(availableWeeks,
-                                    sharedPreferences.getInt(
-                                            "t_week",
-                                            currentWeekOfYear))
-
-                    if (indexToSet != null)
-                        weekSpinner.setSelection(indexToSet)
-                    else
-                        weekSpinner.setSelection(2)
+                    override fun onNothingSelected(adapterView: AdapterView<*>) {}
                 }
+
+                val indexToSet =
+                        getIndexByKey(availableWeeks,
+                                sharedPreferences.getInt(
+                                        "t_week",
+                                        currentWeekOfYear))
+
+                if (indexToSet != null)
+                    weekSpinner.setSelection(indexToSet)
+                else
+                    weekSpinner.setSelection(2)
             }
         }
     }

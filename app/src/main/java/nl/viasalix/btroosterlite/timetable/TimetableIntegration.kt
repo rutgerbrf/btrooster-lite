@@ -48,30 +48,28 @@ class TimetableIntegration(private var context: Context,
     private val dbHelper = TimetableDbHelper(context)
 
     fun getIndexes(callback: (String, Boolean) -> Unit) {
-        doAsync {
-            if (online(context)) {
-                val builder = Uri.Builder()
-                builder.scheme(MainActivity.SCHEME)
-                        .encodedAuthority(MainActivity.AUTHORITY)
-                        .appendPath("api")
-                        .appendPath("RoosterApiServlet")
-                        .appendQueryParameter("actie", "weken")
-                        .appendQueryParameter("locatie", location)
-                val url = builder.build().toString()
+        if (online(context)) {
+            val builder = Uri.Builder()
+            builder.scheme(MainActivity.SCHEME)
+                    .encodedAuthority(MainActivity.AUTHORITY)
+                    .appendPath("api")
+                    .appendPath("RoosterApiServlet")
+                    .appendQueryParameter("actie", "weken")
+                    .appendQueryParameter("locatie", location)
+            val url = builder.build().toString()
 
-                Log.d("url", url)
+            Log.d("url", url)
 
-                val stringRequest = StringRequest(Request.Method.GET, url,
-                        { response ->
-                            sharedPreferences.edit().putString("t_indexes", response).apply()
-                            Log.d("or", response)
-                            callback(response, true)
-                        }) { error -> if (error.message != null) Log.d("ERROR", error.message) }
-                queue.add(stringRequest)
-            } else {
-                val response = sharedPreferences.getString("t_indexes", null)
-                callback(response, false)
-            }
+            val stringRequest = StringRequest(Request.Method.GET, url,
+                    { response ->
+                        sharedPreferences.edit().putString("t_indexes", response).apply()
+                        Log.d("or", response)
+                        callback(response, true)
+                    }) { error -> if (error.message != null) Log.d("ERROR", error.message) }
+            queue.add(stringRequest)
+        } else {
+            val response = sharedPreferences.getString("t_indexes", null)
+            callback(response, false)
         }
     }
 
@@ -183,9 +181,7 @@ class TimetableIntegration(private var context: Context,
                         )
             }
 
-            doAsync {
-                queue.add(stringRequest)
-            }
+            queue.add(stringRequest)
         } else {
             // Als de gebruiker offline is wordt de volgende code uitgoevoerd
 
@@ -198,10 +194,14 @@ class TimetableIntegration(private var context: Context,
                     // Voer de callback uit met de response als argument
                     callback(data)
                 } else {
+                    Log.d("ERROR", "Timetable is empty")
+
                     // Geef een foutmelding
                     callback(context.getString(R.string.error_timetable))
                 }
             } else {
+                Log.d("ERROR", "Timetable not available in database")
+
                 // Geef een foutmelding
                 callback(context.getString(R.string.error_timetable))
             }
@@ -291,7 +291,7 @@ class TimetableIntegration(private var context: Context,
                     var selection = "DELETE FROM ${TimetableContract.Timetable.TABLE_NAME} WHERE "
 
                     weeks.forEachIndexed { index, it ->
-                        selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER}!=$code|$it"
+                        selection += "${TimetableContract.Timetable.COLUMN_NAME_IDENTIFIER} NOT LIKE '%|$it'"
                         selection += if (weeks.size > index + 1)
                             " AND "
                         else
