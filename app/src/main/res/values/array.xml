@@ -32,11 +32,16 @@
 
     <string-array name="locatieValues" translatable="false">
         <item>Goes</item>
-        <item>GoesNoorhoeklaan</item>
+        <item>GoesNoordhoeklaan</item>
         <item>GoesStationspark</item>
         <item>KrabbendijkeAppelstraat</item>
         <item>KrabbendijkeKerkpolder</item>
         <item>Middelburg</item>
         <item>Tholen</item>
+    </string-array>
+
+    <string-array name="class_room" translatable="true">
+        <item>@string/vt_class</item>
+        <item>@string/vt_room</item>
     </string-array>
 </resources>

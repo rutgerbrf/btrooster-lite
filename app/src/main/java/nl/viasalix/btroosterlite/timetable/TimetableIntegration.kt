@@ -321,7 +321,7 @@ class TimetableIntegration(private var context: Context,
 
             if (!docentPattern.matcher(code).matches() &&
                     !leerlingPattern.matcher(code).matches()) {
-                return "c"
+                return "unknown"
             } else if (docentPattern.matcher(code).matches()) {
                 return "t"
             } else if (leerlingPattern.matcher(code).matches()) {

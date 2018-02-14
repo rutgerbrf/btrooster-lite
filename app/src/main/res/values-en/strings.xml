@@ -46,4 +46,9 @@
     <string name="int_teacher">I\'m a teacher</string>
     <string name="error">Error</string>
     <string name="settings_information">Information</string>
+    <string name="vt_view">View</string>
+    <string name="vt_class">Class</string>
+    <string name="vt_room">Room</string>
+    <string name="vt_title">View Timetable</string>
+    <string name="vt_save_timetable">Save timetable in cache</string>
 </resources>

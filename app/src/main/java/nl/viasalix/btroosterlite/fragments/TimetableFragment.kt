@@ -24,6 +24,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -35,17 +36,17 @@ import android.widget.Spinner
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.activities.SettingsActivity
+import nl.viasalix.btroosterlite.activities.ViewTimetableActivity
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
+import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.getType
 import nl.viasalix.btroosterlite.util.Util.Companion.getIndexByKey
 import nl.viasalix.btroosterlite.util.Util.Companion.getKeyByIndex
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.noButton
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.yesButton
 import org.joda.time.DateTime
-import org.joda.time.Weeks
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.regex.Pattern
 
 class TimetableFragment : Fragment() {
@@ -125,6 +126,10 @@ class TimetableFragment : Fragment() {
 
         ttIntegration = TimetableIntegration(activity!!, location!!, code!!)
 
+        activity.findViewById<FloatingActionButton>(R.id.t_loadOtherTimetable)?.onClick {
+            startActivity(Intent(activity!!, ViewTimetableActivity::class.java))
+        }
+
         if (loadSharedPreferences() != 1) {
             getIndexes(true)
             loadTimetable()
@@ -145,7 +150,7 @@ class TimetableFragment : Fragment() {
         code = sharedPreferences!!.getString("code", "12345")
 
         location = sharedPreferences!!.getString("location", locaties[0])
-        type = getType(code)
+        type = getType(code!!)
 
         try {
             defaultSharedPreferences.getInt("t_week", currentWeekOfYear)
@@ -180,24 +185,6 @@ class TimetableFragment : Fragment() {
                 activity!!.finish()
             }
         }
-    }
-
-    private fun getType(code: String?): String {
-        val docentPatternInput = "([A-Za-z]){3}"
-        val leerlingPatternInput = "([0-9]){5}"
-
-        val docentPattern = Pattern.compile(docentPatternInput)
-        val leerlingPattern = Pattern.compile(leerlingPatternInput)
-
-        if (!docentPattern.matcher(code!!).matches() && !leerlingPattern.matcher(code).matches()) {
-            return "c"
-        } else if (docentPattern.matcher(code).matches()) {
-            return "t"
-        } else if (leerlingPattern.matcher(code).matches()) {
-            return "s"
-        }
-
-        return "none"
     }
 
     override fun onAttach(context: Context) {

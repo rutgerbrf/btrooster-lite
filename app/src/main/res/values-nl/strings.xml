@@ -46,4 +46,9 @@
     <string name="int_teacher">Ik ben docent</string>
     <string name="error">Fout</string>
     <string name="settings_information">Informatie</string>
+    <string name="vt_view">Weergeven</string>
+    <string name="vt_class">Klas</string>
+    <string name="vt_room">Ruimte</string>
+    <string name="vt_title">Rooster bekijken</string>
+    <string name="vt_save_timetable">Rooster opslaan in cache</string>
 </resources>

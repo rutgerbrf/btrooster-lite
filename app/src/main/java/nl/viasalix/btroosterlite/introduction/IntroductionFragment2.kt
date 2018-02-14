@@ -85,7 +85,7 @@ class IntroductionFragment2 : Fragment(), Step {
         else if (!rbG13!!.isChecked && !rbG46!!.isChecked)
             return VerificationError("NO_GRADE")
         else {
-            if (TimetableIntegration.getType(etCode!!.text.toString()) != "c") {
+            if (TimetableIntegration.getType(etCode!!.text.toString()) != "unknown") {
                 val location: String = TimetableFragment.locatiesURL[spLocation!!.selectedItemPosition]
 
                 ivError!!.visibility = View.INVISIBLE
