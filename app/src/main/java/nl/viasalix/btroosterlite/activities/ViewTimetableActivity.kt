@@ -6,16 +6,21 @@ import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.webkit.WebView
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.getType
 import org.jetbrains.anko.defaultSharedPreferences
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 class ViewTimetableActivity : AppCompatActivity() {
     var classSpinner: Spinner? = null
     var locationSpinner: Spinner? = null
     var etCode: EditText? = null
+    var btnView: Button? = null
+    var webView: WebView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +42,8 @@ class ViewTimetableActivity : AppCompatActivity() {
         classSpinner = findViewById(R.id.vt_class_room)
         locationSpinner = findViewById(R.id.vt_location)
         etCode = findViewById(R.id.vt_code)
+        btnView = findViewById(R.id.vt_btn_view)
+        webView = findViewById(R.id.vt_webview)
 
         classSpinner!!.isEnabled = false
         classSpinner!!.isClickable = false
@@ -56,6 +63,10 @@ class ViewTimetableActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+
+        btnView!!.onClick {
+            viewTimetable()
+        }
     }
 
     private fun processCodeInput() {
@@ -66,5 +77,9 @@ class ViewTimetableActivity : AppCompatActivity() {
             classSpinner!!.isEnabled = false
             classSpinner!!.isClickable = false
         }
+    }
+
+    private fun viewTimetable() {
+
     }
 }

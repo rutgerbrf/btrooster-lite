@@ -73,7 +73,7 @@
         tools:layout_editor_absoluteX="0dp" />
 
     <WebView
-        android:id="@+id/webView"
+        android:id="@+id/vt_webview"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:translationZ="-1dp"
