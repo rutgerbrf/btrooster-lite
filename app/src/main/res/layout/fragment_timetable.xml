@@ -37,26 +37,26 @@
         android:clickable="true"
         android:focusable="true"
         android:tint="@android:color/white"
-        app:backgroundTint="@color/colorAccent"
+        app:backgroundTint="#40C4FF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_apps_black_24dp" />
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/toolbar_layout">
+        android:layout_height="wrap_content">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
+            android:theme="@style/AppTheme.Toolbar"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:theme="@style/AppTheme.Toolbar"
             app:popupTheme="@style/Theme.AppCompat.Light.NoActionBar">
 
             <Spinner

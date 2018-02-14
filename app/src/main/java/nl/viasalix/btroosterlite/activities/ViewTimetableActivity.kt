@@ -1,12 +1,11 @@
 package nl.viasalix.btroosterlite.activities
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MenuItem
 import android.webkit.WebView
 import android.widget.Button
@@ -18,7 +17,6 @@ import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.getType
 import nl.viasalix.btroosterlite.util.Util.Companion.currentWeekOfYear
 import org.jetbrains.anko.defaultSharedPreferences
-import kotlin.math.exp
 
 class ViewTimetableActivity : AppCompatActivity() {
     var classSpinner: Spinner? = null
@@ -60,7 +58,7 @@ class ViewTimetableActivity : AppCompatActivity() {
 
         locationSpinner!!.setSelection(locationValuesArray.indexOf(defaultSharedPreferences.getString("location", "Goes")))
 
-        etCode!!.addTextChangedListener(object: TextWatcher {
+        etCode!!.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 processCodeInput()
             }
@@ -72,7 +70,7 @@ class ViewTimetableActivity : AppCompatActivity() {
 
         btnView!!.setOnClickListener { viewTimetable() }
     }
-    
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -86,33 +84,40 @@ class ViewTimetableActivity : AppCompatActivity() {
     }
 
     private fun processCodeInput() {
-        if (getType(etCode!!.text.toString()) == "unknown") {
+        val type = getType(etCode!!.text.toString())
+
+        if (type == "unknown") {
             classSpinner!!.isEnabled = true
             classSpinner!!.isClickable = true
         } else {
             classSpinner!!.isEnabled = false
             classSpinner!!.isClickable = false
+            classSpinner!!.setSelection(when (type) {
+                "s" -> 2
+                "t" -> 3
+                else -> 2
+            })
         }
     }
 
     private fun viewTimetable() =
-        TimetableIntegration(this,
-                locationValuesArray[locationSpinner!!.selectedItemPosition],
-                etCode!!.text.toString()
-        ).downloadTimetable(currentWeekOfYear,
-                { data ->
-                    webView!!.loadData(data,
-                            "text/html; charset=UTF-8",
-                            null)
-                },
-                saveCheckBox!!.isChecked,
-                if (getType(etCode!!.text.toString()) == "unknown") {
-                    when (classSpinner!!.selectedItemPosition) {
-                        0 -> "c"
-                        1 -> "r"
-                        else -> ""
-                    }
-                } else {
-                    ""
-                })
+            TimetableIntegration(this,
+                    locationValuesArray[locationSpinner!!.selectedItemPosition],
+                    etCode!!.text.toString()
+            ).downloadTimetable(currentWeekOfYear,
+                    { data ->
+                        webView!!.loadData(data,
+                                "text/html; charset=UTF-8",
+                                null)
+                    },
+                    saveCheckBox!!.isChecked,
+                    if (getType(etCode!!.text.toString()) == "unknown") {
+                        when (classSpinner!!.selectedItemPosition) {
+                            0 -> "c"
+                            1 -> "r"
+                            else -> ""
+                        }
+                    } else {
+                        ""
+                    })
 }

@@ -55,5 +55,7 @@
     <string name="last_week">Vorige week</string>
     <string name="current_week">Deze week</string>
     <string name="next_week">Volgende week</string>
-    <string name="in_weeks" translatable="false">Over | weken</string>
+    <string name="in_weeks">Over | weken</string>
+    <string name="student">Leerling</string>
+    <string name="teacher">Leraar</string>
 </resources>

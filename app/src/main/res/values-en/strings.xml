@@ -55,5 +55,7 @@
     <string name="last_week">Last week</string>
     <string name="current_week">Current week</string>
     <string name="next_week">Next week</string>
-    <string name="in_weeks" translatable="false">In | weeks</string>
+    <string name="in_weeks">In | weeks</string>
+    <string name="student">Student</string>
+    <string name="teacher">Teacher</string>
 </resources>

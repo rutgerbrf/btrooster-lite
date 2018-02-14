@@ -42,18 +42,15 @@ import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.getTyp
 import nl.viasalix.btroosterlite.util.Util.Companion.currentWeekOfYear
 import nl.viasalix.btroosterlite.util.Util.Companion.getIndexByKey
 import nl.viasalix.btroosterlite.util.Util.Companion.getKeyByIndex
-import nl.viasalix.btroosterlite.util.Util.Companion.getKeyByValue
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.noButton
-import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.yesButton
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Weeks
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
-import java.util.regex.Pattern
 import kotlin.math.absoluteValue
 
 class TimetableFragment : Fragment() {

@@ -19,11 +19,8 @@
 package nl.viasalix.btroosterlite.fragments
 
 import android.app.Fragment
-import android.content.Context.CONNECTIVITY_SERVICE
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -45,6 +42,7 @@ import nl.viasalix.btroosterlite.activities.MainActivity
 import nl.viasalix.btroosterlite.activities.SettingsActivity
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 import nl.viasalix.btroosterlite.util.Util.Companion.online
+import org.jetbrains.anko.doAsync
 
 class TestTimetableFragment : Fragment() {
     private var currentView: View? = null
@@ -152,31 +150,33 @@ class TestTimetableFragment : Fragment() {
     }
 
     private fun getIndexes() {
-        if (online(activity)) {
-            val queue = Volley.newRequestQueue(activity)
-            val builder = Uri.Builder()
-            builder.scheme(MainActivity.SCHEME)
-                    .encodedAuthority(MainActivity.AUTHORITY)
-                    .appendPath("embed")
-                    .appendPath("ToetsroosterEmbedServlet")
-                    .appendQueryParameter("indexOphalen", "1")
-                    .appendQueryParameter("locatie", location)
-            val url = builder.build().toString()
+        doAsync {
+            if (online(activity)) {
+                val queue = Volley.newRequestQueue(activity)
+                val builder = Uri.Builder()
+                builder.scheme(MainActivity.SCHEME)
+                        .encodedAuthority(MainActivity.AUTHORITY)
+                        .appendPath("embed")
+                        .appendPath("ToetsroosterEmbedServlet")
+                        .appendQueryParameter("indexOphalen", "1")
+                        .appendQueryParameter("locatie", location)
+                val url = builder.build().toString()
 
-            val stringRequest = StringRequest(Request.Method.GET, url,
-                    { response ->
-                        sharedPreferences!!.edit().putString("tt_indexes", response).apply()
-                        Log.d("or", response)
-                        handleIndexResponse(response)
-                    }) { error -> if (error.message != null) Log.d("error", error.message) }
+                val stringRequest = StringRequest(Request.Method.GET, url,
+                        { response ->
+                            sharedPreferences!!.edit().putString("tt_indexes", response).apply()
+                            Log.d("or", response)
+                            handleIndexResponse(response)
+                        }) { error -> if (error.message != null) Log.d("error", error.message) }
 
-            queue.add(stringRequest)
-        } else {
-            val response = sharedPreferences!!.getString("tt_indexes", null)
-            handleIndexResponse(response)
+                queue.add(stringRequest)
+            } else {
+                val response = sharedPreferences!!.getString("tt_indexes", null)
+                handleIndexResponse(response)
 
-            if (responseList.isNotEmpty())
-                getTestTimetable()
+                if (responseList.isNotEmpty())
+                    getTestTimetable()
+            }
         }
     }
 

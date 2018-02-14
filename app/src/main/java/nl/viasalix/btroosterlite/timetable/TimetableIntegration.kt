@@ -37,7 +37,6 @@ import nl.viasalix.btroosterlite.cup.CUPIntegration
 import nl.viasalix.btroosterlite.util.Util.Companion.online
 import org.jetbrains.anko.doAsync
 import java.util.regex.Pattern
-import kotlin.math.exp
 
 class TimetableIntegration(private var context: Context,
                            private var location: String,
@@ -49,28 +48,30 @@ class TimetableIntegration(private var context: Context,
     private val dbHelper = TimetableDbHelper(context)
 
     fun getIndexes(callback: (String, Boolean) -> Unit) {
-        if (online(context)) {
-            val builder = Uri.Builder()
-            builder.scheme(MainActivity.SCHEME)
-                    .encodedAuthority(MainActivity.AUTHORITY)
-                    .appendPath("api")
-                    .appendPath("RoosterApiServlet")
-                    .appendQueryParameter("actie", "weken")
-                    .appendQueryParameter("locatie", location)
-            val url = builder.build().toString()
+        doAsync {
+            if (online(context)) {
+                val builder = Uri.Builder()
+                builder.scheme(MainActivity.SCHEME)
+                        .encodedAuthority(MainActivity.AUTHORITY)
+                        .appendPath("api")
+                        .appendPath("RoosterApiServlet")
+                        .appendQueryParameter("actie", "weken")
+                        .appendQueryParameter("locatie", location)
+                val url = builder.build().toString()
 
-            Log.d("url", url)
+                Log.d("url", url)
 
-            val stringRequest = StringRequest(Request.Method.GET, url,
-                    { response ->
-                        sharedPreferences.edit().putString("t_indexes", response).apply()
-                        Log.d("or", response)
-                        callback(response, true)
-                    }) { error -> if (error.message != null) Log.d("ERROR", error.message) }
-            queue.add(stringRequest)
-        } else {
-            val response = sharedPreferences.getString("t_indexes", null)
-            callback(response, false)
+                val stringRequest = StringRequest(Request.Method.GET, url,
+                        { response ->
+                            sharedPreferences.edit().putString("t_indexes", response).apply()
+                            Log.d("or", response)
+                            callback(response, true)
+                        }) { error -> if (error.message != null) Log.d("ERROR", error.message) }
+                queue.add(stringRequest)
+            } else {
+                val response = sharedPreferences.getString("t_indexes", null)
+                callback(response, false)
+            }
         }
     }
 
@@ -82,7 +83,11 @@ class TimetableIntegration(private var context: Context,
      */
     fun buildURL(week: Int, explicitType: String = ""): String {
         // Bepaalt of de gebruiker een docent, klas of leerling is
-        val typeString = if (explicitType.isEmpty()) { getType(code) } else { explicitType }
+        val typeString = if (explicitType.isEmpty()) {
+            getType(code)
+        } else {
+            explicitType
+        }
 
         val builder = Uri.Builder()
         builder.scheme(MainActivity.SCHEME)
@@ -106,7 +111,6 @@ class TimetableIntegration(private var context: Context,
 
                     doAsync {
                         response.forEach {
-                            Log.d("TimetableIntegration", "Downloading timetable for week ${it.key}")
                             downloadTimetable(it.key, {})
                         }
                     }
@@ -124,78 +128,80 @@ class TimetableIntegration(private var context: Context,
      */
     fun downloadTimetable(week: Int, callback: (String) -> Unit, saveToDatabase: Boolean = false,
                           explicitType: String = "") {
-        /*
-         * Identifier die wordt gebruikt als key in de database
-         * Ziet er als volgt uit: "<code>|<week>"
-         */
-
-        val identifier = "$code|$week"
-
-        // Check of de gebruiker online is
-        if (online(context)) {
+        doAsync {
             /*
-             *  Maak een nieuw StringRequest aan en override een aantal functies om de goede
-             *  parameters mee te geven
+             * Identifier die wordt gebruikt als key in de database
+             * Ziet er als volgt uit: "<code>|<week>"
              */
 
-            val stringRequest = object : StringRequest(
-                    Request.Method.GET, buildURL(week, explicitType),
-                    Response.Listener<String> {
-                        if (saveToDatabase) {
-                            if (recordExists(identifier)) {
-                                updateTimetable(identifier, it)
-                            } else {
-                                saveTimetableToDatabase(identifier, it)
-                            }
-                        }
+            val identifier = "$code|$week"
 
-                        callback(it)
-                    },
-                    Response.ErrorListener {
-
-                    }) {
-                override fun getBodyContentType() =
-                        "application/x-www-form-urlencoded; charset=UTF-8"
-
-                /**
-                 * Maakt een Map<String, String> van headers in het volgende formaat:
-                 * Client-Key=<sp/ci_clientKey>
-                 * Bewaartoken=<sp/ci_preservationToken>
-                 *
-                 * @return  map van headers
+            // Check of de gebruiker online is
+            if (online(context)) {
+                /*
+                 *  Maak een nieuw StringRequest aan en override een aantal functies om de goede
+                 *  parameters mee te geven
                  */
-                override fun getHeaders(): Map<String, String> =
-                        hashMapOf(
-                                CUPIntegration.Params.ClientKey.param to
-                                        sharedPreferences.getString(
-                                                "ci_clientKey",
-                                                ""),
-                                CUPIntegration.Params.PreservationToken.param to
-                                        sharedPreferences.getString(
-                                                "ci_preservationToken",
-                                                "")
-                        )
-            }
 
-            queue.add(stringRequest)
-        } else {
-            // Als de gebruiker offline is wordt de volgende code uitgoevoerd
+                val stringRequest = object : StringRequest(
+                        Request.Method.GET, buildURL(week, explicitType),
+                        Response.Listener<String> {
+                            if (saveToDatabase) {
+                                if (recordExists(identifier)) {
+                                    updateTimetable(identifier, it)
+                                } else {
+                                    saveTimetableToDatabase(identifier, it)
+                                }
+                            }
 
-            // Check of het rooster al in de database staat
-            if (recordExists(identifier)) {
-                // Laad het rooster uit de database
-                val data = loadTimetableFromDatabase(identifier)
+                            callback(it)
+                        },
+                        Response.ErrorListener {
 
-                if (data.isNotEmpty()) {
-                    // Voer de callback uit met de response als argument
-                    callback(data)
+                        }) {
+                    override fun getBodyContentType() =
+                            "application/x-www-form-urlencoded; charset=UTF-8"
+
+                    /**
+                     * Maakt een Map<String, String> van headers in het volgende formaat:
+                     * Client-Key=<sp/ci_clientKey>
+                     * Bewaartoken=<sp/ci_preservationToken>
+                     *
+                     * @return  map van headers
+                     */
+                    override fun getHeaders(): Map<String, String> =
+                            hashMapOf(
+                                    CUPIntegration.Params.ClientKey.param to
+                                            sharedPreferences.getString(
+                                                    "ci_clientKey",
+                                                    ""),
+                                    CUPIntegration.Params.PreservationToken.param to
+                                            sharedPreferences.getString(
+                                                    "ci_preservationToken",
+                                                    "")
+                            )
+                }
+
+                queue.add(stringRequest)
+            } else {
+                // Als de gebruiker offline is wordt de volgende code uitgoevoerd
+
+                // Check of het rooster al in de database staat
+                if (recordExists(identifier)) {
+                    // Laad het rooster uit de database
+                    val data = loadTimetableFromDatabase(identifier)
+
+                    if (data.isNotEmpty()) {
+                        // Voer de callback uit met de response als argument
+                        callback(data)
+                    } else {
+                        // Geef een foutmelding
+                        callback(context.getString(R.string.error_timetable))
+                    }
                 } else {
                     // Geef een foutmelding
                     callback(context.getString(R.string.error_timetable))
                 }
-            } else {
-                // Geef een foutmelding
-                callback(context.getString(R.string.error_timetable))
             }
         }
     }

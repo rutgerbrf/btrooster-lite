@@ -57,15 +57,6 @@
     <string name="current_week">Current week</string>
     <string name="next_week">Next week</string>
     <string name="in_weeks">In | weeks</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-
-    <!-- Example settings for Data & Sync -->
-
-    <!-- Example settings for Notifications -->
-
+    <string name="student">Student</string>
+    <string name="teacher">Teacher</string>
 </resources>

@@ -43,6 +43,8 @@
     <string-array name="class_room" translatable="true">
         <item>@string/vt_class</item>
         <item>@string/vt_room</item>
+        <item>@string/student</item>
+        <item>@string/teacher</item>
     </string-array>
 
     <string-array name="in_weeks" translatable="true">
