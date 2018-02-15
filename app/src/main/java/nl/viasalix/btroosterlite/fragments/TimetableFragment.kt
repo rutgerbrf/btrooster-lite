@@ -146,28 +146,38 @@ class TimetableFragment : Fragment() {
         }
 
         if (loadSharedPreferences() != 1) {
-            if (activity != null) {
-                try {
-                    getIndexes(activity,
-                            ttIntegration!!,
-                            {
-                                if (activity != null)
-                                    handleIndexResponse(activity,
-                                            ttIntegration!!,
-                                            weekSpinner!!,
-                                            it,
-                                            true,
-                                            { loadTimetable() })
-                            },
-                            {
-                                getTimetable(defaultSharedPreferences.getInt(
-                                        "t_week",
-                                        currentWeekOfYear))
-                            })
-                    loadTimetable()
-                } catch (e: IllegalStateException) {
-                    Log.d("ERROR", e.message)
-                }
+            getIndexesAndTimetable()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        getIndexesAndTimetable()
+    }
+
+    private fun getIndexesAndTimetable() {
+        if (activity != null) {
+            try {
+                getIndexes(activity,
+                        ttIntegration!!,
+                        {
+                            if (activity != null)
+                                handleIndexResponse(activity,
+                                        ttIntegration!!,
+                                        weekSpinner!!,
+                                        it,
+                                        true,
+                                        { loadTimetable() })
+                        },
+                        {
+                            getTimetable(defaultSharedPreferences.getInt(
+                                    "t_week",
+                                    currentWeekOfYear))
+                        })
+                loadTimetable()
+            } catch (e: IllegalStateException) {
+                Log.d("ERROR", e.message)
             }
         }
     }
@@ -326,21 +336,25 @@ class TimetableFragment : Fragment() {
 
                 weekSpinner.adapter = adapter
 
-                weekSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
-                        if (editSharedPreferences) {
-                            val week = getKeyByIndex(availableWeeks, position)
+                try {
+                    weekSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(adapterView: AdapterView<*>, view: View?, position: Int, id: Long) {
+                            if (editSharedPreferences) {
+                                val week = getKeyByIndex(availableWeeks, position)
 
-                            if (week != null)
-                                sharedPreferences?.edit()?.putInt("t_week", week)?.apply()
-                            else
-                                sharedPreferences?.edit()?.putInt("t_week", currentWeekOfYear)?.apply()
+                                if (week != null)
+                                    sharedPreferences?.edit()?.putInt("t_week", week)?.apply()
+                                else
+                                    sharedPreferences?.edit()?.putInt("t_week", currentWeekOfYear)?.apply()
+                            }
+
+                            callback()
                         }
 
-                        callback()
+                        override fun onNothingSelected(adapterView: AdapterView<*>) {}
                     }
-
-                    override fun onNothingSelected(adapterView: AdapterView<*>) {}
+                } catch (e: Exception) {
+                    Log.e("ERROR", e.message)
                 }
 
                 val indexToSet =
