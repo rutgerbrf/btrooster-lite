@@ -124,8 +124,11 @@ class TimetableIntegration(private var context: Context,
      * @param week      week in het jaar van het rooster
      * @param callback  functie die wordt uitgevoerd als de stringRequest een response heeft
      */
-    fun downloadTimetable(week: Int, callback: (String) -> Unit, saveToDatabase: Boolean = true,
-                          explicitType: String = "") {
+    fun downloadTimetable(week: Int,
+                          callback: (String) -> Unit,
+                          saveToDatabase: Boolean = true,
+                          explicitType: String = "",
+                          sendTokens: Boolean = true) {
         /*
          * Identifier die wordt gebruikt als key in de database
          * Ziet er als volgt uit: "<code>|<week>"

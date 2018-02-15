@@ -141,5 +141,6 @@ class ViewTimetableActivity : AppCompatActivity() {
                         }
                     } else {
                         ""
-                    })
+                    },
+                    false)
 }

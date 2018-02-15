@@ -265,7 +265,7 @@ class TimetableFragment : Fragment() {
         // Locaties die in de request URL moeten te komen staan
         var locatiesURL = arrayOf("Goes", "GoesNoordhoeklaan", "GoesStationspark", "KrabbendijkeAppelstraat", "KrabbendijkeKerkpolder", "Middelburg", "Tholen")
 
-        fun parseAvailableWeeks(resources: Resources, availableWeeks: LinkedHashMap<Int, String>): List<String> {
+        private fun parseAvailableWeeks(resources: Resources, availableWeeks: LinkedHashMap<Int, String>): List<String> {
             val weekNames = resources.getStringArray(R.array.in_weeks)
             val currentWeek = DateTime.now(DateTimeZone.getDefault())
                     .withDayOfWeek(1)
@@ -299,7 +299,10 @@ class TimetableFragment : Fragment() {
             return result
         }
 
-        fun getIndexes(activity: Activity, ttIntegration: TimetableIntegration, callback: (String?) -> Unit, loadTimetableCallback: () -> Unit) {
+        fun getIndexes(activity: Activity,
+                       ttIntegration: TimetableIntegration,
+                       callback: (String?) -> Unit,
+                       loadTimetableCallback: () -> Unit) {
             ttIntegration.getIndexes { it, wasOnline ->
                 if (wasOnline) {
                     callback(it)
@@ -317,7 +320,14 @@ class TimetableFragment : Fragment() {
             }
         }
 
-        fun handleIndexResponse(activity: Activity, ttIntegration: TimetableIntegration, weekSpinner: Spinner, response: String?, deleteUnusedTimetables: Boolean = false, callback: () -> Unit, editSharedPreferences: Boolean = true, availableWeeksCallback: (LinkedHashMap<Int, String>) -> Unit = {}) {
+        fun handleIndexResponse(activity: Activity,
+                                ttIntegration: TimetableIntegration,
+                                weekSpinner: Spinner,
+                                response: String?,
+                                deleteUnusedTimetables: Boolean = false,
+                                callback: () -> Unit,
+                                editSharedPreferences: Boolean = true,
+                                availableWeeksCallback: (LinkedHashMap<Int, String>) -> Unit = {}) {
             if (response != null) {
                 val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
 
