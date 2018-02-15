@@ -58,4 +58,5 @@
     <string name="in_weeks">Over | weken</string>
     <string name="student">Leerling</string>
     <string name="teacher">Leraar</string>
+    <string name="tap_again_exit">Druk opnieuw om af te sluiten</string>
 </resources>

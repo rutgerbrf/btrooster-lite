@@ -58,4 +58,5 @@
     <string name="in_weeks">In | weeks</string>
     <string name="student">Student</string>
     <string name="teacher">Teacher</string>
+    <string name="tap_again_exit">Tap again to exit</string>
 </resources>

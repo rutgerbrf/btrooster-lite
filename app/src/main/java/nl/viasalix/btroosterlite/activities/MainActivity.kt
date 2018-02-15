@@ -22,8 +22,10 @@ import android.app.Fragment
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import nl.viasalix.btroosterlite.R
@@ -33,10 +35,14 @@ import nl.viasalix.btroosterlite.fragments.TestTimetableFragment
 import nl.viasalix.btroosterlite.fragments.TimetableFragment
 import nl.viasalix.btroosterlite.introduction.IntroductionActivity
 import nl.viasalix.btroosterlite.singleton.Singleton
+import org.jetbrains.anko.design.snackbar
 
 class MainActivity : AppCompatActivity() {
     private var currentFragment: Fragment? = null
     private var bottomNavigation: AHBottomNavigation? = null
+
+    private val TIME_INTERVAL = 2000
+    private var backPressed: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +62,6 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation!!.inactiveColor = Color.parseColor("#747474")
         bottomNavigation!!.isForceTint = true
         bottomNavigation!!.titleState = AHBottomNavigation.TitleState.ALWAYS_SHOW
-        bottomNavigation!!.currentItem = 0
 
         currentFragment = null
 
@@ -66,21 +71,29 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
-        tabSelected(bottomNavigation!!.currentItem, false)
-
-        bottomNavigation!!.currentItem = when (currentFragment) {
-            is TimetableFragment -> 0
-            is CUPFragment -> 1
-            is TestTimetableFragment -> 2
-            else -> 0
-        }
-
         bottomNavigation!!.setOnTabSelectedListener { position, wasSelected ->
             tabSelected(position, wasSelected)
             true
         }
 
         Singleton.cupIntegration = CUPIntegration(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        tabSelected(bottomNavigation!!.currentItem, false)
+    }
+
+    override fun onBackPressed() {
+        if (backPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+            super.onBackPressed()
+            return
+        } else {
+            snackbar(findViewById(android.R.id.content), resources.getString(R.string.tap_again_exit))
+        }
+
+        backPressed = System.currentTimeMillis()
     }
 
     private fun tabSelected(position: Int, wasSelected: Boolean) {
@@ -92,6 +105,8 @@ class MainActivity : AppCompatActivity() {
                 else -> launchTimetableFragment()
             }
         }
+
+        Log.d("currentItem", bottomNavigation!!.currentItem.toString())
     }
 
     fun launchTimetableFragment() {
@@ -102,7 +117,6 @@ class MainActivity : AppCompatActivity() {
         val fragmentTransaction = fragmentManager.beginTransaction()
 
         fragmentTransaction.replace(R.id.fragment_container, currentFragment)
-        fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
 
         bottomNavigation!!.setCurrentItem(0, false)
@@ -116,7 +130,6 @@ class MainActivity : AppCompatActivity() {
         val fragmentTransaction = fragmentManager.beginTransaction()
 
         fragmentTransaction.replace(R.id.fragment_container, currentFragment)
-        fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
 
         bottomNavigation!!.setCurrentItem(1, false)
@@ -130,7 +143,6 @@ class MainActivity : AppCompatActivity() {
         val fragmentTransaction = fragmentManager.beginTransaction()
 
         fragmentTransaction.replace(R.id.fragment_container, currentFragment)
-        fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
 
         bottomNavigation!!.setCurrentItem(2, false)

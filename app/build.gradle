@@ -71,6 +71,8 @@ dependencies {
     compile 'joda-time:joda-time:2.9.9'
 
     compile "org.jetbrains.anko:anko:$anko_version"
+    compile "org.jetbrains.anko:anko-commons:$anko_version"
+    compile "org.jetbrains.anko:anko-design:$anko_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     testCompile 'junit:junit:4.12'

@@ -147,22 +147,27 @@ class TimetableFragment : Fragment() {
 
         if (loadSharedPreferences() != 1) {
             if (activity != null) {
-                getIndexes(activity,
-                        ttIntegration!!,
-                        {
-                            handleIndexResponse(activity,
-                                    ttIntegration!!,
-                                    weekSpinner!!,
-                                    it,
-                                    true,
-                                    { loadTimetable() })
-                        },
-                        {
-                            getTimetable(defaultSharedPreferences.getInt(
-                                    "t_week",
-                                    currentWeekOfYear))
-                        })
-                loadTimetable()
+                try {
+                    getIndexes(activity,
+                            ttIntegration!!,
+                            {
+                                if (activity != null)
+                                    handleIndexResponse(activity,
+                                            ttIntegration!!,
+                                            weekSpinner!!,
+                                            it,
+                                            true,
+                                            { loadTimetable() })
+                            },
+                            {
+                                getTimetable(defaultSharedPreferences.getInt(
+                                        "t_week",
+                                        currentWeekOfYear))
+                            })
+                    loadTimetable()
+                } catch (e: IllegalStateException) {
+                    Log.d("ERROR", e.message)
+                }
             }
         }
     }
