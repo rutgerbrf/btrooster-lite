@@ -33,33 +33,38 @@
 
     <Spinner
         android:id="@+id/vt_location"
-        android:layout_width="368dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:entries="@array/locatieArray"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/vt_code" />
 
     <Spinner
         android:id="@+id/vt_week"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/vt_code"
         app:layout_constraintTop_toBottomOf="@+id/vt_toolbar" />
 
     <Spinner
         android:id="@+id/vt_class_room"
-        android:layout_width="368dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:entries="@array/class_room"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/vt_location" />
 
@@ -67,12 +72,12 @@
         android:id="@+id/vt_btn_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="24dp"
         android:text="@string/vt_view"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vt_save_timetable" />
+        app:layout_constraintTop_toBottomOf="@+id/vt_class_room" />
 
     <View
         android:id="@+id/view"
@@ -99,12 +104,16 @@
         android:id="@+id/vt_save_timetable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="24dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="32dp"
         android:checked="true"
         android:text="@string/vt_save_timetable"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/vt_btn_view"
         app:layout_constraintTop_toBottomOf="@+id/vt_class_room" />
 
 </android.support.constraint.ConstraintLayout>

@@ -17,7 +17,6 @@ import nl.viasalix.btroosterlite.fragments.TimetableFragment
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration
 import nl.viasalix.btroosterlite.timetable.TimetableIntegration.Companion.getType
 import nl.viasalix.btroosterlite.util.Util
-import nl.viasalix.btroosterlite.util.Util.Companion.currentWeekOfYear
 import org.jetbrains.anko.defaultSharedPreferences
 
 class ViewTimetableActivity : AppCompatActivity() {

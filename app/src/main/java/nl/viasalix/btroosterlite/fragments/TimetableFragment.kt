@@ -84,16 +84,18 @@ class TimetableFragment : Fragment() {
                 loadTimetable()
                 getIndexes(activity,
                         ttIntegration!!,
-                        { handleIndexResponse(activity,
-                                ttIntegration!!,
-                                weekSpinner!!,
-                                it,
-                                true,
-                                {})
+                        {
+                            handleIndexResponse(activity,
+                                    ttIntegration!!,
+                                    weekSpinner!!,
+                                    it,
+                                    true,
+                                    {})
                         },
-                        { getTimetable(defaultSharedPreferences.getInt(
-                                "t_week",
-                                currentWeekOfYear))
+                        {
+                            getTimetable(defaultSharedPreferences.getInt(
+                                    "t_week",
+                                    currentWeekOfYear))
                         })
                 return true
             }
