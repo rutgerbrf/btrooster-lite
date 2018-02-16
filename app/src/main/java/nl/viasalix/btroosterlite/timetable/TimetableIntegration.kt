@@ -58,8 +58,6 @@ class TimetableIntegration(private var context: Context,
                     .appendQueryParameter("locatie", location)
             val url = builder.build().toString()
 
-            Log.d("url", url)
-
             val stringRequest = StringRequest(Request.Method.GET, url,
                     { response ->
                         sharedPreferences.edit().putString("t_indexes", response).apply()

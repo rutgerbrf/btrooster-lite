@@ -59,7 +59,6 @@ class ViewTimetableActivity : AppCompatActivity() {
         classSpinner!!.isClickable = false
 
         locationValuesArray = resources.getStringArray(R.array.locatieValues)
-
         locationSpinner!!.setSelection(locationValuesArray.indexOf(defaultSharedPreferences.getString("location", "Goes")))
 
         etCode!!.addTextChangedListener(object : TextWatcher {
