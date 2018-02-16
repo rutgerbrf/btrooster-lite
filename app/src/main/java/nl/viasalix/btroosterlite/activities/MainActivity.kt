@@ -104,8 +104,6 @@ class MainActivity : AppCompatActivity() {
                 else -> launchTimetableFragment()
             }
         }
-
-        Log.d("currentItem", bottomNavigation!!.currentItem.toString())
     }
 
     fun launchTimetableFragment() {
