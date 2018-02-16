@@ -63,7 +63,7 @@ class TimetableIntegration(private var context: Context,
                         sharedPreferences.edit().putString("t_indexes", response).apply()
                         Log.d("or", response)
                         callback(response, true)
-                    }) { error -> if (error.message != null) Log.d("ERROR", error.message) }
+                    }) { error -> if (error.message != null) Log.e("ERROR", error.message) }
             queue.add(stringRequest)
         } else {
             val response = sharedPreferences.getString("t_indexes", null)
@@ -145,8 +145,6 @@ class TimetableIntegration(private var context: Context,
                     Request.Method.GET, buildURL(week, explicitType),
                     Response.Listener<String> {
                         if (saveToDatabase) {
-                            Log.d("std", "true")
-
                             if (recordExists(identifier)) {
                                 updateTimetable(identifier, it)
                             } else {
@@ -197,13 +195,13 @@ class TimetableIntegration(private var context: Context,
                     // Voer de callback uit met de response als argument
                     callback(data)
                 } else {
-                    Log.d("ERROR", "Timetable is empty")
+                    Log.e("ERROR", "Timetable is empty")
 
                     // Geef een foutmelding
                     callback(context.getString(R.string.error_timetable))
                 }
             } else {
-                Log.d("ERROR", "Timetable not available in database")
+                Log.e("ERROR", "Timetable not available in database")
 
                 // Geef een foutmelding
                 callback(context.getString(R.string.error_timetable))
@@ -301,13 +299,11 @@ class TimetableIntegration(private var context: Context,
                             ";"
                     }
 
-                    Log.d("QUERY", selection)
-
                     db.execSQL(selection)
                 }
             }
         } catch (e: SQLiteException) {
-            Log.d("ERROR", e.message)
+            Log.e("ERROR", e.message)
         }
     }
 

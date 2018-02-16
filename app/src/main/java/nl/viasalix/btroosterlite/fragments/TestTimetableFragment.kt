@@ -167,7 +167,7 @@ class TestTimetableFragment : Fragment() {
                             sharedPreferences!!.edit().putString("tt_indexes", response).apply()
                             Log.d("or", response)
                             handleIndexResponse(response)
-                        }) { error -> if (error.message != null) Log.d("error", error.message) }
+                        }) { error -> if (error.message != null) Log.e("ERROR", error.message) }
 
                 queue.add(stringRequest)
             } else {

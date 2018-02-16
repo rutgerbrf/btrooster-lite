@@ -123,7 +123,7 @@ class CUPConfigFragment2 : Fragment(), Step {
     }
 
     override fun onError(error: VerificationError) {
-        Log.d("ERROR", error.errorMessage)
+        Log.e("ERROR", error.errorMessage)
 
         when (error.errorMessage) {
             "NO_SELECTION" -> {

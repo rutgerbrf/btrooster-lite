@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     private var currentFragment: Fragment? = null
     private var bottomNavigation: AHBottomNavigation? = null
 
-    private val TIME_INTERVAL = 2000
     private var backPressed: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,9 +63,9 @@ class MainActivity : AppCompatActivity() {
 
         currentFragment = null
 
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("firstLaunch", true)) {
-            val intent = Intent(this, IntroductionActivity::class.java)
-            startActivity(intent)
+        if (PreferenceManager.getDefaultSharedPreferences(this)
+                        .getBoolean("firstLaunch", true)) {
+            startActivity(Intent(this, IntroductionActivity::class.java))
             finish()
         }
 
@@ -85,7 +84,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (backPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+        // Interval is 2000 seconden
+        if (backPressed + 2000 > System.currentTimeMillis()) {
             super.onBackPressed()
             return
         } else {

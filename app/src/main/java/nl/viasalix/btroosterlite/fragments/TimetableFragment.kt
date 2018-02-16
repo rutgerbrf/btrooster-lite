@@ -82,8 +82,7 @@ class TimetableFragment : Fragment() {
         when (item.itemId) {
             R.id.action_reload -> {
                 loadTimetable()
-                getIndexes(activity,
-                        ttIntegration!!,
+                getIndexes(ttIntegration!!,
                         {
                             handleIndexResponse(activity,
                                     ttIntegration!!,
@@ -161,8 +160,7 @@ class TimetableFragment : Fragment() {
     private fun getIndexesAndTimetable() {
         if (activity != null) {
             try {
-                getIndexes(activity,
-                        ttIntegration!!,
+                getIndexes(ttIntegration!!,
                         {
                             if (activity != null)
                                 handleIndexResponse(activity,
@@ -179,7 +177,7 @@ class TimetableFragment : Fragment() {
                         })
                 loadTimetable()
             } catch (e: IllegalStateException) {
-                Log.d("ERROR", e.message)
+                Log.e("ERROR", e.message)
             }
         }
     }
@@ -301,8 +299,7 @@ class TimetableFragment : Fragment() {
             return result
         }
 
-        fun getIndexes(activity: Activity,
-                       ttIntegration: TimetableIntegration,
+        fun getIndexes(ttIntegration: TimetableIntegration,
                        callback: (String?) -> Unit,
                        loadTimetableCallback: () -> Unit) {
             ttIntegration.getIndexes { it, wasOnline ->
@@ -310,11 +307,9 @@ class TimetableFragment : Fragment() {
                     callback(it)
 
                     try {
-                        if (activity != null) {
-                            loadTimetableCallback()
-                        }
+                        loadTimetableCallback()
                     } catch (e: NullPointerException) {
-                        Log.d("ERROR", e.message)
+                        Log.e("ERROR", e.message)
                     }
                 } else {
                     callback(it)

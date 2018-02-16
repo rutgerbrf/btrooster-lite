@@ -176,7 +176,6 @@ class CUPIntegration(context: Context) {
         val stringRequest = object : StringRequest(Request.Method.POST, url,
                 Response.Listener<String> { response ->
                     handleResponse(response, ResponseType.SearchNames)
-                    Log.v("RESP: SEARCHNAMES", response)
                 },
                 Response.ErrorListener {
                     Log.e("ERROR", it.message)
@@ -272,13 +271,10 @@ class CUPIntegration(context: Context) {
      * Voert daarna de corresponderende functie uit.
      */
     private fun handleResponse(response: String, respType: ResponseType) {
-        Log.d("handleResponse", response)
-
         if (response.isNotEmpty()) {
             if (response.startsWith("ERR"))
                 handleError(response.split("\n")[0].trim(), respType)
             else {
-                Log.d("handleNormalResponse", response)
                 handleNormalResponse(response, respType)
             }
         }
@@ -298,9 +294,7 @@ class CUPIntegration(context: Context) {
         response.split("\n").forEach {
             if (it.split("|").size > 1) {
                 keys.add(it.split("|")[0])
-                Log.d("adding key", it.split("|")[0])
                 values.add(it.split("|")[1])
-                Log.d("adding value", it.split("|")[1])
             }
         }
 
@@ -310,7 +304,6 @@ class CUPIntegration(context: Context) {
                     sharedPreferences.edit()
                             .putString(keyPreservationToken, values[keys.indexOf(it)].trim())
                             .apply()
-                    Log.d("BEWAARTOKEN", values[keys.indexOf(it)].trim())
                 }
 
                 ResponseHeaders.Ok.header -> {
