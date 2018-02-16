@@ -124,11 +124,16 @@ class ViewTimetableActivity : AppCompatActivity() {
             TimetableIntegration(this,
                     locationValuesArray[locationSpinner!!.selectedItemPosition],
                     etCode!!.text.toString()
-            ).downloadTimetable(Util.getKeyByIndex(availableWeeks, weekSpinner!!.selectedItemPosition)!!,
+            ).downloadTimetable(Util.getKeyByIndex(availableWeeks, weekSpinner!!.selectedItemPosition),
                     { data ->
-                        webView!!.loadData(data,
-                                "text/html; charset=UTF-8",
-                                null)
+                        if (data.isNotEmpty())
+                            webView!!.loadData(data,
+                                    "text/html; charset=UTF-8",
+                                    null)
+                        else
+                            webView!!.loadData(resources.getString(R.string.error_timetable),
+                                    "text/html; charset=UTF-8",
+                                    null)
                     },
                     saveCheckBox!!.isChecked,
                     if (getType(etCode!!.text.toString()) == "unknown") {

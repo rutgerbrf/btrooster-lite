@@ -67,6 +67,7 @@ class TimetableIntegration(private var context: Context,
             queue.add(stringRequest)
         } else {
             val response = sharedPreferences.getString("t_indexes", null)
+
             if (response != null)
                 callback(response, false)
         }
@@ -123,7 +124,7 @@ class TimetableIntegration(private var context: Context,
      * @param week      week in het jaar van het rooster
      * @param callback  functie die wordt uitgevoerd als de stringRequest een response heeft
      */
-    fun downloadTimetable(week: Int,
+    fun downloadTimetable(week: Int?,
                           callback: (String) -> Unit,
                           saveToDatabase: Boolean = true,
                           explicitType: String = "",
@@ -135,77 +136,80 @@ class TimetableIntegration(private var context: Context,
 
         val identifier = "$code|$week"
 
-        // Check of de gebruiker online is
-        if (online(context)) {
-            /*
-             *  Maak een nieuw StringRequest aan en override een aantal functies om de goede
-             *  parameters mee te geven
-             */
-
-            val stringRequest = object : StringRequest(
-                    Request.Method.GET, buildURL(week, explicitType),
-                    Response.Listener<String> {
-                        if (saveToDatabase) {
-                            if (recordExists(identifier)) {
-                                updateTimetable(identifier, it)
-                            } else {
-                                saveTimetableToDatabase(identifier, it)
-                            }
-                        }
-
-                        callback(it)
-                    },
-                    Response.ErrorListener {
-
-                    }) {
-                override fun getBodyContentType() =
-                        "application/x-www-form-urlencoded; charset=UTF-8"
-
-                /**
-                 * Maakt een Map<String, String> van headers in het volgende formaat:
-                 * Client-Key=<sp/ci_clientKey>
-                 * Bewaartoken=<sp/ci_preservationToken>
-                 *
-                 * @return  map van headers
+        // Check of de week niet null is
+        if (week != null) {
+            // Check of de gebruiker online is
+            if (online(context)) {
+                /*
+                 *  Maak een nieuw StringRequest aan en override een aantal functies om de goede
+                 *  parameters mee te geven
                  */
-                override fun getHeaders(): Map<String, String> =
-                        if (sendTokens)
-                            hashMapOf(
-                                    CUPIntegration.Params.ClientKey.param to
-                                            sharedPreferences.getString(
-                                                    "ci_clientKey",
-                                                    ""),
-                                    CUPIntegration.Params.PreservationToken.param to
-                                            sharedPreferences.getString(
-                                                    "ci_preservationToken",
-                                                    ""))
-                        else
-                            hashMapOf()
-            }
 
-            queue.add(stringRequest)
-        } else {
-            // Als de gebruiker offline is wordt de volgende code uitgoevoerd
+                val stringRequest = object : StringRequest(
+                        Request.Method.GET, buildURL(week!!, explicitType),
+                        Response.Listener<String> {
+                            if (saveToDatabase) {
+                                if (recordExists(identifier)) {
+                                    updateTimetable(identifier, it)
+                                } else {
+                                    saveTimetableToDatabase(identifier, it)
+                                }
+                            }
 
-            // Check of het rooster al in de database staat
-            if (recordExists(identifier)) {
-                // Laad het rooster uit de database
-                val data = loadTimetableFromDatabase(identifier)
+                            callback(it)
+                        },
+                        Response.ErrorListener {
 
-                if (data.isNotEmpty()) {
-                    // Voer de callback uit met de response als argument
-                    callback(data)
+                        }) {
+                    override fun getBodyContentType() =
+                            "application/x-www-form-urlencoded; charset=UTF-8"
+
+                    /**
+                     * Maakt een Map<String, String> van headers in het volgende formaat:
+                     * Client-Key=<sp/ci_clientKey>
+                     * Bewaartoken=<sp/ci_preservationToken>
+                     *
+                     * @return  map van headers
+                     */
+                    override fun getHeaders(): Map<String, String> =
+                            if (sendTokens)
+                                hashMapOf(
+                                        CUPIntegration.Params.ClientKey.param to
+                                                sharedPreferences.getString(
+                                                        "ci_clientKey",
+                                                        ""),
+                                        CUPIntegration.Params.PreservationToken.param to
+                                                sharedPreferences.getString(
+                                                        "ci_preservationToken",
+                                                        ""))
+                            else
+                                hashMapOf()
+                }
+
+                queue.add(stringRequest)
+            } else {
+                // Als de gebruiker offline is wordt de volgende code uitgoevoerd
+
+                // Check of het rooster al in de database staat
+                if (recordExists(identifier)) {
+                    // Laad het rooster uit de database
+                    val data = loadTimetableFromDatabase(identifier)
+
+                    if (data.isNotEmpty()) {
+                        // Voer de callback uit met de response als argument
+                        callback(data)
+                    } else {
+                        Log.e("ERROR", "Timetable is empty")
+
+                        // Geef een foutmelding
+                        callback(context.getString(R.string.error_timetable))
+                    }
                 } else {
-                    Log.e("ERROR", "Timetable is empty")
+                    Log.e("ERROR", "Timetable not available in database")
 
                     // Geef een foutmelding
                     callback(context.getString(R.string.error_timetable))
                 }
-            } else {
-                Log.e("ERROR", "Timetable not available in database")
-
-                // Geef een foutmelding
-                callback(context.getString(R.string.error_timetable))
             }
         }
     }
