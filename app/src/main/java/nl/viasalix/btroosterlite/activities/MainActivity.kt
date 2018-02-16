@@ -23,9 +23,10 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigationAdapter
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import nl.viasalix.btroosterlite.R
 import nl.viasalix.btroosterlite.cup.CUPIntegration
@@ -46,14 +47,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        bottomNavigation = findViewById<AHBottomNavigation>(R.id.bottom_navigation)
+        bottomNavigation = findViewById(R.id.bottom_navigation)
 
-        val itemTimetable = AHBottomNavigationItem(getString(R.string.timetable), R.drawable.ic_schedule_black_24dp, R.color.colorBottomNavigationPrimary)
-        val itemCup = AHBottomNavigationItem(getString(R.string.CUP), R.drawable.ic_event_black_24dp, R.color.colorBottomNavigationPrimary)
-        val itemTestTimetable = AHBottomNavigationItem(getString(R.string.test_timetable), R.drawable.ic_school_black_24dp, R.color.colorBottomNavigationPrimary)
-        bottomNavigation!!.addItem(itemTimetable)
-        bottomNavigation!!.addItem(itemCup)
-        bottomNavigation!!.addItem(itemTestTimetable)
+        val tabColors: IntArray = intArrayOf(
+                ContextCompat.getColor(this, R.color.colorBottomNavigationPrimary),
+                ContextCompat.getColor(this, R.color.colorBottomNavigationPrimary),
+                ContextCompat.getColor(this, R.color.colorBottomNavigationPrimary))
+
+        val navigationAdapter = AHBottomNavigationAdapter(this, R.menu.bottom_navigation)
+        navigationAdapter.setupWithBottomNavigation(bottomNavigation, tabColors)
+
         bottomNavigation!!.defaultBackgroundColor = Color.parseColor("#FEFEFE")
         bottomNavigation!!.isBehaviorTranslationEnabled = false
         bottomNavigation!!.accentColor = Color.parseColor("#F63D2B")

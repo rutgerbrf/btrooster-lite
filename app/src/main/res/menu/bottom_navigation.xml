@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:icon="@drawable/ic_schedule_black_24dp"
+        android:title="@string/timetable" />
+    <item
+        android:icon="@drawable/ic_event_black_24dp"
+        android:title="@string/CUP" />
+    <item
+        android:icon="@drawable/ic_school_black_24dp"
+        android:title="@string/test_timetable" />
+</menu>
