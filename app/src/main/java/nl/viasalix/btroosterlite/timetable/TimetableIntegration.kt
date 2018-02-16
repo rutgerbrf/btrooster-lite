@@ -67,7 +67,8 @@ class TimetableIntegration(private var context: Context,
             queue.add(stringRequest)
         } else {
             val response = sharedPreferences.getString("t_indexes", null)
-            callback(response, false)
+            if (response != null)
+                callback(response, false)
         }
     }
 
