@@ -20,15 +20,15 @@ import nl.viasalix.btroosterlite.util.Util
 import org.jetbrains.anko.defaultSharedPreferences
 
 class ViewTimetableActivity : AppCompatActivity() {
-    var classSpinner: Spinner? = null
-    var locationSpinner: Spinner? = null
-    var weekSpinner: Spinner? = null
-    var etCode: EditText? = null
-    var btnView: Button? = null
-    var webView: WebView? = null
-    var saveCheckBox: CheckBox? = null
-    var locationValuesArray: Array<String> = arrayOf()
-    var availableWeeks: LinkedHashMap<Int, String> = linkedMapOf()
+    private var classSpinner: Spinner? = null
+    private var locationSpinner: Spinner? = null
+    private var weekSpinner: Spinner? = null
+    private var etCode: EditText? = null
+    private var btnView: Button? = null
+    private var webView: WebView? = null
+    private var saveCheckBox: CheckBox? = null
+    private var locationValuesArray: Array<String> = arrayOf()
+    private var availableWeeks: LinkedHashMap<Int, String> = linkedMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +75,7 @@ class ViewTimetableActivity : AppCompatActivity() {
                 defaultSharedPreferences.getString("location", "Goes"),
                 defaultSharedPreferences.getString("code", "12345"))
 
-        TimetableFragment.getIndexes(this, ttIntegration, {
+        TimetableFragment.getIndexes(ttIntegration, {
             TimetableFragment.handleIndexResponse(
                     this,
                     ttIntegration,
