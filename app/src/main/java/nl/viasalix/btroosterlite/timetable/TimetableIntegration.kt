@@ -172,7 +172,7 @@ class TimetableIntegration(private var context: Context,
                  * @return  map van headers
                  */
                 override fun getHeaders(): Map<String, String> =
-                        if (sendTokens) {
+                        if (sendTokens)
                             hashMapOf(
                                     CUPIntegration.Params.ClientKey.param to
                                             sharedPreferences.getString(
@@ -181,9 +181,9 @@ class TimetableIntegration(private var context: Context,
                                     CUPIntegration.Params.PreservationToken.param to
                                             sharedPreferences.getString(
                                                     "ci_preservationToken",
-                                                    "")
-                            )
-                        }
+                                                    ""))
+                        else
+                            hashMapOf()
             }
 
             queue.add(stringRequest)
