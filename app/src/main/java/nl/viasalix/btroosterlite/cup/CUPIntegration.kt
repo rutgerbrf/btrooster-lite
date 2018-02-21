@@ -261,8 +261,6 @@ class CUPIntegration(context: Context) {
                     )
         }
 
-        Log.d("PTOK", sharedPreferences.getString(keyPreservationToken, ""))
-
         queue.add(stringRequest)
     }
 

@@ -61,7 +61,6 @@ class TimetableIntegration(private var context: Context,
             val stringRequest = StringRequest(Request.Method.GET, url,
                     { response ->
                         sharedPreferences.edit().putString("t_indexes", response).apply()
-                        Log.d("or", response)
                         callback(response, true)
                     }) { error -> if (error.message != null) Log.e("ERROR", error.message) }
             queue.add(stringRequest)
@@ -146,7 +145,7 @@ class TimetableIntegration(private var context: Context,
                  */
 
                 val stringRequest = object : StringRequest(
-                        Request.Method.GET, buildURL(week!!, explicitType),
+                        Request.Method.GET, buildURL(week, explicitType),
                         Response.Listener<String> {
                             if (saveToDatabase) {
                                 if (recordExists(identifier)) {

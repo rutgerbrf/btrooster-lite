@@ -55,8 +55,6 @@ class CUPConfigFragment3 : Fragment(), Step {
         val name = defaultSharedPreferences.getString("cc_name", "")
 
         Singleton.cupIntegration!!.logIn(name, etPinCode!!.text.toString(), {
-            Log.d("it", it)
-
             if (it == "" || it == "Ok") {
                 tvErrorCode!!.visibility = View.INVISIBLE
                 tvErrorCode!!.visibility = View.INVISIBLE

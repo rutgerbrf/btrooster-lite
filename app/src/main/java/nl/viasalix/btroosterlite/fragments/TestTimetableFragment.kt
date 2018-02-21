@@ -165,7 +165,6 @@ class TestTimetableFragment : Fragment() {
                 val stringRequest = StringRequest(Request.Method.GET, url,
                         { response ->
                             sharedPreferences!!.edit().putString("tt_indexes", response).apply()
-                            Log.d("or", response)
                             handleIndexResponse(response)
                         }) { error -> if (error.message != null) Log.e("ERROR", error.message) }
 

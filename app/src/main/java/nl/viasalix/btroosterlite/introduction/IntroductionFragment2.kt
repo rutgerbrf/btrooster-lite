@@ -101,9 +101,6 @@ class IntroductionFragment2 : Fragment(), Step {
                         .apply()
 
                 if (rbG46!!.isChecked && location == "Goes") {
-                    Log.d("isChecked", rbG46!!.isChecked.toString())
-                    Log.d("location", location)
-
                     alert(getString(R.string.alert_cupintegration_text),
                             getString(R.string.alert_cupintegration_title)) {
                         yesButton {

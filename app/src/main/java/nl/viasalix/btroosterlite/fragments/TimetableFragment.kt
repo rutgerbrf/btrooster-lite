@@ -82,21 +82,25 @@ class TimetableFragment : Fragment() {
         when (item.itemId) {
             R.id.action_reload -> {
                 loadTimetable()
-                getIndexes(ttIntegration!!,
-                        {
-                            handleIndexResponse(activity,
-                                    ttIntegration!!,
-                                    weekSpinner!!,
-                                    it,
-                                    true,
-                                    {})
-                        },
-                        {
-                            getTimetable(defaultSharedPreferences.getInt(
-                                    "t_week",
-                                    currentWeekOfYear))
-                        })
-                return true
+                try {
+                    getIndexes(ttIntegration!!,
+                            {
+                                handleIndexResponse(activity,
+                                        ttIntegration!!,
+                                        weekSpinner!!,
+                                        it,
+                                        true,
+                                        {})
+                            },
+                            {
+                                getTimetable(defaultSharedPreferences.getInt(
+                                        "t_week",
+                                        currentWeekOfYear))
+                            })
+                    return true
+                } catch(e: IllegalArgumentException) {
+                    Log.e("ERROR", e.message)
+                }
             }
             R.id.action_settings -> {
                 val intent = Intent(activity, SettingsActivity::class.java)
@@ -349,10 +353,12 @@ class TimetableFragment : Fragment() {
                             if (editSharedPreferences) {
                                 val week = getKeyByIndex(availableWeeks, position)
 
-                                if (week != null)
-                                    sharedPreferences?.edit()?.putInt("t_week", week)?.apply()
-                                else
-                                    sharedPreferences?.edit()?.putInt("t_week", currentWeekOfYear)?.apply()
+                                if (sharedPreferences != null) {
+                                    if (week != null)
+                                        sharedPreferences.edit().putInt("t_week", week).apply()
+                                    else
+                                        sharedPreferences.edit().putInt("t_week", currentWeekOfYear).apply()
+                                }
                             }
 
                             callback()
