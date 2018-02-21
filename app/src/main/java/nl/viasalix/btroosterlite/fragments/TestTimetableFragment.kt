@@ -150,32 +150,30 @@ class TestTimetableFragment : Fragment() {
     }
 
     private fun getIndexes() {
-        doAsync {
-            if (online(activity)) {
-                val queue = Volley.newRequestQueue(activity)
-                val builder = Uri.Builder()
-                builder.scheme(MainActivity.SCHEME)
-                        .encodedAuthority(MainActivity.AUTHORITY)
-                        .appendPath("embed")
-                        .appendPath("ToetsroosterEmbedServlet")
-                        .appendQueryParameter("indexOphalen", "1")
-                        .appendQueryParameter("locatie", location)
-                val url = builder.build().toString()
+        if (online(activity)) {
+            val queue = Volley.newRequestQueue(activity)
+            val builder = Uri.Builder()
+            builder.scheme(MainActivity.SCHEME)
+                    .encodedAuthority(MainActivity.AUTHORITY)
+                    .appendPath("embed")
+                    .appendPath("ToetsroosterEmbedServlet")
+                    .appendQueryParameter("indexOphalen", "1")
+                    .appendQueryParameter("locatie", location)
+            val url = builder.build().toString()
 
-                val stringRequest = StringRequest(Request.Method.GET, url,
-                        { response ->
-                            sharedPreferences!!.edit().putString("tt_indexes", response).apply()
-                            handleIndexResponse(response)
-                        }) { error -> if (error.message != null) Log.e("ERROR", error.message) }
+            val stringRequest = StringRequest(Request.Method.GET, url,
+                    { response ->
+                        sharedPreferences!!.edit().putString("tt_indexes", response).apply()
+                        handleIndexResponse(response)
+                    }) { error -> if (error.message != null) Log.e("ERROR", error.message) }
 
-                queue.add(stringRequest)
-            } else {
-                val response = sharedPreferences!!.getString("tt_indexes", null)
-                handleIndexResponse(response)
+            queue.add(stringRequest)
+        } else {
+            val response = sharedPreferences!!.getString("tt_indexes", null)
+            handleIndexResponse(response)
 
-                if (responseList.isNotEmpty())
-                    getTestTimetable()
-            }
+            if (responseList.isNotEmpty())
+                getTestTimetable()
         }
     }
 

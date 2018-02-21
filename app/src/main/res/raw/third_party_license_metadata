@@ -10,35 +10,35 @@
 425:46 joda-time
 472:45 anko
 518:45 anko-design
-564:46 kotlin-stdlib-jdk7
-611:46 support-fragment
-658:46 support-core-utils
-705:46 support-media-compat
-752:46 support-core-ui
-799:46 support-compat
-846:46 support-annotations
-893:1558 RE2
-2452:1732 Protobuf Nano
-4185:1481 darts_clone
-5667:3182 PCRE
-8850:2500 zlib
-11351:11358 CCTZ
-22710:19442 ICU4C
-42153:243 tz database
-42397:1602 JSR 305
-44000:731 UTF
-44732:680 STL
-45413:11358 safeparcel
-56772:11342 flatbuffers
-68115:45 anko-sqlite
-68161:45 anko-sdk25
-68207:45 anko-sdk25-coroutines
-68253:45 anko-appcompat-v7
-68299:45 anko-support-v4
-68345:45 anko-appcompat-v7-coroutines
-68391:45 anko-appcompat-v7-commons
-68437:45 anko-support-v4-commons
-68483:45 anko-commons
+564:45 anko-sqlite
+610:45 anko-sdk25
+656:45 anko-sdk25-coroutines
+702:45 anko-appcompat-v7
+748:45 anko-support-v4
+794:45 anko-appcompat-v7-coroutines
+840:45 anko-appcompat-v7-commons
+886:45 anko-support-v4-commons
+932:45 anko-commons
+978:46 kotlin-stdlib-jdk7
+1025:46 support-fragment
+1072:46 support-core-utils
+1119:46 support-media-compat
+1166:46 support-core-ui
+1213:46 support-compat
+1260:46 support-annotations
+1307:1558 RE2
+2866:1732 Protobuf Nano
+4599:1481 darts_clone
+6081:3182 PCRE
+9264:2500 zlib
+11765:11358 CCTZ
+23124:19442 ICU4C
+42567:243 tz database
+42811:1602 JSR 305
+44414:731 UTF
+45146:680 STL
+45827:11358 safeparcel
+57186:11342 flatbuffers
 68529:45 anko-coroutines
 68575:46 kotlin-stdlib
 68622:46 runtime
