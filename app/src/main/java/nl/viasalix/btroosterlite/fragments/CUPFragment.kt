@@ -114,7 +114,9 @@ class CUPFragment : Fragment() {
                     activity!!.finish()
                 }
                 noButton {
-                    (activity!! as MainActivity).launchTimetableFragment()
+                    if (activity != null) {
+                        (activity!! as MainActivity).launchTimetableFragment()
+                    }
                 }
             }.show()
         }
