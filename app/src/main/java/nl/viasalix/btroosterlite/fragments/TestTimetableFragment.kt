@@ -190,7 +190,10 @@ class TestTimetableFragment : Fragment() {
                 weekSpinner!!.adapter = adapter
                 menuHasLoaded = true
 
-                weekSpinner!!.setSelection(sharedPreferences!!.getInt("tt_weekChange", 0))
+                val preferredSelection = sharedPreferences!!.getInt("tt_weekChange", 0)
+
+                if (weekSpinner!!.count > preferredSelection)
+                    weekSpinner!!.setSelection(preferredSelection)
 
                 weekSpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {

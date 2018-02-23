@@ -375,10 +375,11 @@ class TimetableFragment : Fragment() {
                                 sharedPreferences.getInt(
                                         "t_week",
                                         currentWeekOfYear))
-
                 if (indexToSet != null)
-                    weekSpinner.setSelection(indexToSet)
-                else
+                    if (weekSpinner.count > indexToSet)
+                        weekSpinner.setSelection(indexToSet)
+
+                if (weekSpinner.count > 2)
                     weekSpinner.setSelection(2)
             }
         }
