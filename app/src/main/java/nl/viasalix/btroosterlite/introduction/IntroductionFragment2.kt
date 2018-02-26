@@ -82,7 +82,7 @@ class IntroductionFragment2 : Fragment(), Step {
     override fun verifyStep(): VerificationError? {
         if (etCode!!.text.toString().isEmpty())
             return VerificationError("NO_CODE")
-        else if (!rbG13!!.isChecked && !rbG46!!.isChecked)
+        else if (!rbG13!!.isChecked && !rbG46!!.isChecked && !rbTeacher!!.isChecked)
             return VerificationError("NO_GRADE")
         else {
             if (TimetableIntegration.getType(etCode!!.text.toString()) != "unknown") {
