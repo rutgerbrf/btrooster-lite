@@ -328,14 +328,14 @@ class TimetableFragment : Fragment() {
                                 deleteUnusedTimetables: Boolean = false,
                                 callback: () -> Unit,
                                 editSharedPreferences: Boolean = true,
-                                availableWeeksCallback: (LinkedHashMap<Int, String>) -> Unit = {}) {
+                                onAvailableWeeksCallback: (LinkedHashMap<Int, String>) -> Unit = {}) {
             if (response != null) {
                 val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
 
                 val availableWeeks = TimetableIntegration.handleIndexResponse<Int, String>(response)
                 val parsedWeekNames = parseAvailableWeeks(activity.resources, availableWeeks)
 
-                availableWeeksCallback(availableWeeks)
+                onAvailableWeeksCallback(availableWeeks)
 
                 if (deleteUnusedTimetables)
                     ttIntegration.deleteUnusedTimetables(availableWeeks.keys.toList())
@@ -375,12 +375,13 @@ class TimetableFragment : Fragment() {
                                 sharedPreferences.getInt(
                                         "t_week",
                                         currentWeekOfYear))
-                if (indexToSet != null)
-                    if (weekSpinner.count > indexToSet)
-                        weekSpinner.setSelection(indexToSet)
 
-                if (weekSpinner.count > 2)
-                    weekSpinner.setSelection(2)
+                if (indexToSet != null) {
+                    if (weekSpinner.count > indexToSet)
+                        weekSpinner.setSelection(indexToSet, false)
+                } else if (weekSpinner.count > 2) {
+                    weekSpinner.setSelection(2, false)
+                }
             }
         }
     }
